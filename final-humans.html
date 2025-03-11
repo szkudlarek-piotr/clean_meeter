@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Meeter - portal dla wszystkich oprócz Amerykanów</title>
+        <link rel="stylesheet" href="final_humans.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            Baza danych spotkań
+        </header>
+        <div class="container">
+            <nav class="left-menu">
+            </nav>
+            <main class="content" id="main_content">
+                <div id="human_modal" style="display: none">
+                    <div id="topOfHumanModal">
+                        <div class="closingDiv" onclick="closeModal()">X</div>
+                    </div>
+                    <div id="restOfModal">
+                        <div id="leftModalMenu">
+                            <h1>Menu</h1>
+                        </div>
+                        <div id="placeForHumanInfo">
+
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+            <aside class="right-menu">
+                <!-- Right menu content goes here -->
+            </aside>
+        </div>
+    </body>
+    <script src="./dateToText.js"></script>
+    <script src="./createLeftMenu.js"></script>
+    <script>
+        createLeftMenu()
+        async function createHumanTiles() {
+            const humansQuery = await fetch("http://localhost:3000/get-humans")
+            const humansJson = await humansQuery.json()
+            const mainContent = document.getElementById("main_content")
+            for (human of humansJson) {
+                let createdHumanTile = document.createElement("div")
+                createdHumanTile.setAttribute("class", "human_tile")
+                let humanPhoto = human.photoDir
+                let humanImageElement = document.createElement("img")
+                humanImageElement.setAttribute("src", humanPhoto)
+                humanImageElement.setAttribute("class", "person_photo")
+                createdHumanTile.appendChild(humanImageElement)
+                mainContent.appendChild(createdHumanTile)
+
+                let humanNameDiv = document.createElement("div")
+                humanNameDiv.setAttribute("class", "nameDiv")
+                humanNameDiv.innerText = human.name
+                createdHumanTile.appendChild(humanNameDiv)
+
+                let visitsNumberDiv = document.createElement("div")
+                visitsNumberDiv.setAttribute("class", "visits_number")
+                visitsNumberDiv.innerText = `Liczba wizyt: ${human.visits}`
+                createdHumanTile.appendChild(visitsNumberDiv)
+
+                let meetingsNumberDiv = document.createElement("div")
+                meetingsNumberDiv.setAttribute("class", "visits_number")
+                meetingsNumberDiv.innerText = `Liczba spotkań: ${human.meetings}`
+                createdHumanTile.appendChild(meetingsNumberDiv)
+
+                let cliquePhotoDiv = document.createElement("img")
+                cliquePhotoDiv.setAttribute("class", "clique_photo")
+                cliquePhotoDiv.setAttribute("title", human.cliqueName)
+                cliquePhotoDiv.setAttribute("src", human.cliquePhoto)
+                createdHumanTile.appendChild(cliquePhotoDiv)
+
+                if (human.quote != null) {
+                    let quoteDiv = document.createElement("div")
+                    quoteDiv.setAttribute("class", "golden_quote")
+                    quoteDiv.innerHTML = human.quote
+                    createdHumanTile.appendChild(quoteDiv)
+                }
+
+            }
+        }
+        createHumanTiles()
+    </script>
+</html>

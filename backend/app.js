@@ -1,0 +1,74 @@
+import express from 'express'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+import getFinalHumans from './getFinalHumans.js'
+import addClique from './addClique.js'
+import getHumanFromSubstring from './getHumanFromNameSubstring.js'
+import getCliquesFromSubstring from './getCliquesFromSubstring.js'
+const app = express()
+app.use(cors())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use((err,req,res,next) => {
+    console.error(err.stack)
+    res.status(500).send('something broke')
+})
+
+app.get('/get-humans', async (req, res) => {
+    const sendedArray = await getFinalHumans()
+    res.send(sendedArray)
+})
+
+app.get('/get-cliques-from-subs', async (req, res) => {
+    const deliveredSubstring = req.query.cliqueInput
+    const returnedArray = await getCliquesFromSubstring(deliveredSubstring)
+    res.send(returnedArray)
+})
+
+app.get('/get-human-from-substring', async (req, res) => {
+    try {
+        const deliveredString = req.query.name_fragment;
+        if (!deliveredString) {
+            return res.status(400).send({ error: "name_fragment is required" });
+        }
+        const arrayOfPeople = await getHumanFromSubstring(deliveredString);
+        res.send(arrayOfPeople);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+});
+
+app.post('/add-clique', async(req, res) => {
+    const cliqueName = req.query.clique_name
+    const cliquePhotoLink = req.query.clique_photo_link
+    let returnedMessage
+    try {
+        await addClique(cliqueName, cliquePhotoLink)
+        returnedMessage= "Pomyślnie dodano klikę!"
+    }
+    catch (error) {
+        returnedMessage = error
+    }
+    res.send(returnedMessage)
+})
+
+app.post('/save-quote', async(req, res) => {
+    const authorId = req.query.author
+    const quote = req.query.quote
+    const isPublic = req.query.ispublic
+    try {
+        const postQuoteReq = await addGoldenQuote(authorId, quote, isPublic)
+        res.status(200).send("Good")
+    }
+    catch (error) {
+        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+            res.status(400).send("Nie udało się")
+        }
+    }
+})
+
+app.listen(3000, () => {
+    console.log('server is running on port 3000')
+})
