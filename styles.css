@@ -144,27 +144,41 @@ a {
 }
 
 #cliquesSuggestionsInAddHuman {
-    width: 80%
+    width: 80%;
+    border: 1px solid black;
+    margin-left: 10%;
+    margin-left: 10%;
 }
-
+#cliquesSuggestionsInAddHuman>input {
+    width: calc(100% - 8px);
+}
 #cliqueInputDiv {
    margin-left: auto;
    margin-right: auto;
 }
 
+.cliqueSuggestion {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    border-bottom: 1px solid #010101;
+}
+
 .cliqueSuggestion>.nameOfClique {
     font-size: 24px;
-    width:90%;
+    width:95%;
     margin-left: 2%;
     text-align: left;
 }
 .cliqueSuggestion>.photoOfClique {
     height: 30px;
+    width: 5%;
     margin-top: auto;
     margin-bottom: auto;
 }
 .photoOfClique>img {
-    height: 26px;
+    height: 30px;
+    align-items: center;
 }
 .cliqueSuggestion:hover {
     font-weight: 700;

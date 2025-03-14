@@ -18,6 +18,7 @@
             <nav class="left-menu">
             </nav>
             <div id="main">
+
                 <form>
                     <h2 class="inputHeader">Imię osoby</h2>
                     <input type="text" id="addedHumanNameInput" placeholder="Imię..."/>
@@ -26,9 +27,9 @@
                     <input type="text" id="addedHumanSurnameInput" placeholder="Nazwisko..."/>
                     
                     <h2 class="inputHeader">Płeć</h2>
-                    <input type="radio" name="sex" id="male" value="male">
+                    <input type="radio" name="sex" id="male" value="M">
                     <label for="male">Mężczyzna</label>
-                    <input type="radio" name="sex" id="female" value="female">
+                    <input type="radio" name="sex" id="female" value="F">
                     <label for="female">Kobieta</label>
                     
                     <h2 class="inputHeader">Gdzie mieszka?</h2>
@@ -36,14 +37,15 @@
                     
                     <h2 class="inputHeader">Klika</h2>
                     <div id="cliquesSuggestionsInAddHuman">
-                    <input type="text" id="cliqueInput" placeholder="Skąd znasz?" onkeyup="getSuggestedCliques()"/>
+                        <input type="hidden" id="cliqueIdInput" name="cliqueId">
+                        <input type="text" id="cliqueInput" placeholder="Skąd znasz?" onkeyup="getSuggestedCliques()"/>
                     </div>
                     
                     <h2 class="inputHeader">Link do zdęcia</h2>
                     <input type="text" id="photoInput" placeholder="Wklej link do zdjęcia z Wikipedii"/> <br/><br/><br/>
                     
-                    <button>Dodaj osobę!</button>
-                    </div>
+                    <button onclick="addHuman(event)">Dodaj osobę!</button>
+                
                 
                 </form>
 
@@ -54,43 +56,15 @@
         </div>
     </body>
     <script src="createLeftMenu.js" ></script>
-    <script src="add-human.js" ></script>
+    <script src="add_humans_functions/add-human.js" ></script>
+    <script src="add_humans_functions/getSuggestedCliques.js"></script>
+    <script src="add_humans_functions/setCliqueInputValue.js"></script>
     <script>
         createLeftMenu()
-        function setCliqueInputValue(cliqueId) {
-            let cliqueInputElement = document.getElementById("cliqueInput")
-            cliqueInputElement.setAttribute("value", cliqueId)
-        }
+
         function removeCliquessSuggestions() {
             document.querySelectorAll(".cliqueSuggestion").forEach(clique => clique.remove())
         }
-        async function getSuggestedCliques() {
-            removeCliquessSuggestions()
-            const deliveredSubstring = document.getElementById("cliqueInput").value
-            let cliquesSuggestions = document.getElementById("cliquesSuggestionsInAddHuman")
-            if (deliveredSubstring.length > 1) {
-                console.log(deliveredSubstring)
-                const cliqueGetReq = await fetch(`http://localhost:3000/get-cliques-from-subs?cliqueInput=${deliveredSubstring}`)
-                let suggestedCliquesJson = await cliqueGetReq.json()
-                console.log(suggestedCliquesJson)
-                for (let clique of suggestedCliquesJson) {
-                    let createdCliqueDiv = document.createElement("div")
-                    createdCliqueDiv.setAttribute("class", "cliqueSuggestion")
-                    createdCliqueDiv.setAttribute("onclick", clique.id)
-                    cliquesSuggestionsInAddHuman.appendChild(createdCliqueDiv)
 
-                    let nameOfCliqueDiv = document.createElement("div")
-                    nameOfCliqueDiv.setAttribute("class", "nameOfClique")
-                    nameOfCliqueDiv.innerText = clique.name
-                    createdCliqueDiv.appendChild(nameOfCliqueDiv)
-
-                    let cliquePhotoElement = document.createElement("div")
-                    cliquePhotoElement.setAttribute("class", "photoOfClique")
-                    cliquePhotoElement.innerHTML = `<img src=${clique.photoDir} />`
-                    createdCliqueDiv.appendChild(cliquePhotoElement)
-
-                }
-            }
-        }
     </script>
 </html>

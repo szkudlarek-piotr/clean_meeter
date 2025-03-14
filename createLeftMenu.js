@@ -1,8 +1,9 @@
 async function createLeftMenu() {
     let leftMenu = document.getElementsByClassName("left-menu")[0]
-    const menuButtonsArray = [{"id":"mainPage","text": "Strona główna", "href": "index.html"}, {"id":"addNewHuman","href": "add_human.html", "text": "Dodaj nowego człowieka"},
+    const menuButtonsArray = [{"id":"mainPage","text": "Strona główna", "href": "index.html"}, 
+        {"id":"addNewHuman","href": "add-human.html", "text": "Dodaj nowego człowieka"},
         {"id": "calendar","href": "new_calendar.html", "text": "Zobacz kalendarz"},
-         {"id": "showAllCliques","href": "all_cliques.html", "text": "Pokaż wszystkie kliki"},
+         {"id": "showAllCliques","href": "all-cliques.html", "text": "Pokaż wszystkie kliki"},
           {"id": "showAllPeople","href": "final-humans.html", "text": "Zobacz wszystkich ludzi"}, 
           {"id": "addNewMeeting", "href": "add_meeting.html", "text": "Dodaj nowe spotanie"}, 
           {"id": "addNewClique", "href": "add-clique.html", "text": "Dodaj nową klikę"}, 

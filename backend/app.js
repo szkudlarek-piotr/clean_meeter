@@ -3,8 +3,10 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import getFinalHumans from './getFinalHumans.js'
 import addClique from './addClique.js'
+import addHuman from './addHuman.js'
 import getHumanFromSubstring from './getHumanFromNameSubstring.js'
 import getCliquesFromSubstring from './getCliquesFromSubstring.js'
+import getCliquesWithHumans from './getCLiquesWithHumans.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -20,11 +22,17 @@ app.get('/get-humans', async (req, res) => {
     res.send(sendedArray)
 })
 
-app.get('/get-cliques-from-subs', async (req, res) => {
+app.get('/get-cliques-from-subs', async(req, res) => {
     const deliveredSubstring = req.query.cliqueInput
     const returnedArray = await getCliquesFromSubstring(deliveredSubstring)
     res.send(returnedArray)
 })
+
+app.get('/get-all-cliques', async(req,res) => {
+    const cliquesData = await getCliquesWithHumans()
+    res.send(cliquesData)
+})
+
 
 app.get('/get-human-from-substring', async (req, res) => {
     try {
@@ -39,6 +47,23 @@ app.get('/get-human-from-substring', async (req, res) => {
         res.status(500).send({ error: "Internal Server Error" });
     }
 });
+
+app.post('/add-human', async(req, res) => {
+    const name = req.query.name
+    const surname = req.query.surname
+    const city = req.query.city
+    const photoLink = req.query.photoLink
+    const cliqueId = req.query.cliqueId
+    const gender = req.query.gender
+    try {
+        const addStatus = await addHuman(name, surname, gender, city, cliqueId, photoLink)
+        res.send(addStatus)
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+})
 
 app.post('/add-clique', async(req, res) => {
     const cliqueName = req.query.clique_name
