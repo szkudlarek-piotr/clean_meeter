@@ -1,4 +1,5 @@
 /backend/node_modules/
 /backend/functionalPhotos/
 /backend/cliques_photos/
+/backend/photos/
 .env
