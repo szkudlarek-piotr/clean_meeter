@@ -105,10 +105,8 @@
                     ispublic: isPublicValue
                 }
                 const queryString = new URLSearchParams(queryParams).toString()
-                console.log(queryString)
                 const addQuoteReq = await fetch(`http://localhost:3000/save-quote?${queryString}`, {method:"POST"})
                 const responseJson = await addQuoteReq.json()
-                console.log(responseJson)
                 if (responseJson.affectedRows > 0) {
                     alert("Udało się dodać cytat!")
                 }
