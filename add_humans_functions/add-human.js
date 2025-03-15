@@ -6,7 +6,6 @@ async function addHuman(event) {
     const city = document.getElementById("cityInput").value
     const photoLink = document.getElementById("photoInput").value
     const cliqueId = document.getElementById("cliqueIdInput").value
-    console.log(`Id kliki to ${cliqueId}.`)
     const reqParams = {
         name: addedHumanName,
         surname: addedHumanSurname,
