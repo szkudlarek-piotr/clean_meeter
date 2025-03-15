@@ -30,6 +30,9 @@ export default async function addHuman(name, surname, gender, city, cliqueId, ph
     else if (photoExtension == "png") {
         addedPhotoName = `${addedHumanID.toString()}.png`
     }
+    else {
+        addedPhotoName = `${addedHumanID.toString()}.jpg`
+    }
     const downloadPhotoDir = path.join(__dirname, "photos", addedPhotoName)
     const response = await fetch(photoLink)
     if (!response.ok) throw new Error(`Błąd pobierania obrazu: ${response.statusText}`)
