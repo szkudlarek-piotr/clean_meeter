@@ -24,9 +24,9 @@
                     <h2 class="inputHeader">Czas trwania wizyty</h2>
                     <input type="number" value="1" id="visitDaysNumber"/>
                     <h2 class="inputHeader">Krótki opis wizyty</h2>
-                    <input type="text" id="inputShortDescInput"/>
+                    <input type="text" id="shortDescInput"/>
                     <h2 class="inputHeader">Długi opis wizyty</h2>
-                    <textarea id="inputLongDescInput" rows=20 cols=95></textarea>
+                    <textarea id="longDescInput" rows=20 cols=120></textarea>
                     <h2 class="inputHeader">Wybierz gości</h2>
                     <input type="text" id="searchedHumanInput" onkeyup="createGuestsTilesFromName()" placeholder="Wyszukaj gościa..."/>
                     <div id="suggestedGuestsContainer">
@@ -36,7 +36,7 @@
                     <div id="chosenGuestsContainer">
 
                     </div>
-                    <button>Dodaj wizytę!</button>
+                    <button onclick="addVisitWithGuests(event)">Dodaj wizytę!</button>
                 </form>
 
             </div>
@@ -62,24 +62,97 @@
                 createHumanTiles(guestCandidates)
             }
         }
+        function createSingleHumanTile(singleHumanJson, containerElementId, withClosingCross=false, withAddingToChosen=false) {
+            let newHumanTile = document.createElement("div")
+            let containerElement = document.getElementById(containerElementId)
+            let chosenGuestsContainer = document.getElementById("chosenGuestsContainer")
+            
+            if (!withClosingCross) {
+                newHumanTile.setAttribute("id", `humanTile-${singleHumanJson.id}`)
+                newHumanTile.setAttribute("class", "human_tile_in_add_visit")
+            }
+
+            if (withAddingToChosen) {
+                newHumanTile.setAttribute("onclick", `createSingleHumanTile(${JSON.stringify(singleHumanJson)}, 'chosenGuestsContainer', true, false)`)
+            }
+
+            containerElement.appendChild(newHumanTile)
+
+            if (withClosingCross == true) {
+                let humanTileId = `removableHuman-${singleHumanJson.id}`
+                newHumanTile.setAttribute("id", humanTileId)
+                let closingDiv = document.createElement("div")
+                closingDiv.setAttribute("class", "closingDiv")
+                closingDiv.innerText = "X"
+                closingDiv.setAttribute("onclick", `removeHumanFromChosen(${singleHumanJson.id})`)
+                newHumanTile.setAttribute("class", "chosen_human_tile")
+                newHumanTile.appendChild(closingDiv)
+
+            }
+
+            let humanPhoto = document.createElement("img")
+            humanPhoto.setAttribute("src", singleHumanJson.photoDir)
+            humanPhoto.setAttribute("class", "person_photo")
+            newHumanTile.appendChild(humanPhoto)
+
+            let humanName = document.createElement("div")
+            humanName.setAttribute("class", "nameDiv")
+            humanName.innerText = singleHumanJson.name
+            newHumanTile.appendChild(humanName)
+        }
+        function removeHumanFromChosen(humanId) {
+            let elementToRemoveId = `removableHuman-${humanId}`
+            let elementToRemove = document.getElementById(elementToRemoveId)
+            elementToRemove.remove()
+        }
         function createHumanTiles(arrayOfHumans) {
             let suggestedGuestsContainer = document.getElementById("suggestedGuestsContainer")
             for (human of arrayOfHumans) {
-                    let newHumanTile = document.createElement("div")
-                    newHumanTile.setAttribute("class", "human_tile_in_add_visit")
-                    newHumanTile.setAttribute("id", `humanTile-${human.id}`)
-                    suggestedGuestsContainer.appendChild(newHumanTile)
-
-                    let guestPhoto = document.createElement("img")
-                    guestPhoto.setAttribute("src", human.photoDir)
-                    guestPhoto.setAttribute("class", "person_photo")
-                    newHumanTile.appendChild(guestPhoto)
-
-                    let guestName = document.createElement("div")
-                    guestName.setAttribute("class", "nameDiv")
-                    guestName.innerText = human.name
-                    newHumanTile.appendChild(guestName)
+                    createSingleHumanTile(human, "suggestedGuestsContainer", false, true)
                 }
+        }
+        async function addVisitWithGuests(event) {
+            event.preventDefault()
+            const visitDate = document.getElementById("visitDateInput").value
+            const visitDuration = document.getElementById("visitDaysNumber").value
+            const shortDesc = document.getElementById("shortDescInput").value
+            const longDesc = document.getElementById("longDescInput").value
+            const guestsArray = document.querySelectorAll("div.chosen_human_tile")
+            if (guestsArray.length > 0) {
+                const visitParams = {
+                    date: visitDate,
+                    duration: visitDuration,
+                    shortDesc: shortDesc,
+                    longDesc: longDesc
+                }
+                const queryString = new URLSearchParams(visitParams).toString()
+                const addVisitQueryAdress = `http://localhost:3000/add-visit?${queryString}`
+                try {
+                    const addVisitQuery = await fetch(addVisitQueryAdress, {method: "POST"})
+                    const addVisitJson = await addVisitQuery.json()
+                    const addedVisitId = addVisitJson.insertId
+                    
+                    for (let guest of guestsArray) {
+                        let chosenHumanId = guest.getAttribute("id").replace("removableHuman-", "")
+                        try {
+                            const visitGuestResponse = await fetch(`http://localhost:3000/add-visit-guest?visitId=${addedVisitId}&guestId=${chosenHumanId}`, {method:"POST"})
+                            const visitGuestJson = await visitGuestResponse.json()
+                            console.log(visitGuestJson)
+                        }
+                        catch (error) {
+                            console.log(error)
+                        }      
+                    }
+                }
+                catch(error) {
+                    console.log(error)
+                }
+            }
+            else {
+                alert("Spotkanie można dodać dopiero po dodaniu gości.")
+            }
+
+
         }
     </script>
 </html>

@@ -5,9 +5,11 @@ import getFinalHumans from './getFinalHumans.js'
 import addClique from './addClique.js'
 import addHuman from './addHuman.js'
 import addQuote from './addQuoteBackend.js'
+import addVisitGuest from './addVisitGuest.js'
 import getHumanFromSubstring from './getHumanFromNameSubstring.js'
 import getCliquesFromSubstring from './getCliquesFromSubstring.js'
 import getCliquesWithHumans from './getCLiquesWithHumans.js'
+import addVisit from './addVisitBackend.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -64,6 +66,28 @@ app.post('/add-human', async(req, res) => {
         console.error(error);
         res.status(500).send({ error: "Internal Server Error" });
     }
+})
+
+app.post('/add-visit', async(req, res) => {
+    const date = req.query.date
+    const duration = req.query.duration
+    const shortDesc = req.query.shortDesc
+    const longDesc = req.query.longDesc
+    try {
+        const visitAddReq = await addVisit(date, duration, shortDesc, longDesc)
+        console.log(visitAddReq)
+        res.send(visitAddReq) 
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.post('/add-visit-guest', async(req, res) => {
+    const visitId = req.query.visitId
+    const guestId = req.query.guestId
+    const visitGuestReq = await addVisitGuest(visitId, guestId)
+    res.send(visitGuestReq)
 })
 
 app.post('/add-clique', async(req, res) => {
