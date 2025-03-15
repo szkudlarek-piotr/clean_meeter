@@ -39,7 +39,7 @@
                     <label for="notPublicQuote">Nie</label>
                     <br/><br/>
                     
-                    <button onclick="addQuote(event)">Dodaj cytat!</button>
+                    <button onclick="addQuote()">Dodaj cytat!</button>
                 
                 
                 </form>
@@ -56,6 +56,7 @@
         function cleanQuoteAuthorsSuggestions() {
             document.querySelectorAll(".quoteAuthorSuggestion").forEach(author => author.remove())
         }
+
         async function getSuggestedHumans() {
             cleanQuoteAuthorsSuggestions()
             let humanInputValue = document.getElementById("quoteAuthorInput").value
@@ -89,8 +90,7 @@
             quoteAuthorIdInput.setAttribute("value", authorId)
             cleanQuoteAuthorsSuggestions()
         }
-        async function addQuote(event) {
-            event.preventDefault()
+        async function addQuote() {
             let authorId = document.getElementById("quoteAuthorIdInput").value
             let quoteText = document.getElementById("quoteTextarea").value
             let isPublicChoice = document.querySelector(`input[name="isPublic"]:checked`)
@@ -102,13 +102,14 @@
                 let queryParams = {
                     authorId: authorId,
                     quote: quoteText,
-                    isPublic: isPublicValue
+                    ispublic: isPublicValue
                 }
                 const queryString = new URLSearchParams(queryParams).toString()
                 console.log(queryString)
                 const addQuoteReq = await fetch(`http://localhost:3000/save-quote?${queryString}`, {method:"POST"})
                 const responseJson = await addQuoteReq.json()
-                if (responseJson > 0) {
+                console.log(responseJson)
+                if (responseJson.affectedRows > 0) {
                     alert("Udało się dodać cytat!")
                 }
                 else {
