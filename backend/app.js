@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import getFinalHumans from './getFinalHumans.js'
 import addClique from './addClique.js'
 import addHuman from './addHuman.js'
+import addQuote from './addQuoteBackend.js'
 import getHumanFromSubstring from './getHumanFromNameSubstring.js'
 import getCliquesFromSubstring from './getCliquesFromSubstring.js'
 import getCliquesWithHumans from './getCLiquesWithHumans.js'
@@ -80,17 +81,15 @@ app.post('/add-clique', async(req, res) => {
 })
 
 app.post('/save-quote', async(req, res) => {
-    const authorId = req.query.author
+    const authorId = req.query.authorId
     const quote = req.query.quote
     const isPublic = req.query.ispublic
     try {
-        const postQuoteReq = await addGoldenQuote(authorId, quote, isPublic)
-        res.status(200).send("Good")
+        const postQuoteReq = await addQuote(authorId, quote, isPublic)
+        res.status(200).send(postQuoteReq)
     }
     catch (error) {
-        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-            res.status(400).send("Nie udało się")
-        }
+        res.send(error)
     }
 })
 
