@@ -10,6 +10,8 @@ import getHumanFromSubstring from './getHumanFromNameSubstring.js'
 import getCliquesFromSubstring from './getCliquesFromSubstring.js'
 import getCliquesWithHumans from './getCLiquesWithHumans.js'
 import addVisit from './addVisitBackend.js'
+import addMeeting from './addMeetingBackend.js'
+import addMettingHuman from './addMeetingHuman.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -75,7 +77,6 @@ app.post('/add-visit', async(req, res) => {
     const longDesc = req.query.longDesc
     try {
         const visitAddReq = await addVisit(date, duration, shortDesc, longDesc)
-        console.log(visitAddReq)
         res.send(visitAddReq) 
     }
     catch (error) {
@@ -86,8 +87,40 @@ app.post('/add-visit', async(req, res) => {
 app.post('/add-visit-guest', async(req, res) => {
     const visitId = req.query.visitId
     const guestId = req.query.guestId
-    const visitGuestReq = await addVisitGuest(visitId, guestId)
-    res.send(visitGuestReq)
+    try {
+        const visitGuestReq = await addVisitGuest(visitId, guestId)
+        res.send(visitGuestReq)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.post('/add-meeting', async(req, res) => {
+    const date = req.query.date
+    const place = req.query.place
+    const shortDesc = req.query.shortDesc
+    const longDesc = req.query.longDesc
+    try {
+        const meetingAddReq = await addMeeting(date, place, shortDesc, longDesc)
+        console.log(meetingAddReq)
+        res.send(meetingAddReq) 
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.post('/add-meeting-human', async(req, res) => {
+    const meetingId = req.query.meetingId
+    const humanId = req.query.humanId
+    try {
+        const insertQuery = await addMettingHuman(meetingId, humanId)
+        res.send(insertQuery)
+    }
+    catch(error) {
+        res.send(error)
+    }
 })
 
 app.post('/add-clique', async(req, res) => {

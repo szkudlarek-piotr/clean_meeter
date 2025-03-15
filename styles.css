@@ -58,7 +58,7 @@ aside.right-menu {
 .left_option:hover {
     font-weight: 600;
 }
-.human_tile_in_add_visit, .chosen_human_tile {
+.human_tile_in_add_visit, .chosen_human_tile, .human_tile_in_add_human {
     width: 26%;
     margin-top: 40px;
     border-radius: 35px;
@@ -68,9 +68,10 @@ aside.right-menu {
     text-align: center;
     border: 1px solid black;
 }
-.human_tile_in_add_visit:hover {
+.human_tile_in_add_visit:hover, .human_tile_in_add_human:hover, .chosen_human_tile:hover {
     background-color: red;
 }
+
 .human_tile {
     width: 26%;
     margin-bottom: 40px;
@@ -293,7 +294,7 @@ a {
 .closingDiv:hover {
     cursor: pointer;
 }
-#chosenGuestsContainer {
+#chosenGuestsContainer, #suggestedHumansContainer, #chosenHumansContainer {
     display: flex;
     flex-wrap: wrap;
     min-height: 300px;
