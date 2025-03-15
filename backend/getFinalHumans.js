@@ -19,7 +19,7 @@ export default async function getFinalHumans(){
         const idAsString = human.id.toString()
         const humanName = human.full_name
         const humanPhotoDir = getHumanPhotoDir(idAsString)
-        const cliquePhotoDir = getCliquePhoto(human.clique_name)
+        const cliquePhotoDir = getCliquePhoto(human.clique_id)
         const newDict = {"name": humanName, "photoDir": humanPhotoDir, "cliqueName": human.clique_name, "cliquePhoto": cliquePhotoDir, "visits": human.visit_c, "meetings": human.others_count, "quote": human.quote, "id": human.id.toString()}
         returnedArr.push(newDict)
     }
