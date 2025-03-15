@@ -17,7 +17,7 @@
         <div class="container">
             <nav class="left-menu">
             </nav>
-            <div id="main">
+            <div id="main-flex">
 
             </div>
             <aside class="right-menu">
@@ -26,13 +26,44 @@
         </div>
     </body>
     <script src="createLeftMenu.js" ></script>
-    <script src="add-human.js" ></script>
     <script>
         createLeftMenu()
         async function getAllCliques() {
+            let mainElement = document.getElementById("main-flex")
             const cliquesReq = await fetch("http://localhost:3000/get-all-cliques")
             const cliquesJson = await cliquesReq.json()
-            console.log(cliquesJson)
+            for (let cliqueId in cliquesJson) {
+                const singleCliqueJson = cliquesJson[cliqueId]
+                console.log(singleCliqueJson)
+                let newCliqueDiv = document.createElement("div")
+                newCliqueDiv.setAttribute("class", "clique_div")
+                newCliqueDiv.id = `clique_div_${cliqueId}`
+                mainElement.appendChild(newCliqueDiv)
+
+                let createdImageElement = document.createElement("img")
+                createdImageElement.setAttribute("src", singleCliqueJson["cliquePhoto"])
+                createdImageElement.setAttribute("class", "clique_photo_in_all_cliques")
+                newCliqueDiv.appendChild(createdImageElement)
+
+                let cliqueNameDiv = document.createElement("div")
+                cliqueNameDiv.setAttribute("class","clique_name_in_clique_div")
+                cliqueNameDiv.innerText = singleCliqueJson["cliqueName"]
+                newCliqueDiv.appendChild(cliqueNameDiv)
+
+                if (singleCliqueJson["members"].length > 0) {
+                    let humansContainerInCliqueDiv = document.createElement("div")
+                    humansContainerInCliqueDiv.setAttribute("class", "humansContainerInCliqueDiv")
+                    newCliqueDiv.appendChild(humansContainerInCliqueDiv)
+                    for (let human of singleCliqueJson["members"]) {
+                        let humanInCliqueDiv = document.createElement("img")
+                        humanInCliqueDiv.setAttribute("class", "humanInCliqueDiv")
+                        humanInCliqueDiv.setAttribute("src", human["humanPhotoDir"])
+                        humanInCliqueDiv.setAttribute("title", human["humanName"])
+                        humansContainerInCliqueDiv.appendChild(humanInCliqueDiv)
+                    }
+                }
+            }
         }
+        getAllCliques()
     </script>
 </html>
