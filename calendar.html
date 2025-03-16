@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Meeter - portal dla wszystkich oprócz Amerykanów</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            Baza danych spotkań
+        </header>
+        <div class="container">
+            <nav class="left-menu">
+            </nav>
+            <div id="main">
+
+            </div>
+            <aside class="right-menu">
+                <!-- Right menu content goes here -->
+            </aside>
+        </div>
+    </body>
+    <script src="createLeftMenu.js" ></script>
+    <script>
+
+        function makeCalendar() {
+            const startDay = new Date("01/01/2025")
+            const lastDay = new Date("12/31/2025")
+            let daysCounter = 0
+            const monthJson = {0: "Styczeń", 1:"Luty", 2: "Marzec", 3: "Kwiecień", 4: "Maj", 5: "Czerwiec", 6:"Lipiec", 7: "Sierpień", 8:"Wrzesień", 9:"Październik", 10: "Listopad", 11:"Grudzień"}
+            const weekdaysArray = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
+            const trimDays = weekdaysArray.map((nameOfWeek) => nameOfWeek.substring(0,3) + ".")
+            let main_content = document.getElementById("main")
+            let containerForCalendar = document.createElement("div")
+            containerForCalendar.setAttribute("class", "calendarContainer")
+            main_content.appendChild(containerForCalendar)
+            for (let day = startDay; day <= lastDay; day.setDate(day.getDate() + 1)) {
+                let addedDayRectangle = document.createElement("div")
+                addedDayRectangle.setAttribute("class", "dayRectangle")
+                const dayOfMonth = day.getDate().toString()
+                if (dayOfMonth == 1) {
+                    let numberOfGhostDays = 6
+                    containerForCalendar.innerHTML += `<h2>${monthJson[day.getMonth()]} ${day.getFullYear()}</h2>`
+                    for (const name of trimDays) {
+                        let nameOfWeekdayDiv = document.createElement("div")
+                        nameOfWeekdayDiv.setAttribute("class", "nameOfWeekdayDiv")
+                        nameOfWeekdayDiv.innerHTML = name
+                        containerForCalendar.appendChild(nameOfWeekdayDiv)
+                    }
+                    const dayOfWeek = day.getDay()
+                    if (dayOfWeek != 0) {
+                        numberOfGhostDays = dayOfWeek - 1
+                    }
+                    for (let i = 0; i < numberOfGhostDays; i++) {
+                        let ghostDayToAdd = document.createElement("div")
+                        ghostDayToAdd.setAttribute("class", "ghostDayRectangle")
+                        containerForCalendar.appendChild(ghostDayToAdd)
+                    }
+                }
+                const startOfMonth = monthJson[day.getMonth()].substring(0, 3)
+                let thing_to_write = `${dayOfMonth} ${startOfMonth}`
+                let date_id = `${dayOfMonth}_${startOfMonth}_${day.getFullYear()}`
+                addedDayRectangle.innerHTML = thing_to_write
+
+                addedDayRectangle.setAttribute("id", date_id)
+                containerForCalendar.appendChild(addedDayRectangle)
+            }
+        }
+        createLeftMenu()
+        makeCalendar()
+    </script>
+</html>
