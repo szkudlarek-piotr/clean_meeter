@@ -326,7 +326,6 @@ a {
     font-family: cursive;
     font-size: 14px;
 }
-
 input {
     height: 20px;
 }
@@ -337,4 +336,66 @@ h2 .inputHeader {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
+}
+
+.calendarContainer {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+.dayRectangle {
+    width: 11%;
+    display: flex;
+    background-color: antiquewhite;
+    align-items: center;
+    justify-content: center;
+    margin-left: 2%;
+    aspect-ratio: 1/1;
+    border: 2px solid black;
+    margin-bottom: 10px;
+    border-radius: 5%;
+}
+.ghostDayRectangle {
+    width: calc(11% + 4px);
+    margin-left: 2%;
+    aspect-ratio: 1/1;
+    margin-bottom: 10px;
+}
+.calendarContainer>h2 {
+    width: 100%;
+}
+.nameOfWeekdayDiv {
+    width: 11% ;
+    border: 2px solid black;
+    margin-left: 2%;
+    margin-bottom: 10px;
+    aspect-ratio: 3/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+}
+.slider {
+    width: 80%;
+}
+.slider>img {
+    width: 100%;
+    margin-top: 10%;
+    border-radius: 3px;
+}
+#weddingCharactersDiv {
+    display: flex;
+    justify-content: space-evenly;
+}
+.weddingCharacter {
+    width: 30%;
+}
+.weddingCharacter>img {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+    border-radius: 10px;
+    border: 1px solid black;
 }
