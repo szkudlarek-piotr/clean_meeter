@@ -12,6 +12,7 @@ import getCliquesWithHumans from './getCLiquesWithHumans.js'
 import addVisit from './addVisitBackend.js'
 import addMeeting from './addMeetingBackend.js'
 import addMettingHuman from './addMeetingHuman.js'
+import addWedding from './addWedding.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -144,6 +145,26 @@ app.post('/save-quote', async(req, res) => {
     try {
         const postQuoteReq = await addQuote(authorId, quote, isPublic)
         res.status(200).send(postQuoteReq)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.post('/add-wedding', async(req, res) => {
+    const date = req.query.date
+    const groomId = req.query.groomId
+    const brideId = req.query.brideId
+    const title = req.query.title
+    const partnerId = req.query.partnerId
+    const weddingPlace = req.query.weddingPlace
+    const partyPlace = req.query.partyPlace
+    const hotelName = req.query.hotelName
+    const weddingDescription = req.query.weddingDescription
+    const wasIInvited = req.query.wasIInvited
+    try {
+        const postWeddingReq = await addWedding(date,groomId, brideId, title, partnerId, weddingPlace, partyPlace, hotelName, weddingDescription, wasIInvited)
+        res.status(200).send(postWeddingReq)
     }
     catch (error) {
         res.send(error)
