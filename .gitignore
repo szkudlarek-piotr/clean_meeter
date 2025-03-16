@@ -2,4 +2,7 @@
 /backend/functionalPhotos/
 /backend/cliques_photos/
 /backend/photos/
-.env
+/backend/trips/
+/backend/events/
+/backend/meetings/
+/backend/.env
