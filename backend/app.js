@@ -13,6 +13,7 @@ import addVisit from './addVisitBackend.js'
 import addMeeting from './addMeetingBackend.js'
 import addMettingHuman from './addMeetingHuman.js'
 import addWedding from './addWedding.js'
+import getHumanNameFromId from './getHumanNameFromId.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -26,6 +27,18 @@ app.use((err,req,res,next) => {
 app.get('/get-humans', async (req, res) => {
     const sendedArray = await getFinalHumans()
     res.send(sendedArray)
+})
+
+app.get('/get-human-name-from-id', async(req,res) => {
+    const humanId = req.query.id
+    try {
+        const nameAndPhoto = await getHumanNameFromId(humanId)
+        res.send(nameAndPhoto)
+    }
+    catch (error) {
+        res.send(error)
+    }
+
 })
 
 app.get('/get-cliques-from-subs', async(req, res) => {
@@ -163,7 +176,12 @@ app.post('/add-wedding', async(req, res) => {
     const weddingDescription = req.query.weddingDescription
     const wasIInvited = req.query.wasIInvited
     try {
-        const postWeddingReq = await addWedding(date,groomId, brideId, title, partnerId, weddingPlace, partyPlace, hotelName, weddingDescription, wasIInvited)
+        if (partnerId == "") {
+            const postWeddingReq = await addWedding(date,groomId, brideId, title, "NULL", weddingPlace, partyPlace, hotelName, weddingDescription, wasIInvited)
+        }
+        else {
+            const postWeddingReq = await addWedding(date,groomId, brideId, title, partnerId, weddingPlace, partyPlace, hotelName, weddingDescription, wasIInvited)
+        }
         res.status(200).send(postWeddingReq)
     }
     catch (error) {

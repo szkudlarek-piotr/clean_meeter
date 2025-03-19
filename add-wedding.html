@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Meeter - portal dla wszystkich oprócz Amerykanów</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            Baza danych spotkań
+        </header>
+        <div class="container">
+            <nav class="left-menu">
+            </nav>
+            <div id="main">
+                <h1>Dodaj wesele</h1>
+
+                <form>
+                    <h2 class="inputHeader">Data wesela</h2>
+                    <input type="datetime-local" id="weddingDateInput"/>
+
+                    <h2 class="inputHeader">Pan młody</h2>
+                    <input type="text" placeholder="Imię lub nazwisko Pana Młodego" id="groomNameInput" onkeyup="getCandidates('groomNameInput', 'groomCandiatesDiv', 'groomDiv')"/>
+                    <div id="groomCandiatesDiv">
+
+                    </div>
+
+                    <h2 class="inputHeader">Panna młoda</h2>
+                    <input type="text" placeholder="Imię lub nazwisko Panny Młodej" id="brideNameInput" onkeyup="getCandidates('brideNameInput', 'brideCandiatesDiv', 'brideDiv')"/>
+
+                    <div id="brideCandiatesDiv">
+
+                    </div>
+
+                    <h2 class="inputHeader">Partner</h2>
+                    <input type="text" placeholder="Imię lub nazwisko partnera" id="partnerNameInput" onkeyup="getCandidates('partnerNameInput', 'partnerCandiatesDiv', 'partnerDiv')"/>
+
+                    <div id="partnerCandiatesDiv">
+
+                    </div>
+                    
+                    <h2 class="inputHeader">Nazwa wesela w kalendarzu</h2>
+                    <input type="text" id="weddingTitleInput" placeholder="Na przykład 'Wesele Kasi i Tomka'..." "/>
+
+                    <h2 class="inputHeader">Miejsce ślubu</h2>
+                    <input type="text" id="weddingPlaceInput"/>
+
+                    <h2 class="inputHeader">Miejsce wesela</h2>
+                    <input type="text" id="weddingPartyPlaceInput"/>
+                    
+                    <h2 class="inputHeader">Nazwa hotelu</h2>
+                    <input type="text" id="hotelNameInput"/>
+
+                    <h2 class="inputHeader">Dłuższy opis wesela</h2>
+                    <textarea id="weddingDescInput" rows=20 cols=120></textarea>
+
+                    <h2 class="inputHeader">Czy byłeś zaproszony?</h2>
+                    
+                    <label for="invitedPositive">Tak</label>
+                    <input type="radio" id="invitedPositive" name="wasInvited" value="1">
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                    <label for="invitedNegative">Nie</label>
+                    <input type="radio" id="invitedNegative" name="wasInvited" value="0">
+                    <br/><br/><br/><br/>
+
+                    <div id="weddingCharactersDiv">
+
+                        <div id="groomDiv" class="weddingCharacter">
+                            <input type="hidden" id="groomIdInput" value="null"/>
+                            <img src="backend/photos/anonymous.jpg" id="groomPhoto">
+                            <h3 id="groomName">Pan Młody</h3>
+                        </div>
+    
+                        <div id="partnerDiv" class="weddingCharacter">
+                            <img src="backend/photos/anonymous.jpg" id="partnerPhoto">
+                            <input type="hidden" id="partnerIdInput" value="null"/>
+                            <h3 id="partnerName">Partnerka</h3>
+                        </div>
+    
+                        <div id="brideDiv" class="weddingCharacter">
+                            <input type="hidden" id="brideIdInput" value="null"/>
+                            <img src="backend/photos/anonymous.jpg" id="bridePhoto">
+                            <h3 id="brideName">Panna Młoda</h3>
+                        </div>
+    
+                    </div>
+                    <br/><br/><br/><br/>
+
+                    <button onclick="addWedding()">Dodaj wesele!</button>
+                </form>
+            </div>
+            <aside class="right-menu">
+                <!-- Right menu content goes here -->
+            </aside>
+        </div>
+    </body>
+    <script src="createLeftMenu.js" ></script>
+    <script>
+        createLeftMenu()
+
+        async function getCandidates(inputElementId, candidatesContainerId, wedPersonDivId) {
+            let candidatesContainer = document.getElementById(candidatesContainerId)
+            let interactingInputElement = document.getElementById(inputElementId)
+            candidatesContainer.innerHTML = ""
+            const deliveredInputValue = interactingInputElement.value
+            const encodedHumanIput = encodeURI(deliveredInputValue)
+            if (deliveredInputValue.length > 2) {
+                const searchReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${encodedHumanIput}`)
+                const returnedJson = await searchReq.json()
+                
+                for (let human of returnedJson) {
+                    let candidateDiv = document.createElement("div")
+                    candidateDiv.setAttribute("class", "human_tile_in_add_visit")
+                    let createdDivId = `${candidatesContainerId}_${human.id}`
+                    candidateDiv.setAttribute("id", `${createdDivId}`)
+                    candidateDiv.setAttribute("onclick", `setWeddingCharacter("${createdDivId}", "${human.id}",  "${wedPersonDivId}")`)
+                    candidatesContainer.appendChild(candidateDiv)
+
+                    let photoElement = document.createElement("img")
+                    photoElement.setAttribute("class", "person_photo")
+                    photoElement.setAttribute("src", human.photoDir)
+                    candidateDiv.appendChild(photoElement)
+
+                    let nameElement = document.createElement("div")
+                    nameElement.setAttribute("class", "nameDiv")
+                    nameElement.innerText = human.name
+                    candidateDiv.appendChild(nameElement)
+                }
+            }
+        }
+        async function setWeddingCharacter(candidateDivId, humanId, wedPersonContainerId) {
+            let wedPersonDiv = document.getElementById(wedPersonContainerId)
+            let wedPersonPhotoElement = wedPersonDiv.querySelector("img")
+            let wedPersonNameElement =  wedPersonDiv.querySelector("h3")
+            let wedPersonIdElement = wedPersonDiv.querySelector("input")
+            console.log(`http://localhost:3000/get-human-name-from-id?id=${humanId}`)
+            const getNamePhotoReq = await fetch(`http://localhost:3000/get-human-name-from-id?id=${humanId}`)
+            const namePhotoJson = await getNamePhotoReq.json()
+            console.log(namePhotoJson)
+            const detailsToSet = namePhotoJson[0]
+
+            wedPersonNameElement.innerText = detailsToSet.name
+            wedPersonPhotoElement.setAttribute("src", detailsToSet.photoDir)
+            wedPersonIdElement.setAttribute("value", humanId)
+        }
+        async function addWedding() {
+            event.preventDefault()
+            const weddingDate = document.getElementById("weddingDateInput").value
+            console.log(weddingDate)
+            const groomId = document.getElementById("groomIdInput").value
+            const partnerId = document.getElementById("partnerIdInput").value
+            const brideId = document.getElementById("brideIdInput").value
+            const infoAfterHover = document.getElementById("weddingTitleInput").value
+            const weddingPlaceName = document.getElementById("weddingPlaceInput").value
+            const partyPlaceName = document.getElementById("weddingPartyPlaceInput").value
+            const hotelName = document.getElementById("hotelNameInput").value
+            const longDesc = document.getElementById("weddingDescInput").value
+            const wasIInvited = document.querySelector(`input[name="wasInvited"]:checked`).value
+            let params = {
+                date: weddingDate,
+                groomId: groomId, 
+                partnerId: partnerId,
+                brideId: brideId,
+                title: infoAfterHover,
+                weddingPlace: weddingPlaceName,
+                partyPlace: partyPlaceName,
+                hotelName: hotelName,
+                weddingDescription: longDesc,
+                wasIInvited: wasIInvited
+            }
+                const queryParamsAsString = new URLSearchParams(params).toString()
+                const queryAdress = `http://localhost:3000/add-wedding?${queryParamsAsString}`
+                const addWedReq = await fetch(queryAdress, {method:"POST"})
+                const responseJson = await addWedReq.json()
+                console.log(responseJson["sql"])
+
+                alert("Pomyślnie dodano wesele!")
+        }
+    </script>
+</html>

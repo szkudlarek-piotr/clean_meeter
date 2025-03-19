@@ -8,7 +8,14 @@ const pool = mysql.createPool({
 }).promise()
 
 export default async function addWedding(date, groomId, brideId, infoAfterHover, partnerId, weddingPlace, partyPlace, hotelName, description, was_i_invited) {
-    const addWeddingText = "INSERT INTO `weddings` (`id`, `date`, `man_id`, `woman_id`, `info_after_hover`, `partner_id`, `wedding_place_name`, `party_place_text`, `hotel_name`, `description`, `was_i_invited`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-    const [addWeddingReq] = await pool.query(addWeddingText, [date, groomId, brideId, infoAfterHover, partnerId, weddingPlace, partyPlace, hotelName, description, was_i_invited])
-    console.log(addWeddingReq)
+    if (partnerId != "null") {
+        const addWeddingText = "INSERT INTO `weddings` (`id`, `date`, `man_id`, `woman_id`, `info_after_hover`, `partner_id`, `wedding_place_name`, `party_place_text`, `hotel_name`, `description`, `was_i_invited`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        const [addWeddingReq] = await pool.query(addWeddingText, [date, groomId, brideId, infoAfterHover, partnerId, weddingPlace, partyPlace, hotelName, description, was_i_invited])
+    }
+    else {
+        const addWeddingText = "INSERT INTO `weddings` (`id`, `date`, `man_id`, `woman_id`, `info_after_hover`, `wedding_place_name`, `party_place_text`, `hotel_name`, `description`, `was_i_invited`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        const [addWeddingReq] = await pool.query(addWeddingText, [date, groomId, brideId, infoAfterHover,  weddingPlace, partyPlace, hotelName, description, was_i_invited])
+    }
+
+    return addWeddingReq
 }

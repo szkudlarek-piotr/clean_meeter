@@ -399,3 +399,8 @@ h2 .inputHeader {
     border-radius: 10px;
     border: 1px solid black;
 }
+#partnerCandiatesDiv, #groomCandiatesDiv, #brideCandiatesDiv {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
