@@ -1,7 +1,6 @@
 async function createLeftMenu() {
     let leftMenu = document.getElementsByClassName("left-menu")[0]
-    const menuButtonsArray = [{"id":"mainPage","text": "Strona główna", "href": "index.html"}, 
-        {"id":"addNewHuman","href": "add-human.html", "text": "Dodaj nowego człowieka"},
+    const menuButtonsArray = [{"id":"addNewHuman","href": "add-human.html", "text": "Dodaj nowego człowieka"},
         {"id": "calendar","href": "calendar.html", "text": "Zobacz kalendarz"},
          {"id": "showAllCliques","href": "all-cliques.html", "text": "Pokaż wszystkie kliki"},
           {"id": "showAllPeople","href": "final-humans.html", "text": "Zobacz wszystkich ludzi"}, 
@@ -9,7 +8,8 @@ async function createLeftMenu() {
           {"id": "addNewClique", "href": "add-clique.html", "text": "Dodaj nową klikę"}, 
            {"id": "addVisit", "href": "add-visit.html", "text": "Dodaj wizytę!"}, 
            {"id": "addQuote", "href": "add-quote.html", "text": "Dodaj Złoty Cytat"}, 
-           {"id": "addEvent", "href": "add-event.html", "text": "Dodaj wydarzenie"}, {"id": "guessQuotes", "href": "guess-quotes.html", "text": "Odgadnij autora cytatu!"}]
+           {"id": "addEvent", "href": "add-event.html", "text": "Dodaj wydarzenie"},
+           {"id": "addWedding", "href": "add-wedding.html", "text": "Dodaj wesele"}]
     for (button of menuButtonsArray) {
         let newButton = document.createElement("div")
         newButton.setAttribute("class", "left_option")
