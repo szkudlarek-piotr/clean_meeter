@@ -138,6 +138,7 @@ aside.right-menu {
     border: 1px solid black;
     aspect-ratio: 1/1;
     margin-bottom: 10px;
+    border-radius: 5px;
   }
   .clique_div:hover {
     background-color: red;
@@ -403,4 +404,15 @@ h2 .inputHeader {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+}
+.wedPersonNuller {
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    margin-left: calc(50% - 31px);
+    margin-right: calc(50% - 31px);
+}
+.wedPersonNuller:hover {
+    cursor: pointer;
 }
