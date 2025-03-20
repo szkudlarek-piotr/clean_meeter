@@ -8,10 +8,14 @@ const cliquesPhotoFolder = path.join(__dirname, "cliques_photos")
 export default function getCliquePhoto(cliqueId) {
     const possiblePngDir = path.join(cliquesPhotoFolder, `${cliqueId}.png`)
     const possibleJpgDir = path.join(cliquesPhotoFolder, `${cliqueId}.jpg`)
+    const possibleJpegDir = path.join(cliquesPhotoFolder, `${cliqueId}.jpeg`)
     if (fs.existsSync(possibleJpgDir)) {
         return possibleJpgDir
     } 
     if (fs.existsSync(possiblePngDir)) {
         return possiblePngDir
     }
+    if (fs.existsSync(possibleJpegDir)) {
+        return possibleJpegDir
+    } 
 }
