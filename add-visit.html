@@ -137,7 +137,6 @@
                         try {
                             const visitGuestResponse = await fetch(`http://localhost:3000/add-visit-guest?visitId=${addedVisitId}&guestId=${chosenHumanId}`, {method:"POST"})
                             const visitGuestJson = await visitGuestResponse.json()
-                            console.log(visitGuestJson)
                         }
                         catch (error) {
                             console.log(error)
