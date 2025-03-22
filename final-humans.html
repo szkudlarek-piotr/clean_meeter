@@ -17,22 +17,9 @@
         <div class="container">
             <nav class="left-menu">
             </nav>
-            <main class="content" id="main_content">
-                <div id="human_modal" style="display: none">
-                    <div id="topOfHumanModal">
-                        <div class="closingDiv" onclick="closeModal()">X</div>
-                    </div>
-                    <div id="restOfModal">
-                        <div id="leftModalMenu">
-                            <h1>Menu</h1>
-                        </div>
-                        <div id="placeForHumanInfo">
+            <div id="main">
 
-                        </div>
-                    </div>
-                </div>
-
-            </main>
+            </div>
             <aside class="right-menu">
                 <!-- Right menu content goes here -->
             </aside>
@@ -45,7 +32,7 @@
         async function createHumanTiles() {
             const humansQuery = await fetch("http://localhost:3000/get-humans")
             const humansJson = await humansQuery.json()
-            const mainContent = document.getElementById("main_content")
+            const mainContent = document.getElementById("main")
             for (human of humansJson) {
                 let createdHumanTile = document.createElement("div")
                 createdHumanTile.setAttribute("class", "human_tile")
