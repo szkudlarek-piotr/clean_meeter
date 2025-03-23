@@ -13,6 +13,7 @@ import addVisit from './addVisitBackend.js'
 import addMeeting from './addMeetingBackend.js'
 import addMettingHuman from './addMeetingHuman.js'
 import addWedding from './addWedding.js'
+import getCalendar from './getCalendar.js'
 import getHumanNameFromId from './getHumanNameFromId.js'
 const app = express()
 app.use(cors())
@@ -117,12 +118,16 @@ app.post('/add-meeting', async(req, res) => {
     const longDesc = req.query.longDesc
     try {
         const meetingAddReq = await addMeeting(date, place, shortDesc, longDesc)
-        console.log(meetingAddReq)
         res.send(meetingAddReq) 
     }
     catch (error) {
         res.send(error)
     }
+})
+app.get('/get-calendar', async(req, res) => {
+    const yearNumber = req.query.year
+    const calendar = await getCalendar(yearNumber)
+    res.send(calendar)
 })
 
 app.post('/add-meeting-human', async(req, res) => {

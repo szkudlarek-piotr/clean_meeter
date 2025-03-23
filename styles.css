@@ -416,3 +416,44 @@ h2 .inputHeader {
 .wedPersonNuller:hover {
     cursor: pointer;
 }
+.weddingWithParther > .groomPhoto {
+    left: 20%;
+    bottom: 25%;
+    position: relative;
+    width: 35%;
+}
+
+.weddingWithParther > .bridePhoto {
+    right: 30%;
+    top: 25%;
+    position: relative;
+    width: 35%;
+}
+.weddingWithParther > .ringsPhoto {
+    width: 15%;
+    right: 5%;
+    position: relative;
+}
+.weddingWithParther > .partnerPhoto {
+    width: 40%;
+    right: 20%;
+    position: relative;
+}
+
+.weddingWoParther > .groomPhoto {
+    left: 0%;
+    bottom: 25%;
+    position: relative;
+    width: 35%;
+}
+
+.weddingWoParther > .bridePhoto {
+    left: 0%;
+    top: 25%;
+    position: relative;
+    width: 35%;
+}
+.weddingWoParther > .ringsPhoto {
+    width: 15%;
+    position: relative;
+}

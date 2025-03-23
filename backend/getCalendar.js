@@ -13,16 +13,15 @@ export default async function getCalendar(year) {
     let returnedDict = {}
     const weddingsQueryText = `SELECT date, man_id, woman_id, partner_id, info_after_hover FROM weddings WHERE YEAR(date) = ?`
     const [wedQuery] = await pool.query(weddingsQueryText, [year])
-    //console.log(wedQuery)
     for (let wedding of wedQuery) {
         const wedDate = wedding.date
         const wedDateId = createDateId(wedDate)
         if (wedding.partner_id != null) {
-            const dictToAdd = {"class": "wedding", "partnerPhoto": getHumanPhotoDir(wedding.partner_id), "manId": getHumanPhotoDir(wedding.man_id), "womanId": getHumanPhotoDir(wedding)}
+            const dictToAdd = {"class": "wedding", "title": wedding.info_after_hover, "partnerPhoto": getHumanPhotoDir(wedding.partner_id), "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id)}
             returnedDict[wedDateId] = dictToAdd
         }
         else {
-            const dictToAdd = {"class": "wedding", "manId": getHumanPhotoDir(wedding.man_id), "womanId": getHumanPhotoDir(wedding)}
+            const dictToAdd = {"class": "wedding", "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id), "title": wedding.info_after_hover}
             returnedDict[wedDateId] = dictToAdd
         }
     }
@@ -66,5 +65,5 @@ export default async function getCalendar(year) {
         }
     }
     console.log(returnedDict)
+    return returnedDict
 }
-getCalendar(2025)

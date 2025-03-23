@@ -28,9 +28,9 @@
     <script src="createLeftMenu.js" ></script>
     <script>
 
-        function makeCalendar() {
-            const startDay = new Date("01/01/2025")
-            const lastDay = new Date("12/31/2025")
+        function makeCalendar(year) {
+            const startDay = new Date(`${year}-01-01`)
+            const lastDay = new Date(`${year}-12-31`)
             let daysCounter = 0
             const monthJson = {0: "Styczeń", 1:"Luty", 2: "Marzec", 3: "Kwiecień", 4: "Maj", 5: "Czerwiec", 6:"Lipiec", 7: "Sierpień", 8:"Wrzesień", 9:"Październik", 10: "Listopad", 11:"Grudzień"}
             const weekdaysArray = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
@@ -70,8 +70,96 @@
                 addedDayRectangle.setAttribute("id", date_id)
                 containerForCalendar.appendChild(addedDayRectangle)
             }
+            addThingsToCalendar(year)
+        }
+        function createSlider(modifiedDivId, array_of_photos, divColor) {
+            let modifiedDiv = document.getElementById(modifiedDivId)
+            let sliderDiv = document.createElement("div")
+            sliderDiv.setAttribute("class", "slider")
+            modifiedDiv.appendChild(sliderDiv)
+            modifiedDiv.setAttribute("style", `background-color: ${divColor}`)
+            let imageElement = document.createElement("img")
+            let firstPhoto = array_of_photos[0]
+            imageElement.setAttribute("src", firstPhoto)
+            sliderDiv.appendChild(imageElement)
+            function photoSlider() {
+                        let index = 0
+                        function newImage() {
+                            imageElement.setAttribute("src", array_of_photos[index])
+                            index = (index + 1) % array_of_photos.length
+                            sliderDiv.appendChild(imageElement)
+                        }
+                        setInterval(newImage,2000)
+                    }
+                    photoSlider()
+
+        }
+        async function addThingsToCalendar(year) {
+            const yearEvents = await fetch(`http://localhost:3000/get-calendar?year=${year}`)
+            const yearJson = await yearEvents.json()
+            const ringsPhotoDir = "backend\\functionalPhotos\\rings.png"
+            for (let [dateId, activity] of Object.entries(yearJson)) {
+                let modifiedDiv = document.getElementById(dateId)
+                modifiedDiv.innerHTML = ""
+                if (activity["class"] == "visit") {
+                    createSlider(dateId, activity["photos"], "red")
+                }
+                else if (activity["class"] == "meeting") {
+                    createSlider(dateId, activity["photos"], "#33cb33")
+                }
+                else if (activity["class"] == "wedding") {
+                    modifiedDiv.setAttribute("style", "background-color: #ff72fb")
+                    if (!activity.hasOwnProperty("partnerPhoto")) {
+                        console.log("Mamy tutaj wesele bez partnerki.")
+                        modifiedDiv.className += " weddingWoParther"
+
+                        let groomPhotoElement = document.createElement("img")
+                        groomPhotoElement.className = "groomPhoto" 
+                        groomPhotoElement.setAttribute("src", activity.manPhoto)
+                        modifiedDiv.appendChild(groomPhotoElement)
+
+                        let ringsPhotoElement = document.createElement("img")
+                        ringsPhotoElement.className = "ringsPhoto" 
+                        ringsPhotoElement.setAttribute("src", ringsPhotoDir)
+                        modifiedDiv.appendChild(ringsPhotoElement)
+
+                        let bridePhotoElement = document.createElement("img")
+                        bridePhotoElement.className = "bridePhoto" 
+                        bridePhotoElement.setAttribute("src", activity.womanPhoto)
+                        modifiedDiv.appendChild(bridePhotoElement)
+
+
+                    }
+                    else {
+                        console.log("Wesele z partnerką!")
+                        modifiedDiv.className += " weddingWithParther"
+
+                        let groomPhotoElement = document.createElement("img")
+                        groomPhotoElement.className = "groomPhoto" 
+                        groomPhotoElement.setAttribute("src", activity.manPhoto)
+                        modifiedDiv.appendChild(groomPhotoElement)
+
+                        let ringsPhotoElement = document.createElement("img")
+                        ringsPhotoElement.className = "ringsPhoto" 
+                        ringsPhotoElement.setAttribute("src", ringsPhotoDir)
+                        modifiedDiv.appendChild(ringsPhotoElement)
+                        
+                        let bridePhotoElement = document.createElement("img")
+                        bridePhotoElement.className = "bridePhoto" 
+                        bridePhotoElement.setAttribute("src", activity.womanPhoto)
+                        modifiedDiv.appendChild(bridePhotoElement)
+
+
+                        let partnerPhotoElement = document.createElement("img")
+                        partnerPhotoElement.className = "partnerPhoto" 
+                        partnerPhotoElement.setAttribute("src", activity.partnerPhoto)
+                        modifiedDiv.appendChild(partnerPhotoElement)
+                    }
+                }
+                modifiedDiv.setAttribute("title", activity["title"])
+            }
         }
         createLeftMenu()
-        makeCalendar()
+        makeCalendar(2025)
     </script>
 </html>
