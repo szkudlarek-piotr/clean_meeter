@@ -18,6 +18,10 @@ Add a wedding:
 Calendar(at the moment calendar is empty, in the full version it will show al the events, visits, meetings and weddings)
 ![alt text](calendar.png)
 
+Presentation of the project (in Polish) can be found here:
+https://www.youtube.com/watch?v=igZqlkbeFKU
+
+
 ## Technologies
 - **Frontend**: HTML, CSS, JavaScript, planned migration to React.js
 - **Backend**: Node.js, Express.js
