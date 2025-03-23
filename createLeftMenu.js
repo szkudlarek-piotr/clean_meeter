@@ -8,7 +8,6 @@ async function createLeftMenu() {
           {"id": "addNewClique", "href": "add-clique.html", "text": "Dodaj nową klikę"}, 
            {"id": "addVisit", "href": "add-visit.html", "text": "Dodaj wizytę!"}, 
            {"id": "addQuote", "href": "add-quote.html", "text": "Dodaj Złoty Cytat"}, 
-           {"id": "addEvent", "href": "add-event.html", "text": "Dodaj wydarzenie"},
            {"id": "addWedding", "href": "add-wedding.html", "text": "Dodaj wesele"}]
     for (button of menuButtonsArray) {
         let newButton = document.createElement("div")
