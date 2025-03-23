@@ -1,6 +1,5 @@
 export default function createDateId(date) {
-    console.log(date)
-    const monthsDict = {0: "January", 1: "February", 2:"March", 3:"April",4:"May",5:"June",6:"July",7:"August",8:"September",9:"October",10:"November",11:"December"}
+    const monthsDict = {0: "Styczeń", 1:"Luty", 2: "Marzec", 3: "Kwiecień", 4: "Maj", 5: "Czerwiec", 6:"Lipiec", 7: "Sierpień", 8:"Wrzesień", 9:"Październik", 10: "Listopad", 11:"Grudzień"}
     const dateObj = new Date(date)
     const dayNumber = dateObj.getDate()
     const monthName = monthsDict[dateObj.getMonth()].substring(0,3)
