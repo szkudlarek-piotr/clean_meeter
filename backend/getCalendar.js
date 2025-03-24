@@ -9,6 +9,13 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 
+function addDays(date, numberOfDays) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + numberOfDays);
+    return result;
+  }
+
+
 export default async function getCalendar(year) {
     let returnedDict = {}
     const weddingsQueryText = `SELECT date, man_id, woman_id, partner_id, info_after_hover FROM weddings WHERE YEAR(date) = ?`
@@ -34,12 +41,26 @@ export default async function getCalendar(year) {
     YEAR(visits.visit_date) = ? 
     OR YEAR(DATE_ADD(visits.visit_date, INTERVAL visits.visit_duration - 1 DAY)) = ?`
     const [visitsReq] = await pool.query(visitsQueryText, [year, year])
+    
     for (let record of visitsReq) {
-        let dateId = createDateId(record.visitDate)
+        const visitStartDate = record.visitDate
+        let dateId = createDateId(visitStartDate)
         if (!(returnedDict[dateId])) {
             returnedDict[dateId] = {"class": "visit","photos": [], "title": record.visitShortDesc}
         }
         returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
+        if (record.visitDuration > 1) {
+            for (let addedDays = 1; addedDays<record.visitDuration; addedDays+=1) {
+                let newDate = addDays(visitStartDate, addedDays)
+                const newDateId = createDateId(newDate)
+                if (!(returnedDict[newDateId])) {
+                    returnedDict[newDateId] = {"class": "visit","photos": [], "title": record.visitShortDesc}
+                }
+                console.log(record.humanId)
+                console.log(getHumanPhotoDir(record.humanId))
+                returnedDict[newDateId]["photos"].push(getHumanPhotoDir(record.humanId))
+            }
+        }
     }
     const meetingsReqText = `SELECT meetings.meeting_date as meetingDate, 
     meetings.short_description as shortDesc, meeting_human.human_id AS humanId
@@ -64,6 +85,6 @@ export default async function getCalendar(year) {
             }
         }
     }
-    console.log(returnedDict)
+    //console.log(returnedDict)
     return returnedDict
 }
