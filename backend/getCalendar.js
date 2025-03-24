@@ -56,8 +56,6 @@ export default async function getCalendar(year) {
                 if (!(returnedDict[newDateId])) {
                     returnedDict[newDateId] = {"class": "visit","photos": [], "title": record.visitShortDesc}
                 }
-                console.log(record.humanId)
-                console.log(getHumanPhotoDir(record.humanId))
                 returnedDict[newDateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
         }
@@ -85,6 +83,5 @@ export default async function getCalendar(year) {
             }
         }
     }
-    //console.log(returnedDict)
     return returnedDict
 }
