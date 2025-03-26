@@ -10,7 +10,7 @@ export default function getSuggestedEventPhotos(deliveredSubstring) {
     const photosList = fs.readdirSync(eventsFolderDir)
     for (let photoName of photosList) {
         if (photoName.includes(deliveredSubstring)) {
-            let dictToAdd = {"name": photoName, "photoDir": path.join(eventsFolderDir, photoName)}
+            let dictToAdd = {"photoName": photoName, "photoDir": path.join(eventsFolderDir, photoName)}
             returnedArr.push(dictToAdd)
         }
     }
