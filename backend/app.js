@@ -15,6 +15,7 @@ import addMettingHuman from './addMeetingHuman.js'
 import addWedding from './addWedding.js'
 import getCalendar from './getCalendar.js'
 import getHumanNameFromId from './getHumanNameFromId.js'
+import getSuggestedEventPhotos from './getSuggestedEventPhotos.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -53,6 +54,11 @@ app.get('/get-all-cliques', async(req,res) => {
     res.send(cliquesData)
 })
 
+app.get('/suggested-event-photos', async(req, res)=>{
+    const deliveredString = req.query.inputString
+    const returnedArr = await getSuggestedEventPhotos(deliveredString)
+    res.send(returnedArr)
+})
 
 app.get('/get-human-from-substring', async (req, res) => {
     try {

@@ -37,14 +37,10 @@
                     <h2 class="inputHeader">Miejsce wydarzenie</h2>
                     <input type="text" id="meetingPLaceInput"/>
 
-                    <h2 class="inputHeader">Czy wydarzenie jest powtarzalne?</h2>
-                    <label for="eventRepetetivePositive" onchange="handleIsRepetitiveChange()">Tak</label>
-                    <input type="radio" name="isRepetitive" value="1" id="eventRepetetivePositive">
-                    <label for="eventRepetetiveNegative" onchange="handleIsRepetitiveChange()">Nie</label>
-                    <input type="radio" name="isRepetitive" value="0" id="eventRepetetiveNegative">
+
                     
                     <h2 class="inputHeader">Dlługi opis eventu</h2>
-                    <textarea id="longDescInput" rows=20 cols=120></textarea>
+                    <textarea id="longDescInput" rows=10 cols=120></textarea>
                     <h2 class="inputHeader">Wybierz gości</h2>
                     <input type="text" id="searchedHumanInput" onkeyup="createGuestsTilesFromName()" placeholder="Wyszukaj gościa..."/>
                     <div id="suggestedGuestsContainer">
@@ -54,6 +50,27 @@
                     <div id="chosenGuestsContainer">
 
                     </div>
+                    <h2 class="inputHeader">Czy wydarzenie jest powtarzalne?</h2>
+                    <label for="eventRepetetivePositive">Tak</label>
+                    <input type="radio" name="isRepetitive" value="1" id="eventRepetetivePositive" onchange="handleIsRepetitiveChange()">
+                    <label for="eventRepetetiveNegative">Nie</label>
+                    <input type="radio" name="isRepetitive" value="0" id="eventRepetetiveNegative" onchange="handleIsRepetitiveChange()">
+                    <div id="divForPhotoChoice">
+                        
+                        <h2 class="inputHeader">Źródło zdjęcia</h2>
+                        <label for="photoSource">Moja baza</label>
+                        <input type="radio" name="photoSource" value="database" id="photoSourceDatabase" onchange="handlePhotoSourceChange()"> &nbsp; &nbsp; &nbsp; 
+                        <label for="photoSource">Dysk</label>
+                        <input type="radio" name="photoSource" value="disk" id="photoSourceDisk" onchange="handlePhotoSourceChange()">&nbsp; &nbsp; &nbsp; 
+                        <label for="photoSource">Link</label>
+                        <input type="radio" name="photoSource" value="link" id="photoSourceLink" onchange="handlePhotoSourceChange()"> <br><br><br>
+
+                        <div id="divForPhotoInput" style="margin: 10px;">
+
+                        </div>
+                        <br><br>
+                    </div>
+
                     <button onclick="addVisitWithGuests(event)">Dodaj wizytę!</button>
                 </form>
 
@@ -171,6 +188,78 @@
             }
 
 
+        }
+        function clearPhotoInput() {
+            let photoInputMeat = document.getElementById("divForPhotoInput")
+            photoInputMeat.innerHTML = ""
+        }
+        function handlePhotoSourceChange() {
+            clearPhotoInput()
+            const chosenPhotoSource = document.querySelector(`input[name="photoSource"]:checked`).value
+            let divForPhotoInput = document.getElementById("divForPhotoInput")
+            if (chosenPhotoSource == "database") {
+                let photoNameInput = document.createElement("input")
+                photoNameInput.setAttribute("type", "text")
+                photoNameInput.setAttribute("id", "photoNameInput")
+                photoNameInput.setAttribute("placeholder", "Podaj nazwę zdjęcia w bazie")
+                photoNameInput.setAttribute("onkeyup", "getsuggestedEventPhotos()")
+                divForPhotoInput.appendChild(photoNameInput)
+
+                let hiddenInput = document.createElement("input")
+                hiddenInput.setAttribute("type", "hidden")
+                hiddenInput.setAttribute("id", "hiddenPhotoPathInput")
+                divForPhotoInput.appendChild(hiddenInput)
+                
+                let headerForChosingPhotos = document.createElement("h3")
+                headerForChosingPhotos.innerText = "Proponowane zdjęcia"
+                divForPhotoInput.appendChild(headerForChosingPhotos)
+
+                let suggestedPhotosContainer = document.createElement("div")
+                suggestedPhotosContainer.className = "wrappingContainer"
+                suggestedPhotosContainer.setAttribute("id", "suggestedPhotosContainer")
+                divForPhotoInput.appendChild(suggestedPhotosContainer)
+
+
+            }
+            if (chosenPhotoSource == "disk") {
+                let photoFileInput = document.createElement("input")
+                photoFileInput.setAttribute("type", "file")
+                divForPhotoInput.appendChild(photoFileInput)
+            }
+            if (chosenPhotoSource == "link") {
+                let photoLinkInput = document.createElement("input")
+                photoLinkInput.setAttribute("id", "photoLinkInput")
+                photoLinkInput.setAttribute("type", "text")
+                photoLinkInput.setAttribute("placeholder", "Podaj link do zdjęcia wydarzenia...")
+                divForPhotoInput.appendChild(photoLinkInput)
+            }
+        }
+        async function getsuggestedEventPhotos() {
+            clearSuggestedPhotoDiv()
+            const photoNameInputValue = document.getElementById("photoNameInput").value
+            const suggesedPhotos = await fetch(`http://localhost:3000/suggested-event-photos?inputString=${photoNameInputValue}`)
+            const photosJson = await suggesedPhotos.json()
+            let suggestedPhotosContainer = document.getElementById("suggestedPhotosContainer")
+            for (let photo of photosJson) {
+                let createdElement = document.createElement("div")
+                createdElement.className = "suggestedPhotoDiv"
+                createdElement.setAttribute("onclick", `setHiddenInputValue("hiddenPhotoPathInput", "${photo.photoDir}")`)
+                suggestedPhotosContainer.appendChild(createdElement)
+                
+                let createdImage = document.createElement("img")
+                createdImage.className = "framedPhoto"
+                createdImage.setAttribute("src", photo.photoDir)
+                createdElement.appendChild(createdImage)
+
+            }
+        }
+        function clearSuggestedPhotoDiv() {
+            let divToClear = document.getElementById("suggestedPhotosContainer")
+            divToClear.innerHTML = ""
+        }
+        function setHiddenInputValue(hiddenInputId, valueToSet) {
+            let inputToModify = document.getElementById(hiddenInputId)
+            inputToModify.setAttribute("value", valueToSet)
         }
     </script>
 </html>

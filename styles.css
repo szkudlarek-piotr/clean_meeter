@@ -457,3 +457,25 @@ h2 .inputHeader {
     width: 15%;
     position: relative;
 }
+.wrappingContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 20px;
+    justify-content: space-evenly;
+}
+.suggestedPhotoDiv {
+    width: 24%;
+    border: 1px solid black;
+    border-radius: 15px;
+}
+.suggestedPhotoDiv:hover {
+    background-color: #e12121;
+    transition: ease-in;
+}
+.framedPhoto {
+    border: 1px solid black;
+    border-radius: 25px;
+    width: 80%;
+    margin: calc(10% - 1px)
+
+}
