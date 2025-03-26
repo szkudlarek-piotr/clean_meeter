@@ -37,4 +37,3 @@ export default async function addEvent(eventName, dateStart, dateStop, comingDat
         }
     }
 }
-addEvent('Odwiedziny Sambora i Michaliny', '2025-04-05 15:30:00', '2025-04-06 18:40:00', '2025-04-05 15:30:00', '2025-04-06 18:40:00', 'Abra Studio', 'Sambor z Michaliną odwiedzają Warszawę, aby zarobić piniąc.', {"mode": "link", "name": "sambor_michalina", "link": "https://www.abra-studio.pl/files/workshop/workshop970.png"})
