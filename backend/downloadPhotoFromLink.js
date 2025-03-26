@@ -15,7 +15,7 @@ export default async function downloadPhotoFromLink(photoLink, folderDirectory, 
                 const arrayBuffer = await imageResponse.arrayBuffer()
                 //This way, you can accidentaly replace an old image on the disk.
                 fs.writeFileSync(writingDir, Buffer.from(arrayBuffer))
-                console.log("Pomyśłnie pobrano zdjęcie!")
+                return fileName
             }
             else {
                 console.log(imageResponse.status)
@@ -30,4 +30,3 @@ export default async function downloadPhotoFromLink(photoLink, folderDirectory, 
         return null
     }
 }
-downloadPhotoFromLink("https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Focdn.eu%2Fpulscms-transforms%2F1%2F5pZktkpTURBXy9mNWEwMzc0MTdiODc2ZjFmMTFmNDc0ZDdhNDNlZmQwMS5qcGeSlQMAI80D6M0CMpMFzQSwzQJ2&f=1&nofb=1&ipt=c6041f3e47d39e2c6c0f9b943bcdfdae4bc69f9b2c30e304821fbb435c9b616f&ipo=images", "C:\\Users\\piotr\\OneDrive\\Pulpit\\projekty\\clean_meeter\\backend\\events", "wybory")
