@@ -5,7 +5,7 @@ For a presentation purposes, I created dummy data which will be presented on a v
 
 At the moment, not all features were implemented in the refactorized version. I created some dummy data for the presentation purposes.
 Presentation of the project (in Polish) can be found here:
-https://www.youtube.com/watch?v=igZqlkbeFKU
+https://www.youtube.com/watch?v=Bp7qzoABvWI
 
 
 ## Technologies
