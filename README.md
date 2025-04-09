@@ -7,6 +7,9 @@ At the moment, not all features were implemented in the refactorized version. I 
 Presentation of the project (in Polish) can be found here:
 https://www.youtube.com/watch?v=Bp7qzoABvWI
 
+Old version of the code can be found here:
+https://github.com/szkudlarek-piotr/Meeter
+
 
 ## Technologies
 - **Frontend**: HTML, CSS, JavaScript, planned migration to React.js
