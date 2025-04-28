@@ -11,6 +11,7 @@ import getCliquesFromSubstring from './getCliquesFromSubstring.js'
 import getCliquesWithHumans from './getCLiquesWithHumans.js'
 import addVisit from './addVisitBackend.js'
 import addMeeting from './addMeetingBackend.js'
+import addCalendarEvent from './addEvent.js'
 import addMettingHuman from './addMeetingHuman.js'
 import addWedding from './addWedding.js'
 import getCalendar from './getCalendar.js'
@@ -19,6 +20,7 @@ import getSuggestedEventPhotos from './getSuggestedEventPhotos.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
+app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((err,req,res,next) => {
@@ -130,6 +132,15 @@ app.post('/add-meeting', async(req, res) => {
         res.send(error)
     }
 })
+
+app.post('/add-event', async(req, res) => {
+    const { eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo } = req.body
+    const stringifiedJson = JSON.stringify(req.body)
+    const eventAddingResult = await addCalendarEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo)
+    res.send(eventAddingResult)
+
+})
+
 app.get('/get-calendar', async(req, res) => {
     const yearNumber = req.query.year
     const calendar = await getCalendar(yearNumber)

@@ -41,22 +41,18 @@
                     
                     <h2 class="inputHeader">Dlługi opis eventu</h2>
                     <textarea id="longDescInput" rows=10 cols=120></textarea>
-                    <h2 class="inputHeader">Wybierz gości</h2>
-                    <input type="text" id="searchedHumanInput" onkeyup="createGuestsTilesFromName()" placeholder="Wyszukaj gościa..."/>
-                    <div id="suggestedGuestsContainer">
+                    <h2 class="inputHeader">Wybierz towarzystwo</h2>
+                    <input type="text" id="searchedHumanInput" onkeyup="createHumansTilesFromName()" placeholder="Wyszukaj towarzysza..."/>
+                    <div id="suggestedHumansContainer">
 
                     </div>
-                    <h2 class="inputHeader">Wybrani goście</h2>
-                    <div id="chosenGuestsContainer">
+                    <h2 class="inputHeader">Wybrani ludzie</h2>
+                    <div id="chosenHumansContainer">
 
                     </div>
-                    <h2 class="inputHeader">Czy wydarzenie jest powtarzalne?</h2>
-                    <label for="eventRepetetivePositive">Tak</label>
-                    <input type="radio" name="isRepetitive" value="1" id="eventRepetetivePositive" onchange="handleIsRepetitiveChange()">
-                    <label for="eventRepetetiveNegative">Nie</label>
-                    <input type="radio" name="isRepetitive" value="0" id="eventRepetetiveNegative" onchange="handleIsRepetitiveChange()">
+                    
                     <div id="divForPhotoChoice">
-                        
+                        <input type="hidden" id="hiddenPhotoNameInput">
                         <h2 class="inputHeader">Źródło zdjęcia</h2>
                         <label for="photoSource">Moja baza</label>
                         <input type="radio" name="photoSource" value="database" id="photoSourceDatabase" onchange="handlePhotoSourceChange()"> &nbsp; &nbsp; &nbsp; 
@@ -71,7 +67,7 @@
                         <br><br>
                     </div>
 
-                    <button onclick="addVisitWithGuests(event)">Dodaj wizytę!</button>
+                    <button onclick="addEvent(event)">Dodaj wizytę!</button>
                 </form>
 
             </div>
@@ -83,24 +79,77 @@
     <script src="createLeftMenu.js" ></script>
     <script>
         createLeftMenu()
-        function clearSuggestedGuests() {
-            let suggestedGuestsContainer = document.getElementById("suggestedGuestsContainer")
-            suggestedGuestsContainer.innerHTML = ""
+        async function addEvent(event) {
+            event.preventDefault()
+            const eventName = document.getElementById("eventNameInput").value
+            console.log(eventName)
+            const startDate = document.getElementById("dateStartInput").value
+            console.log(startDate)
+            const stopDate = document.getElementById("dateStopInput").value
+            const comingDate = document.getElementById("meComingDateInput").value
+            const leavingDate = document.getElementById("meLeavingDateInput").value
+            const eventPlace = document.getElementById("meetingPLaceInput").value
+            const longDesc = document.getElementById("longDescInput").value
+            if (document.querySelector(`input[name="photoSource"]:checked`).value == "link") {
+                console.log(document.getElementById("hiddenPhotoNameInput").value)
+                if (document.getElementById("hiddenPhotoNameInput").value.length > 0) {
+                    let eventPhotoName = document.getElementById("hiddenPhotoNameInput").value
+                    const photoLink = document.getElementById("photoLinkInput").value
+                    console.log(photoLink)
+                    console.log(JSON.stringify({
+                        eventName: eventName,
+                        dateStart: startDate,
+                        dateStop: stopDate,
+                        comingDate: comingDate,
+                        leavingDate: leavingDate,
+                        placeName: eventPlace,
+                        longDesc: longDesc, 
+                        photoAddingInfo: {
+                            mode: "link",
+                            name: eventPhotoName,
+                            link: photoLink
+                        }
+                    }))
+                    const sendReq = await fetch(`http://localhost:3000/add-event`, {method: "POST", 
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        eventName: eventName,
+                        dateStart: startDate,
+                        dateStop: stopDate,
+                        comingDate: comingDate,
+                        leavingDate: leavingDate,
+                        placeName: eventPlace,
+                        longDesc: longDesc, 
+                        photoAddingInfo: {
+                            mode: "link",
+                            name: eventPhotoName,
+                            link: photoLink
+                        }
+                })})
+                console.log(await sendReq.json())
+                }
+            }
+        }
+        function clearSuggestedHumans() {
+            let suggestedHumansContainer = document.getElementById("suggestedHumansContainer")
+            suggestedHumansContainer.innerHTML = ""
         }
 
-        async function createGuestsTilesFromName() {
+        async function createHumansTilesFromName() {
             let deliveredInput = document.getElementById("searchedHumanInput").value
             if (deliveredInput.length > 2) {
-                clearSuggestedGuests()
-                const guestCandidatesReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${deliveredInput}`)
-                const guestCandidates = await guestCandidatesReq.json()
-                createHumanTiles(guestCandidates)
+                clearSuggestedHumans()
+                const humanCandidatesReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${deliveredInput}`)
+                const humanCandidates = await humanCandidatesReq.json()
+                createHumanTiles(humanCandidates)
             }
         }
         function createSingleHumanTile(singleHumanJson, containerElementId, withClosingCross=false, withAddingToChosen=false) {
             let newHumanTile = document.createElement("div")
             let containerElement = document.getElementById(containerElementId)
-            let chosenGuestsContainer = document.getElementById("chosenGuestsContainer")
+            let chosenHumansContainer = document.getElementById("chosenHumansContainer")
             
             if (!withClosingCross) {
                 newHumanTile.setAttribute("id", `humanTile-${singleHumanJson.id}`)
@@ -108,7 +157,7 @@
             }
 
             if (withAddingToChosen) {
-                newHumanTile.setAttribute("onclick", `createSingleHumanTile(${JSON.stringify(singleHumanJson)}, 'chosenGuestsContainer', true, false)`)
+                newHumanTile.setAttribute("onclick", `createSingleHumanTile(${JSON.stringify(singleHumanJson)}, 'chosenHumansContainer', true, false)`)
             }
 
             containerElement.appendChild(newHumanTile)
@@ -141,60 +190,16 @@
             elementToRemove.remove()
         }
         function createHumanTiles(arrayOfHumans) {
-            let suggestedGuestsContainer = document.getElementById("suggestedGuestsContainer")
+            let suggestedHumansContainer = document.getElementById("suggestedHumansContainer")
             for (human of arrayOfHumans) {
-                    createSingleHumanTile(human, "suggestedGuestsContainer", false, true)
+                    createSingleHumanTile(human, "suggestedHumansContainer", false, true)
                 }
         }
-        async function addVisitWithGuests(event) {
-            event.preventDefault()
-            const visitDate = document.getElementById("visitDateInput").value
-            const visitDuration = document.getElementById("visitDaysNumber").value
-            const shortDesc = document.getElementById("shortDescInput").value
-            const longDesc = document.getElementById("longDescInput").value
-            const guestsArray = document.querySelectorAll("div.chosen_human_tile")
-            if (guestsArray.length > 0) {
-                const visitParams = {
-                    date: visitDate,
-                    duration: visitDuration,
-                    shortDesc: shortDesc,
-                    longDesc: longDesc
-                }
-                const queryString = new URLSearchParams(visitParams).toString()
-                const addVisitQueryAdress = `http://localhost:3000/add-visit?${queryString}`
-                try {
-                    const addVisitQuery = await fetch(addVisitQueryAdress, {method: "POST"})
-                    const addVisitJson = await addVisitQuery.json()
-                    const addedVisitId = addVisitJson.insertId
-                    
-                    for (let guest of guestsArray) {
-                        let chosenHumanId = guest.getAttribute("id").replace("removableHuman-", "")
-                        try {
-                            const visitGuestResponse = await fetch(`http://localhost:3000/add-visit-guest?visitId=${addedVisitId}&guestId=${chosenHumanId}`, {method:"POST"})
-                            const visitGuestJson = await visitGuestResponse.json()
-                            console.log(visitGuestJson)
-                        }
-                        catch (error) {
-                            console.log(error)
-                        }      
-                    }
-                }
-                catch(error) {
-                    console.log(error)
-                }
-            }
-            else {
-                alert("Spotkanie można dodać dopiero po dodaniu gości.")
-            }
+        
 
-
-        }
-        function clearPhotoInput() {
-            let photoInputMeat = document.getElementById("divForPhotoInput")
-            photoInputMeat.innerHTML = ""
-        }
         function handlePhotoSourceChange() {
-            clearPhotoInput()
+            setHiddenInputValue("hiddenPhotoNameInput", "")
+            clearElementById("divForPhotoInput")
             const chosenPhotoSource = document.querySelector(`input[name="photoSource"]:checked`).value
             let divForPhotoInput = document.getElementById("divForPhotoInput")
             if (chosenPhotoSource == "database") {
@@ -204,11 +209,6 @@
                 photoNameInput.setAttribute("placeholder", "Podaj nazwę zdjęcia w bazie")
                 photoNameInput.setAttribute("onkeyup", "getsuggestedEventPhotos()")
                 divForPhotoInput.appendChild(photoNameInput)
-
-                let hiddenInput = document.createElement("input")
-                hiddenInput.setAttribute("type", "hidden")
-                hiddenInput.setAttribute("id", "hiddenPhotoPathInput")
-                divForPhotoInput.appendChild(hiddenInput)
                 
                 let headerForChosingPhotos = document.createElement("h3")
                 headerForChosingPhotos.innerText = "Proponowane zdjęcia"
@@ -222,44 +222,85 @@
 
             }
             if (chosenPhotoSource == "disk") {
+                setHiddenInputValue("hiddenPhotoNameInput", "")
                 let photoFileInput = document.createElement("input")
                 photoFileInput.setAttribute("type", "file")
                 divForPhotoInput.appendChild(photoFileInput)
+
+                let photoNameInputTitle = document.createElement("h4")
+                photoNameInputTitle.innerText = "Tytuł zdjęcia. Jeśli pozostawisz to pole puste, zdjęcie zostanie zapisane pod ID wydarzenia i nie będziesz mógł go potem użyć."
+                divForPhotoInput.appendChild(photoNameInputTitle)
+
+                let createdPhotoNameInput = document.createElement("input")
+                createdPhotoNameInput.setAttribute("type", "text")
+                createdPhotoNameInput.setAttribute("id", "photoFromDiskNameInput")
+                createdPhotoNameInput.setAttribute("placeholder", "Wpisz nazwę zdjęcia")
+                divForPhotoInput.appendChild(createdPhotoNameInput)
+
+                document.getElementById("photoFromDiskNameInput").addEventListener("keyup", changeNameFromDiskInput)
             }
             if (chosenPhotoSource == "link") {
+                setHiddenInputValue("hiddenPhotoNameInput", "")
                 let photoLinkInput = document.createElement("input")
                 photoLinkInput.setAttribute("id", "photoLinkInput")
                 photoLinkInput.setAttribute("type", "text")
                 photoLinkInput.setAttribute("placeholder", "Podaj link do zdjęcia wydarzenia...")
                 divForPhotoInput.appendChild(photoLinkInput)
+
+                let photoNameInputTitle = document.createElement("h4")
+                photoNameInputTitle.innerText = "Tytuł zdjęcia. Jeśli pozostawisz to pole puste, zdjęcie zostanie zapisane pod ID wydarzenia i nie będziesz mógł go potem użyć."
+                divForPhotoInput.appendChild(photoNameInputTitle)
+
+                let createdPhotoNameInput = document.createElement("input")
+                createdPhotoNameInput.setAttribute("type", "text")
+                createdPhotoNameInput.setAttribute("id", "photoFromLinkNameInput")
+                createdPhotoNameInput.setAttribute("placeholder", "Wpisz nazwę zdjęcia")
+                divForPhotoInput.appendChild(createdPhotoNameInput)
+
+                document.getElementById("photoFromLinkNameInput").addEventListener("keyup", changeNameFromLinkInput)
             }
         }
+        function changeNameFromDiskInput() {
+            let nameToSet = document.getElementById("photoFromDiskNameInput").value
+            setHiddenInputValue("hiddenPhotoNameInput", nameToSet)
+        }
+        function changeNameFromLinkInput() {
+            let nameToSet = document.getElementById("photoFromLinkNameInput").value
+            setHiddenInputValue("hiddenPhotoNameInput", nameToSet)
+        }
         async function getsuggestedEventPhotos() {
-            clearSuggestedPhotoDiv()
+            clearElementById("suggestedPhotosContainer")
             const photoNameInputValue = document.getElementById("photoNameInput").value
-            const suggesedPhotos = await fetch(`http://localhost:3000/suggested-event-photos?inputString=${photoNameInputValue}`)
+            if (photoNameInputValue.length > 0) {
+                const suggesedPhotos = await fetch(`http://localhost:3000/suggested-event-photos?inputString=${photoNameInputValue}`)
             const photosJson = await suggesedPhotos.json()
             let suggestedPhotosContainer = document.getElementById("suggestedPhotosContainer")
             for (let photo of photosJson) {
                 let createdElement = document.createElement("div")
                 createdElement.className = "suggestedPhotoDiv"
-                createdElement.setAttribute("onclick", `setHiddenInputValue("hiddenPhotoPathInput", "${photo.photoDir}")`)
+                createdElement.setAttribute("onclick", `setHiddenInputValue("hiddenPhotoNameInput", "${photo.photoName}")`)
                 suggestedPhotosContainer.appendChild(createdElement)
                 
                 let createdImage = document.createElement("img")
                 createdImage.className = "framedPhoto"
                 createdImage.setAttribute("src", photo.photoDir)
                 createdElement.appendChild(createdImage)
-
+                }
             }
+
         }
-        function clearSuggestedPhotoDiv() {
-            let divToClear = document.getElementById("suggestedPhotosContainer")
-            divToClear.innerHTML = ""
+        function clearElementById(elementId) {
+            let element = document.getElementById(elementId)
+            element.innerHTML = ""
         }
         function setHiddenInputValue(hiddenInputId, valueToSet) {
             let inputToModify = document.getElementById(hiddenInputId)
             inputToModify.setAttribute("value", valueToSet)
+            if (document.querySelectorAll(`input[name="photoSource"]:checked`) == "database") {
+                clearElementById("suggestedPhotosContainer")
+            }
+
         }
+
     </script>
 </html>

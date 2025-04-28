@@ -13,28 +13,29 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 
-export default async function addEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo) {
-    console.log("test")
+export default async function addCalendarEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo) {
+    console.log(eventName)
+    console.log(dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo)
     const eventPhotosDir = path.join(__dirname, "events")
+    console.log(photoAddingInfo)
     const addEventText = "INSERT INTO `events` (`id`, `nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?);"
     if (photoAddingInfo.mode == "link") {
-        try {
-            console.log("test")
-
-            if (photoAddingInfo.name.length > 1) {
-                const addedPhotoName = await downloadPhotoFromLink(photoAddingInfo.link, eventPhotosDir, photoAddingInfo.name)
-                const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, addedPhotoName, longDesc])
-            }
-            else {
-                const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, "", longDesc])
-                const addedEventId = addEventReq.insertId
-                const addedPhotoName = await downloadPhotoFromLink(photoAddingInfo.link, eventPhotosDir, addedEventId)
-            }
+        console.log("Będę dodawał z linka!")
+        if (photoAddingInfo.name.length > 1) {
+            console.log("Będę dodawał z linka z nazwą zdjęcia!")
+            const addedPhotoName = await downloadPhotoFromLink(photoAddingInfo.link, eventPhotosDir, photoAddingInfo.name)
+            const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, addedPhotoName, longDesc])
             return addEventReq
         }
-        catch (error) {
-            return error
+        else {
+            console.log("Będę dodawał z linka bez nazwy zdjęcia!")
+            const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, "", longDesc])
+            const addedEventId = addEventReq.insertId
+            const addedPhotoName = await downloadPhotoFromLink(photoAddingInfo.link, eventPhotosDir, addedEventId)
+            console.log(addEventReq)
+            console.log(addedPhotoName)
         }
+        return addEventReq
     }
     if (photoAddingInfo.mode == "database") {
         try {
