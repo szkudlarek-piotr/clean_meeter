@@ -101,13 +101,16 @@
             for (let [dateId, activity] of Object.entries(yearJson)) {
                 let modifiedDiv = document.getElementById(dateId)
                 modifiedDiv.innerHTML = ""
-                if (activity["class"] == "visit") {
+                if (activity["interactionClass"] == "visit") {
                     createSlider(dateId, activity["photos"], "red")
                 }
-                else if (activity["class"] == "meeting") {
-                    createSlider(dateId, activity["photos"], "#33cb33")
+                else if (activity["interactionClass"] == "meeting") {
+                    createSlider(dateId, activity["photos"], "blue")
                 }
-                else if (activity["class"] == "wedding") {
+                else if (activity["interactionClass"] == "event") {
+                    createSlider(dateId, activity["photos"], "green")
+                }
+                else if (activity["interactionClass"] == "wedding") {
                     modifiedDiv.setAttribute("style", "background-color: #ff72fb")
                     if (!activity.hasOwnProperty("partnerPhoto")) {
                         console.log("Mamy tutaj wesele bez partnerki.")
@@ -157,7 +160,7 @@
                     }
                 }
                 modifiedDiv.setAttribute("title", activity["title"])
-            }
+                }
         }
         createLeftMenu()
         makeCalendar(2025)

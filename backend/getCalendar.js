@@ -1,5 +1,8 @@
 import dotenv from 'dotenv'
 import mysql from 'mysql2'
+import fs from "fs"
+import path from "path"
+import { fileURLToPath } from "url";
 import createDateId from './multiuseFunctions/createDateId.js'
 import getHumanPhotoDir from './getPhotoFromHumanId.js'
 dotenv.config()
@@ -9,12 +12,31 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 function addDays(date, numberOfDays) {
     var result = new Date(date);
     result.setDate(result.getDate() + numberOfDays);
     return result;
   }
+function getEventPhotoFromName(photoName) {
+    const photoDir = path.join(__dirname, "events", photoName)
+    return photoDir
+}
 
+function getEventPhotoFromId(eventId) {
+    const eventPhotosDir = path.join(__dirname, "events")
+    let returnedDir = ""
+    for (let fileName of fs.linkSync(eventPhotosDir)) {
+        const nameWoExtension = fileName.split(".")[0]
+        if (nameWoExtension == eventId) {
+            returnedDir = path.join(eventPhotosDir, fileName)
+        }
+    }
+    return returnedDir
+}
 
 export default async function getCalendar(year) {
     let returnedDict = {}
@@ -24,11 +46,11 @@ export default async function getCalendar(year) {
         const wedDate = wedding.date
         const wedDateId = createDateId(wedDate)
         if (wedding.partner_id != null) {
-            const dictToAdd = {"class": "wedding", "title": wedding.info_after_hover, "partnerPhoto": getHumanPhotoDir(wedding.partner_id), "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id)}
+            const dictToAdd = {"interactionClass": "wedding", "title": wedding.info_after_hover, "partnerPhoto": getHumanPhotoDir(wedding.partner_id), "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id)}
             returnedDict[wedDateId] = dictToAdd
         }
         else {
-            const dictToAdd = {"class": "wedding", "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id), "title": wedding.info_after_hover}
+            const dictToAdd = {"interactionClass": "wedding", "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id), "title": wedding.info_after_hover}
             returnedDict[wedDateId] = dictToAdd
         }
     }
@@ -46,7 +68,7 @@ export default async function getCalendar(year) {
         const visitStartDate = record.visitDate
         let dateId = createDateId(visitStartDate)
         if (!(returnedDict[dateId])) {
-            returnedDict[dateId] = {"class": "visit","photos": [], "title": record.visitShortDesc}
+            returnedDict[dateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc}
         }
         returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
         if (record.visitDuration > 1) {
@@ -54,7 +76,7 @@ export default async function getCalendar(year) {
                 let newDate = addDays(visitStartDate, addedDays)
                 const newDateId = createDateId(newDate)
                 if (!(returnedDict[newDateId])) {
-                    returnedDict[newDateId] = {"class": "visit","photos": [], "title": record.visitShortDesc}
+                    returnedDict[newDateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc}
                 }
                 returnedDict[newDateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
@@ -71,17 +93,55 @@ export default async function getCalendar(year) {
         const recordDate = record.meetingDate
         const dateId = createDateId(recordDate)
         if (!(returnedDict[dateId])) {
-            returnedDict[dateId] = {"class": "meeting", "photos": [getHumanPhotoDir(record.humanId)], "title": record.shortDesc}
+            returnedDict[dateId] = {"interactionClass": "meeting", "photos": [getHumanPhotoDir(record.humanId)], "title": record.shortDesc}
         }
         else {
-            if (returnedDict[dateId]["class"].includes("meeting")) {
+            if (returnedDict[dateId]["interactionClass"].includes("meeting")) {
                 returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
             else {
-                returnedDict[dateId]["class"] = returnedDict[dateId]["class"] + "_meeting"
+                returnedDict[dateId]["interactionClass"] = returnedDict[dateId]["interactionClass"] + "_meeting"
                 returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
         }
     }
+    const eventsReqText = `SELECT events.id as event_id, events.nameOfEvent as eventName, events.meComingDate as comingDate, 
+    events.meLeavingDate as leavingDate, events.place as place, events.Generic_photo as generic_photo, event_companion.human_id as human_id
+    FROM events
+    LEFT JOIN event_companion ON events.id = event_companion.event_id
+    WHERE YEAR(events.meComingDate) = ? OR YEAR(events.meLeavingDate) = ?;`
+    const [eventsReq] = await pool.query(eventsReqText, [year, year])
+
+    for (let record of eventsReq) {
+        let currentDay = record.comingDate
+        let photosToAdd = []
+        if (record.generic_photo.length > 3) {
+            photosToAdd.push(getEventPhotoFromName(record.generic_photo))
+        }
+        else {
+            photosToAdd.push(getEventPhotoFromId(record.event_id))
+        }
+        if (record.human_id != null) {
+            photosToAdd.push(getHumanPhotoDir(record.human_id))
+        }
+        while (createDateId(currentDay) != createDateId(addDays(record.leavingDate, 1))) {
+            let currentDayId = createDateId(currentDay)
+            if (!(currentDayId in returnedDict)) {
+                returnedDict[currentDayId] = {"interactionClass": "event", "photos": photosToAdd, "title": record.eventName}
+            }
+            else {
+                for (let photoDirectory of photosToAdd) {
+                    if (!(returnedDict[currentDayId]["interactionClass"].includes("event"))) {
+                        returnedDict[currentDayId]["interactionClass"] += "_event"
+                    }
+                    if (!(returnedDict[currentDayId]["photos"].includes(photoDirectory))) {
+                        returnedDict[currentDayId]["photos"].push(photoDirectory)
+                    }
+                }
+            }
+            currentDay = addDays(currentDay, 1)
+        }
+    }
     return returnedDict
-}
+    }
+getCalendar(2025)
