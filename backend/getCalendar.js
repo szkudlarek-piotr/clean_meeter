@@ -29,7 +29,7 @@ function getEventPhotoFromName(photoName) {
 function getEventPhotoFromId(eventId) {
     const eventPhotosDir = path.join(__dirname, "events")
     let returnedDir = ""
-    for (let fileName of fs.linkSync(eventPhotosDir)) {
+    for (let fileName of fs.readdirSync(eventPhotosDir)) {
         const nameWoExtension = fileName.split(".")[0]
         if (nameWoExtension == eventId) {
             returnedDir = path.join(eventPhotosDir, fileName)
@@ -142,6 +142,7 @@ export default async function getCalendar(year) {
             currentDay = addDays(currentDay, 1)
         }
     }
+    console.log(returnedDict)
     return returnedDict
     }
 getCalendar(2025)
