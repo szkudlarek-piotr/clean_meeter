@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import mysql from 'mysql2'
-import getCliquePhoto from './getPhotoFromCliqueName.js'
+import getCliquePhoto from './getPhotoFromCliqueId.js'
 import getHumanPhotoDir from './getPhotoFromHumanId.js'
 dotenv.config()
 const pool = mysql.createPool({
