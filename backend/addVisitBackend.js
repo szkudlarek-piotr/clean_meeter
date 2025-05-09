@@ -8,7 +8,7 @@ const pool = mysql.createPool({
 }).promise()
 
 export default async function addVisit(date, duration, shortDesc, longDesc) {
-    const queryText = "INSERT INTO `visits` (`visit_id`, `visit_date`, `visit_duration`, `short_description`, `long_description`) VALUES (NULL, ?, ?, ?, ?);"
+    const queryText = "INSERT INTO `visits` (`visit_id`, `visit_date`, `visit_duration`, `short_description`, `description`) VALUES (NULL, ?, ?, ?, ?);"
     const [addQuoteQuery] = await pool.query(queryText, [date, duration, shortDesc, longDesc])
     return addQuoteQuery
 }
