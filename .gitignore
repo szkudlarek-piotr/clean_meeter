@@ -6,3 +6,5 @@
 /backend/events/
 /backend/meetings/
 /backend/.env
+/backend/.env_clean
+/backend/getCalendarTest.js
