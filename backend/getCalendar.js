@@ -50,7 +50,7 @@ export default async function getCalendar(year) {
             returnedDict[wedDateId] = dictToAdd
         }
         else {
-            const dictToAdd = {"interactionClass": "wedding", "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id), "title": wedding.info_after_hover}
+            const dictToAdd = {"interactionClass": "wedding", "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id), "title": wedding.info_after_hover, "computedTitle": wedding.info_after_hover}
             returnedDict[wedDateId] = dictToAdd
         }
     }
@@ -65,18 +65,34 @@ export default async function getCalendar(year) {
     const [visitsReq] = await pool.query(visitsQueryText, [year, year])
     
     for (let record of visitsReq) {
-        const visitStartDate = record.visitDate
-        let dateId = createDateId(visitStartDate)
+        let visitAddedDate = record.visitDate
+        let dateId = createDateId(visitAddedDate)
         if (!(returnedDict[dateId])) {
-            returnedDict[dateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc}
+            returnedDict[dateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc, "titlesDict": {[visitAddedDate.toISOString()]: record.visitShortDesc}}
+        }
+        else {
+            if (!(Object.values(returnedDict[dateId]["titlesDict"]).includes(record.visitShortDesc))) {
+                while (Object.keys(returnedDict[dateId]["titlesDict"]).includes(visitAddedDate.toISOString())) {
+                    visitAddedDate = new Date(visitAddedDate.getTime() + 5000)
+                }
+                returnedDict[dateId]["titlesDict"][visitAddedDate.toISOString()] = record.visitShortDesc
+            }
         }
         returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
         if (record.visitDuration > 1) {
             for (let addedDays = 1; addedDays<record.visitDuration; addedDays+=1) {
-                let newDate = addDays(visitStartDate, addedDays)
+                let newDate = addDays(visitAddedDate, addedDays)
                 const newDateId = createDateId(newDate)
                 if (!(returnedDict[newDateId])) {
-                    returnedDict[newDateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc}
+                    returnedDict[newDateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc, "titlesDict": {[visitAddedDate.toISOString()]: record.visitShortDesc}}
+                }
+                else {
+                    if (!(Object.values(returnedDict[dateId]["titlesDict"]).includes(record.visitShortDesc))) {
+                        while (Object.keys(returnedDict[dateId]["titlesDict"]).includes(newDate.toISOString())) {
+                            newDate = new Date(newDate.getTime() + 5000)
+                        }
+                        returnedDict[dateId]["titlesDict"][newDate.toISOString()] = record.visitShortDesc
+                    }
                 }
                 returnedDict[newDateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
@@ -90,12 +106,21 @@ export default async function getCalendar(year) {
     `
     const [meetingReq] = await pool.query(meetingsReqText, [year])
     for (let record of meetingReq) {
-        const recordDate = record.meetingDate
+        let recordDate = new Date(record.meetingDate);
         const dateId = createDateId(recordDate)
         if (!(returnedDict[dateId])) {
-            returnedDict[dateId] = {"interactionClass": "meeting", "photos": [getHumanPhotoDir(record.humanId)], "title": record.shortDesc}
+            returnedDict[dateId] = {"interactionClass": "meeting", "photos": [getHumanPhotoDir(record.humanId)], "title": record.shortDesc, "titlesDict": {[recordDate.toISOString()]: record.shortDesc}}
         }
+        //if date is already in the returnedDict
         else {
+            const descriptionsSoFar= Object.values(returnedDict[dateId]["titlesDict"])
+            if (!(descriptionsSoFar.includes(record.shortDesc))) {
+                while(Object.keys(returnedDict[dateId]["titlesDict"]).includes(recordDate.toISOString())) {
+                    recordDate = new Date(recordDate.getTime() + 5000)
+                }
+                returnedDict[dateId]["titlesDict"][recordDate.toISOString()] = record.shortDesc
+            }
+
             if (returnedDict[dateId]["interactionClass"].includes("meeting")) {
                 returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
@@ -113,7 +138,7 @@ export default async function getCalendar(year) {
     const [eventsReq] = await pool.query(eventsReqText, [year, year])
 
     for (let record of eventsReq) {
-        let currentDay = record.comingDate
+        let currentDatetime = record.comingDate
         let photosToAdd = []
         if (record.generic_photo.length > 3) {
             photosToAdd.push(getEventPhotoFromName(record.generic_photo))
@@ -124,25 +149,64 @@ export default async function getCalendar(year) {
         if (record.human_id != null) {
             photosToAdd.push(getHumanPhotoDir(record.human_id))
         }
-        while (createDateId(currentDay) != createDateId(addDays(record.leavingDate, 1))) {
-            let currentDayId = createDateId(currentDay)
-            if (!(currentDayId in returnedDict)) {
-                returnedDict[currentDayId] = {"interactionClass": "event", "photos": photosToAdd, "title": record.eventName}
+        while (createDateId(currentDatetime) != createDateId(addDays(record.leavingDate, 1))) {
+            let currentDatetimeId = createDateId(currentDatetime)
+            if (!(currentDatetimeId in returnedDict)) {
+                returnedDict[currentDatetimeId] = {"interactionClass": "event", "photos": photosToAdd, "title": record.eventName, "titlesDict": {[currentDatetime.toISOString()]: record.eventName}}
             }
             else {
-                for (let photoDirectory of photosToAdd) {
-                    if (!(returnedDict[currentDayId]["interactionClass"].includes("event"))) {
-                        returnedDict[currentDayId]["interactionClass"] += "_event"
+                //if a given eventName is not in titlesDict
+                if (!(Object.values(returnedDict[currentDatetimeId]["titlesDict"]).includes(record.eventName))) {
+                    while(Object.keys(returnedDict[currentDatetimeId]["titlesDict"]).includes(currentDatetime.toISOString())) {
+                        currentDatetime = new Date(currentDatetime.getTime() + 5000)
                     }
-                    if (!(returnedDict[currentDayId]["photos"].includes(photoDirectory))) {
-                        returnedDict[currentDayId]["photos"].push(photoDirectory)
+                    
+                    returnedDict[currentDatetimeId]["titlesDict"][currentDatetime.toISOString()] = record.eventName
+                }
+                for (let photoDirectory of photosToAdd) {
+                    if (!(returnedDict[currentDatetimeId]["interactionClass"].includes("event"))) {
+                        returnedDict[currentDatetimeId]["interactionClass"] += "_event"
+                    }
+                    if (!(returnedDict[currentDatetimeId]["photos"].includes(photoDirectory))) {
+                        returnedDict[currentDatetimeId]["photos"].push(photoDirectory)
                     }
                 }
             }
-            currentDay = addDays(currentDay, 1)
+            currentDatetime = addDays(currentDatetime, 1)
         }
     }
-    console.log(returnedDict)
+    
+    for (let dateIdentifier in returnedDict) {
+        if (returnedDict[dateIdentifier]["interactionClass"] != "wedding") {
+            if (Object.keys(returnedDict[dateIdentifier]["titlesDict"]).length == 1) {
+                returnedDict[dateIdentifier]["computedTitle"] = Object.values(returnedDict[dateIdentifier]["titlesDict"])[0]
+            }
+            if (Object.keys(returnedDict[dateIdentifier]["titlesDict"]).length == 2) {
+                let sortedKeys = Object.keys(returnedDict[dateIdentifier]["titlesDict"]).sort()
+                let sortedValues = []
+                for (let key of sortedKeys) {
+                    sortedValues.push(returnedDict[dateIdentifier]["titlesDict"][key])
+                }
+                let computedTitle = `${sortedValues[0]} oraz ${sortedValues[1]}`
+                returnedDict[dateIdentifier]["computedTitle"] = computedTitle
+            }
+            if (Object.keys(returnedDict[dateIdentifier]["titlesDict"]).length > 2) {
+                let sortedKeys = Object.keys(returnedDict[dateIdentifier]["titlesDict"]).sort()
+                let sortedValues = []
+                for (let key of sortedKeys) {
+                    sortedValues.push(returnedDict[dateIdentifier]["titlesDict"][key])
+                }
+                let computedTitle = ""
+                for (let description of sortedValues.slice(0,-1)) {
+                    computedTitle = computedTitle + `${description}, `
+                }
+                computedTitle = computedTitle + ` oraz ${sortedValues.at(-1)}`
+                returnedDict[dateIdentifier]["computedTitle"] = computedTitle
+            }
+        }
+        else {
+            returnedDict[dateIdentifier]["computedTitle"] = returnedDict[dateIdentifier]["title"]
+        }
+    }
     return returnedDict
     }
-getCalendar(2025)

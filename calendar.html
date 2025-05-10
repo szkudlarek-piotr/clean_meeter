@@ -95,10 +95,14 @@
 
         }
         async function addThingsToCalendar(year) {
+            let allClasses = []
             const yearEvents = await fetch(`http://localhost:3000/get-calendar?year=${year}`)
             const yearJson = await yearEvents.json()
             const ringsPhotoDir = "backend\\functionalPhotos\\rings.png"
             for (let [dateId, activity] of Object.entries(yearJson)) {
+                if (!(allClasses.includes(activity["interactionClass"]))) {
+                    allClasses.push(activity["interactionClass"])
+                }
                 let modifiedDiv = document.getElementById(dateId)
                 modifiedDiv.innerHTML = ""
                 if (activity["interactionClass"] == "visit") {
@@ -109,6 +113,15 @@
                 }
                 else if (activity["interactionClass"] == "event") {
                     createSlider(dateId, activity["photos"], "green")
+                }
+                else if (activity["interactionClass"] == "visit_meeting") {
+                    createSlider(dateId, activity["photos"], "#ff8000")
+                }
+                else if (activity["interactionClass"] == "visit_event") {
+                    createSlider(dateId, activity["photos"], "#cc00cc")
+                }
+                else if (activity["interactionClass"] == "meeting_event") {
+                    createSlider(dateId, activity["photos"], "#00cccc")
                 }
                 else if (activity["interactionClass"] == "wedding") {
                     modifiedDiv.setAttribute("style", "background-color: #ff72fb")
@@ -159,7 +172,7 @@
                         modifiedDiv.appendChild(partnerPhotoElement)
                     }
                 }
-                modifiedDiv.setAttribute("title", activity["title"])
+                modifiedDiv.setAttribute("title", activity["computedTitle"])
                 }
         }
         createLeftMenu()
