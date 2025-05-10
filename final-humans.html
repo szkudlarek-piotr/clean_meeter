@@ -11,6 +11,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
     </head>
     <body>
+
         <header>
             Baza danych spotkań
         </header>
@@ -36,6 +37,8 @@
             for (human of humansJson) {
                 let createdHumanTile = document.createElement("div")
                 createdHumanTile.setAttribute("class", "human_tile")
+                createdHumanTile.setAttribute("id", `humanTile_${human.id}`)
+                createdHumanTile.setAttribute("onclick", `showHumanModal("${human.id}")`)
                 let humanPhoto = human.photoDir
                 let humanImageElement = document.createElement("img")
                 humanImageElement.setAttribute("src", humanPhoto)
@@ -72,6 +75,9 @@
                 }
 
             }
+        }
+        async function showHumanModal(humanId) {
+            console.log(`ID równe ${humanId}`)
         }
         createHumanTiles()
     </script>
