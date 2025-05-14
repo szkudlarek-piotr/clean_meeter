@@ -17,6 +17,7 @@ import addWedding from './addWedding.js'
 import getCalendar from './getCalendar.js'
 import getHumanNameFromId from './getHumanNameFromId.js'
 import getSuggestedEventPhotos from './getSuggestedEventPhotos.js'
+import getBasicInfoForModal from './getBasicInfoForHumanModal.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -75,6 +76,18 @@ app.get('/get-human-from-substring', async (req, res) => {
         res.status(500).send({ error: "Internal Server Error" });
     }
 });
+
+app.get('/basic-info-for-human-modal', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const requestResult = await getBasicInfoForModal(humanId)
+        res.send(requestResult)
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+})
 
 app.post('/add-human', async(req, res) => {
     const name = req.query.name
