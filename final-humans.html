@@ -17,7 +17,6 @@
             </div>
             <div id="restOfModal">
                 <div id="leftModalMenu">
-                    <h2>Menu</h2>
                 </div>
                 <div id="placeForHumanInfo">
 
@@ -92,28 +91,21 @@
             let modalElement = document.getElementById("human_modal")
             modalElement.style.display = "block"
             let modalMenuELement = document.getElementById("leftModalMenu")
+            let menuHeader = document.createElement("h2")
+            menuHeader.innerText = "Menu"
+            modalMenuELement.appendChild(menuHeader)
             let numberOfModalOptions = modalMenuELement.getElementsByClassName("left_modal_option").length
-            console.log(numberOfModalOptions)
             if (numberOfModalOptions == 0) {
-                console.log("Mam zero ludziów")
                 const modalButtonsDict = {"visits": {"text": "Wizyty"}, "meetings": {"text": "Spotkania"}, "events": {"text": "Wydarzenia"}, "quotes": {"text": "Cytaty"}}
+                
                 createModalButton("Dane ogólne")
                 const modalButtonsKeys = Object.keys(modalButtonsDict)
                 const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
                 const basicInfoJson = await basicHumanInfoReq.json()
-                if (basicInfoJson["visitsCount"] > 0) {
-                    console.log(basicInfoJson)
-                    createModalButton(modalButtonsDict["visits"]["text"])
-                }
-                if (basicInfoJson["meetingsCount"] > 0) {
-                    createModalButton(modalButtonsDict["meetings"]["text"])
-                }
-                if (basicInfoJson["eventsCount"] > 0) {
-                    createModalButton(modalButtonsDict["events"]["text"])
-                }
-                if (basicInfoJson["quotesCount"] > 0) {
-                    createModalButton(modalButtonsDict["quotes"]["text"])
-                }
+                basicInfoJson["visitsCount"] > 0 && createModalButton(modalButtonsDict["visits"]["text"]);
+                basicInfoJson["meetingsCount"] > 0 && createModalButton(modalButtonsDict["meetings"]["text"]);
+                basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"]);
+                basicInfoJson["quotesCount"] > 0 && createModalButton(modalButtonsDict["quotes"]["text"]);
                 
             }
         }
