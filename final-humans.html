@@ -154,7 +154,30 @@
             basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
             placeForHumanInfo.appendChild(closeFriendsHeader)
 
+            const usualCompanionsReq = await fetch(`http://localhost:3000/get-often-seen-with?humanId=${humanId}`)
+            const usualCompanionsJson = await usualCompanionsReq.json()
+
+            let placeForInteractingPeople = document.createElement("div")
+            placeForInteractingPeople.id = "placeForInteractingPeople"
+            placeForHumanInfo.appendChild(placeForInteractingPeople)
+
+            for (let human of usualCompanionsJson) {
+                createInteractingPersonObj(human.fullName, human.photoDir)
+            }
+
         }
+        function createInteractingPersonObj(humanName, photoDir) {
+            let placeForHumanInfo = document.getElementById("placeForInteractingPeople")
+
+            let createdElement = document.createElement("img")
+            createdElement.setAttribute("title", humanName)
+            createdElement.setAttribute("src", photoDir)
+            createdElement.setAttribute("class", "interactingPersonImage")
+
+            placeForHumanInfo.appendChild(createdElement)
+            
+        }
+
         async function showQuotes(humanId) {
             clearModalInfo()
             console.log(`Pokażę teraz cytaty ${humanId}.`)

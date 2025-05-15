@@ -18,6 +18,7 @@ import getCalendar from './getCalendar.js'
 import getHumanNameFromId from './getHumanNameFromId.js'
 import getSuggestedEventPhotos from './getSuggestedEventPhotos.js'
 import getBasicInfoForModal from './getBasicInfoForHumanModal.js'
+import getOftenSeenWith from './getOftenSeenWith.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -87,6 +88,14 @@ app.get('/basic-info-for-human-modal', async(req, res) => {
         console.error(error);
         res.status(500).send({ error: "Internal Server Error" });
     }
+})
+
+app.get('/get-often-seen-with', async(req, res) => {
+    const humanId = req.query.humanId
+    console.log(humanId)
+    const returnedList = await getOftenSeenWith(humanId)
+    console.log(returnedList)
+    res.send(returnedList)
 })
 
 app.post('/add-human', async(req, res) => {

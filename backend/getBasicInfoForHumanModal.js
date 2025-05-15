@@ -57,6 +57,8 @@ export default async function getBasicInfoForModal(humanId) {
         const [getReq] = await pool.query(requestText, [humanId])
         console.log(getReq)
         let returnedDict = {
+            "photoDir": getHumanPhotoDir(getReq[0]["human_id"]),
+            "cliqueName": getReq[0]["clique_name"],
             "fullName": getReq[0]["full_name"],
             "gender": getReq[0]["gender"],
             "cliqueName": getReq[0]["clique_name"],
