@@ -115,8 +115,8 @@ a {
     display: none;
     width:70%;
     top: 5%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 15%;
+    margin-right: 15%;
     height: 90%;
     background-color: antiquewhite;
     position: fixed;
@@ -130,15 +130,17 @@ a {
     margin-top: 0px;
     padding-top: 0px;
 }
-#topOfHumanModal > .closingDiv {
+#topOfHumanModal > #closingDiv {
     height: 30px;
     border: 1px solid black;
     font-size: 30px;
     border-radius: 15px;
     width: 30px;
     position: absolute;
+    text-align: center;
     right: 10px;
     top: 10px;
+    cursor: pointer;
 }
 #restOfModal {
     height: calc(100% - 40px);
@@ -150,7 +152,7 @@ a {
 #leftModalMenu {
     width: 25%;
     font-family: 'Times New Roman', Times, serif;
-    border-right: 1px solid black;
+    text-align: center;
 }
 .left_modal_option {
     font-weight: 300;
@@ -164,6 +166,7 @@ a {
 .humanPhotoInModal {
     margin-top: 20px;
     margin-bottom: 20px;
+    border-radius: 20px;
     width:30%;
     border: 1px solid black;
 
@@ -181,6 +184,11 @@ a {
 }
 .nameInGeneralInfo {
     font-family: 'Comic Sans MS';
+    font-size: 36px;
+}
+.lineInGeneralInfo {
+    font-family: 'Comic Sans MS';
+    font-size: 20px;
 }
 
 #placeForInteractingPeople {

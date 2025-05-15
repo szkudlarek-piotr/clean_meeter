@@ -96,24 +96,87 @@
             modalMenuELement.appendChild(menuHeader)
             let numberOfModalOptions = modalMenuELement.getElementsByClassName("left_modal_option").length
             if (numberOfModalOptions == 0) {
-                const modalButtonsDict = {"visits": {"text": "Wizyty"}, "meetings": {"text": "Spotkania"}, "events": {"text": "Wydarzenia"}, "quotes": {"text": "Cytaty"}}
+                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}}
                 
-                createModalButton("Dane ogólne")
+                createModalButton("Dane ogólne", `showGeneralInfo(${humanId})`)
                 const modalButtonsKeys = Object.keys(modalButtonsDict)
                 const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
                 const basicInfoJson = await basicHumanInfoReq.json()
-                basicInfoJson["visitsCount"] > 0 && createModalButton(modalButtonsDict["visits"]["text"]);
-                basicInfoJson["meetingsCount"] > 0 && createModalButton(modalButtonsDict["meetings"]["text"]);
-                basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"]);
-                basicInfoJson["quotesCount"] > 0 && createModalButton(modalButtonsDict["quotes"]["text"]);
-                
+                basicInfoJson["visitsCount"] > 0 && createModalButton(modalButtonsDict["visits"]["text"], modalButtonsDict["visits"]["functionName"]);
+                basicInfoJson["meetingsCount"] > 0 && createModalButton(modalButtonsDict["meetings"]["text"], modalButtonsDict["meetings"]["functionName"]);
+                basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"], modalButtonsDict["events"]["functionName"]);
+                basicInfoJson["quotesCount"] > 0 && createModalButton(modalButtonsDict["quotes"]["text"], modalButtonsDict["quotes"]["functionName"]);
             }
+            showGeneralInfo(humanId)
         }
-        function createModalButton(buttonText) {
+        function clearModalInfo() {
+            document.getElementById("placeForHumanInfo").innerHTML = ""
+        }
+        async function showGeneralInfo(humanId) {
+            clearModalInfo()
+            const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
+            const basicInfoJson = await basicHumanInfoReq.json()
+            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            console.log(basicInfoJson)
+            
+
+            let humanPhotoElement = document.createElement("img")
+            humanPhotoElement.setAttribute("src", basicInfoJson["photoDir"])
+            humanPhotoElement.setAttribute("class", "humanPhotoInModal")
+            placeForHumanInfo.appendChild(humanPhotoElement)
+
+            let humanNameElement = document.createElement("div")
+            humanNameElement.innerText = basicInfoJson["fullName"]
+            humanNameElement.setAttribute("class", "nameInGeneralInfo")
+            placeForHumanInfo.appendChild(humanNameElement)
+
+            let cliqueLine = document.createElement("div")
+            cliqueLine.innerText = `Należy do kliki ${basicInfoJson["cliqueName"]}.`
+            cliqueLine.setAttribute("class", "lineInGeneralInfo")
+            placeForHumanInfo.appendChild(cliqueLine)
+
+            let visitsLine = document.createElement("div")
+            visitsLine.innerText = `Liczba wizyt: ${basicInfoJson["visitsCount"]}.`
+            visitsLine.setAttribute("class", "lineInGeneralInfo")
+            placeForHumanInfo.appendChild(visitsLine)
+
+            let meetingsLine = document.createElement("div")
+            meetingsLine.innerText = `Liczba spotkań: ${basicInfoJson["meetingsCount"]}.`
+            meetingsLine.setAttribute("class", "lineInGeneralInfo")
+            placeForHumanInfo.appendChild(meetingsLine)
+
+            let eventsLine = document.createElement("div")
+            eventsLine.innerText = `Liczba wspónych wydarzeń: ${basicInfoJson["eventsCount"]}.`
+            eventsLine.setAttribute("class", "lineInGeneralInfo")
+            placeForHumanInfo.appendChild(eventsLine)
+
+            let closeFriendsHeader = document.createElement("h3")
+            basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
+            placeForHumanInfo.appendChild(closeFriendsHeader)
+
+        }
+        async function showQuotes(humanId) {
+            clearModalInfo()
+            console.log(`Pokażę teraz cytaty ${humanId}.`)
+        }
+        async function showMeetings(humanId) {
+            clearModalInfo()
+            console.log(`Pokażę teraz spotkania ${humanId}.`)
+        }
+        async function showVisits(humanId) {
+            clearModalInfo()
+            console.log(`Pokażę teraz wizyty ${humanId}.`)
+        }
+        async function showEvents(humanId) {
+            clearModalInfo()
+            console.log(`Pokażę teraz wydarzenia ${humanId}.`)
+        }
+        function createModalButton(buttonText, buttonFunction) {
             let leftMenuElement = document.getElementById("leftModalMenu")
             let createdElement = document.createElement("div")
             createdElement.setAttribute("class", "left_option")
             createdElement.innerText = buttonText
+            createdElement.setAttribute("onclick", buttonFunction)
             leftMenuElement.appendChild(createdElement)
         }
         function closeModal() {
