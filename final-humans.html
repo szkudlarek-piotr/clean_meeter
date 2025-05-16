@@ -117,8 +117,6 @@
             const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
             const basicInfoJson = await basicHumanInfoReq.json()
             let placeForHumanInfo = document.getElementById("placeForHumanInfo")
-            console.log(basicInfoJson)
-            
 
             let humanPhotoElement = document.createElement("img")
             humanPhotoElement.setAttribute("src", basicInfoJson["photoDir"])
@@ -180,7 +178,15 @@
 
         async function showQuotes(humanId) {
             clearModalInfo()
-            console.log(`Pokażę teraz cytaty ${humanId}.`)
+            const quotesRequest = await fetch(`http://localhost:3000/get-human-quotes?humanId=${humanId}`)
+            const quotesJson = await quotesRequest.json()
+            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            for (let quote of quotesJson) {
+                let quoteElement = document.createElement("div")
+                quoteElement.setAttribute("class", "quoteDivInModal")
+                quoteElement.innerHTML = `"${quote["quote"]}"`
+                placeForHumanInfo.appendChild(quoteElement)
+            }
         }
         async function showMeetings(humanId) {
             clearModalInfo()
