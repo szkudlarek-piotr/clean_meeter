@@ -148,6 +148,20 @@
             eventsLine.setAttribute("class", "lineInGeneralInfo")
             placeForHumanInfo.appendChild(eventsLine)
 
+            let quotesLine = document.createElement("div")
+            quotesLine.setAttribute("class", "lineInGeneralInfo")
+            basicInfoJson["gender"] == "M" ? quotesLine.innerText = `Autor ${basicInfoJson["quotesCount"]} publicznych cytatów.` : 
+            quotesLine.innerText = `Autorka ${basicInfoJson["quotesCount"]} publicznych cytatów.`
+            placeForHumanInfo.appendChild(quotesLine)
+
+            if (basicInfoJson["spouse_name"] != null) {
+                let spouseLine = document.createElement("div")
+                spouseLine.setAttribute("class", "lineInGeneralInfo")
+                basicInfoJson["gender"] == "M" ? spouseLine.innerText = `Jego żoną jest ${basicInfoJson["spouse_name"]}.` : spouseLine.innerText = `Jej mężem jest ${basicInfoJson["spouse_name"]}.`
+                placeForHumanInfo.appendChild(spouseLine)
+            }
+
+
             let closeFriendsHeader = document.createElement("h3")
             basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
             placeForHumanInfo.appendChild(closeFriendsHeader)
