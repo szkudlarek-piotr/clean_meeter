@@ -40,7 +40,7 @@ function getEventPhotoFromId(eventId) {
 
 export default async function getCalendar(year) {
     let returnedDict = {}
-    const weddingsQueryText = `SELECT date, man_id, woman_id, partner_id, info_after_hover FROM weddings WHERE YEAR(date) = ?`
+    const weddingsQueryText = `SELECT date, man_id, woman_id, partner_id, info_after_hover FROM weddings WHERE YEAR(date) = ? AND was_i_invited = 1`
     const [wedQuery] = await pool.query(weddingsQueryText, [year])
     for (let wedding of wedQuery) {
         const wedDate = wedding.date
