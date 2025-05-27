@@ -151,7 +151,7 @@
             let quotesLine = document.createElement("div")
             quotesLine.setAttribute("class", "lineInGeneralInfo")
             basicInfoJson["gender"] == "M" ? quotesLine.innerText = `Autor ${basicInfoJson["quotesCount"]} publicznych cytatów.` : 
-            quotesLine.innerText = `Autorka ${basicInfoJson["quotesCount"]} publicznych cytatów.`
+            quotesLine.innerHTML = `Autorka ${basicInfoJson["quotesCount"]} publicznych cytatów.`
             placeForHumanInfo.appendChild(quotesLine)
 
             if (basicInfoJson["spouse_name"] != null) {
