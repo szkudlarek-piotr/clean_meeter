@@ -208,7 +208,37 @@
         }
         async function showVisits(humanId) {
             clearModalInfo()
-            console.log(`Pokażę teraz wizyty ${humanId}.`)
+            const visitsRequest = await fetch(`http://localhost:3000/get-human-visits?humanId=${humanId}`)
+            const visitsJson = await visitsRequest.json()
+            console.log(visitsJson)
+            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let visitsHeader = document.createElement("h1")
+            visitsHeader.innerText = "Wizyty"
+            placeForHumanInfo.appendChild(visitsHeader)
+
+            for (let visitDict of visitsJson) {
+                console.log(visitDict)
+                let singleVisitDiv = document.createElement("div")
+                singleVisitDiv.setAttribute("class", "visitDetailsDiv")
+                placeForHumanInfo.appendChild(singleVisitDiv)
+
+                let dateDiv = document.createElement("div")
+                dateDiv.setAttribute("class", "interactionDateDiv")
+                dateDiv.innerText = visitDict["date"]
+                singleVisitDiv.appendChild(dateDiv)
+
+                let titleDiv = document.createElement("div")
+                titleDiv.setAttribute("class", "interactionTitle")
+                titleDiv.innerText = visitDict["shortDesc"]
+                singleVisitDiv.appendChild(titleDiv)
+
+                if (visitDict.hasOwnProperty("longDesc")) {
+                    let longDesc = document.createElement("div")
+                    longDesc.setAttribute("class", "interactionLongDesc")
+                    longDesc.innerText = visitDict["longDesc"]
+                    singleVisitDiv.appendChild(longDesc)
+                }
+            }
         }
         async function showEvents(humanId) {
             clearModalInfo()

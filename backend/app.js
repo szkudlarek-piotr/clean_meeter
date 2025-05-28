@@ -20,7 +20,7 @@ import getSuggestedEventPhotos from './getSuggestedEventPhotos.js'
 import getBasicInfoForModal from './getBasicInfoForHumanModal.js'
 import getOftenSeenWith from './getOftenSeenWith.js'
 import getHumanQuotes from './getHumanQuotes.js'
-import getHumanVisits from './getHumanVIsits.js'
+import getHumanVisits from './getHumanVisits.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -50,9 +50,14 @@ app.get('/get-human-name-from-id', async(req,res) => {
 })
 
 app.get('/get-cliques-from-subs', async(req, res) => {
-    const deliveredSubstring = req.query.cliqueInput
-    const returnedArray = await getCliquesFromSubstring(deliveredSubstring)
-    res.send(returnedArray)
+    try {
+        const deliveredSubstring = req.query.cliqueInput
+        const returnedArray = await getCliquesFromSubstring(deliveredSubstring)
+        res.send(returnedArray)
+    }
+    catch (error) {
+        res.send(error)
+    }
 })
 
 app.get('/get-all-cliques', async(req,res) => {
