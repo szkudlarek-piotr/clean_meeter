@@ -123,6 +123,9 @@
                 else if (activity["interactionClass"] == "meeting_event") {
                     createSlider(dateId, activity["photos"], "#00cccc")
                 }
+                else if (activity["interactionClass"].includes("trip")) {
+                    createSlider(dateId, activity["photos"], "olive")
+                }
                 else if (activity["interactionClass"] == "wedding") {
                     modifiedDiv.setAttribute("style", "background-color: #ff72fb")
                     if (!activity.hasOwnProperty("partnerPhoto")) {
@@ -174,6 +177,7 @@
                 }
                 modifiedDiv.setAttribute("title", activity["computedTitle"])
                 }
+
         }
         createLeftMenu()
         makeCalendar(2025)

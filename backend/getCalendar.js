@@ -98,6 +98,8 @@ export default async function getCalendar(year) {
             }
         }
     }
+
+
     const meetingsReqText = `SELECT meetings.meeting_date as meetingDate, 
     meetings.short_description as shortDesc, meeting_human.human_id AS humanId
     FROM meeting_human
@@ -176,6 +178,52 @@ export default async function getCalendar(year) {
         }
     }
     
+    const tripsReqText = `
+    SELECT citybreaks.ID AS id, citybreaks.Place as tripName, citybreaks.Date_start as dateStart, citybreaks.Date_stop AS dateStop, citybreak_companion.human_id AS humanId
+    FROM citybreaks
+    JOIN citybreak_companion ON citybreak_companion.citybreak_id = citybreaks.ID
+    WHERE YEAR(citybreaks.Date_start) = ? OR YEAR(citybreaks.Date_stop) = ?;
+    `
+    const [tripsQuery] = await pool.query(tripsReqText, [year, year])
+
+    for (let trip of tripsQuery) {
+        console.log(trip)
+        let photosToAdd = []
+        const tripPhotosDir = path.join(__dirname, "trips", trip.id.toString())
+        const photosList = fs.readdirSync(tripPhotosDir)
+        const humanPhotoDir = getHumanPhotoDir(trip.humanId)
+        for (const photoName of photosList) {
+            photosToAdd.push(path.join(tripPhotosDir, photoName))
+        }
+        if (!(photosToAdd.includes(humanPhotoDir))) {
+            photosToAdd.push(humanPhotoDir)
+        }
+        //photosToAdd.push(getHumanPhotoDir(trip.humanId))
+        let tripTitle = trip.tripName
+        let currentDatetime = trip.dateStart
+        let endDate = trip.dateStop
+        while (createDateId(currentDatetime) != createDateId(addDays(endDate, 1))) {
+            console.log(createDateId(currentDatetime))
+            let dateId = createDateId(currentDatetime)
+            if (!(returnedDict[dateId])) {
+                console.log({"interactionClass": "trip", "title": tripTitle, "photos": photosToAdd, "titlesDict": {[currentDatetime.toISOString()]: tripTitle}})
+                returnedDict[dateId] = {"interactionClass": "trip", "title": tripTitle, "photos": photosToAdd, "titlesDict": {[currentDatetime.toISOString()]: tripTitle}}
+            }
+            /*else {
+                returnedDict[dateId]["interactionClass"] += "_trip"
+                for (let photoDir of photosToAdd) {
+                    if (!(returnedDict[dateId]["photos"].includes(photoDir))) {
+                        returnedDict[dateId]["photos"].push(photoDir)
+                    }
+                }
+                returnedDict[dateId]["titlesDict"][currentDatetime.toISOString()] = tripTitle
+            }*/
+           currentDatetime = addDays(currentDatetime, 1)
+        }
+    }
+
+
+
     for (let dateIdentifier in returnedDict) {
         if (returnedDict[dateIdentifier]["interactionClass"] != "wedding") {
             if (Object.keys(returnedDict[dateIdentifier]["titlesDict"]).length == 1) {
@@ -208,5 +256,7 @@ export default async function getCalendar(year) {
             returnedDict[dateIdentifier]["computedTitle"] = returnedDict[dateIdentifier]["title"]
         }
     }
+    console.log(`${returnedDict} - linia 254`)
     return returnedDict
     }
+    //getCalendar(2025)
