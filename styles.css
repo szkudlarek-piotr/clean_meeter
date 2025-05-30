@@ -383,7 +383,8 @@ h2 .inputHeader {
 }
 .slider>img {
     width: 100%;
-    margin-top: 10%;
+    margin-top: calc(10% - 2px);
+    border: 1px solid black;
     border-radius: 3px;
 }
 #weddingCharactersDiv {
