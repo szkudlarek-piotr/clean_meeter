@@ -209,7 +209,7 @@ export default async function getCalendar(year) {
                 console.log({"interactionClass": "trip", "title": tripTitle, "photos": photosToAdd, "titlesDict": {[currentDatetime.toISOString()]: tripTitle}})
                 returnedDict[dateId] = {"interactionClass": "trip", "title": tripTitle, "photos": photosToAdd, "titlesDict": {[currentDatetime.toISOString()]: tripTitle}}
             }
-            /*else {
+            else {
                 returnedDict[dateId]["interactionClass"] += "_trip"
                 for (let photoDir of photosToAdd) {
                     if (!(returnedDict[dateId]["photos"].includes(photoDir))) {
@@ -217,7 +217,7 @@ export default async function getCalendar(year) {
                     }
                 }
                 returnedDict[dateId]["titlesDict"][currentDatetime.toISOString()] = tripTitle
-            }*/
+            }
            currentDatetime = addDays(currentDatetime, 1)
         }
     }
