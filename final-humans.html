@@ -212,6 +212,7 @@
             const meetingsReq = await fetch(`http://localhost:3000/get-human-meetings?humanId=${humanId}`)
             const meetingsJson = await meetingsReq.json()
             
+            
             let placeForHumanInfo = document.getElementById("placeForHumanInfo")
             let meetingsHeader = document.createElement("h1")
             meetingsHeader.innerText = "Spotkania"
@@ -249,7 +250,8 @@
             clearModalInfo()
             const visitsRequest = await fetch(`http://localhost:3000/get-human-visits?humanId=${humanId}`)
             const visitsJson = await visitsRequest.json()
-            console.log(visitsJson)
+            
+
             let placeForHumanInfo = document.getElementById("placeForHumanInfo")
             let visitsHeader = document.createElement("h1")
             visitsHeader.innerText = "Wizyty"
@@ -280,8 +282,44 @@
         }
         async function showEvents(humanId) {
             clearModalInfo()
-            console.log(`Pokażę teraz wydarzenia ${humanId}.`)
+            const eventsRequest = await fetch(`http://localhost:3000/get-human-events?humanId=${humanId}`)
+            const eventsJson = await eventsRequest.json()
+            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            
+            let eventsTitle = document.createElement("h1")
+            eventsTitle.innerText = "Wspólne wydarzenia"
+            placeForHumanInfo.appendChild(eventsTitle)
+            
+
+            for (let calendarEvent of eventsJson) {
+                console.log(calendarEvent)
+                const eventTitle = calendarEvent.name
+                const eventDate = calendarEvent.date
+                const place = calendarEvent.place
+
+                let eventElement = document.createElement("div")
+                eventElement.setAttribute("class", "eventDetailsDiv")
+                placeForHumanInfo.appendChild(eventElement)
+
+                let eventTitleElement = document.createElement("div")
+                eventTitleElement.innerText = eventTitle
+                eventTitleElement.setAttribute("class", "interactionTitle")
+                eventElement.appendChild(eventTitleElement)
+
+                let dateElement = document.createElement("div")
+                dateElement.setAttribute("class", "interactionDateDiv")
+                dateElement.innerText = eventDate
+                eventElement.appendChild(dateElement)
+
+                if (calendarEvent["longDesc"]) {
+                    let descElement = document.createElement("div")
+                    descElement.innerText = calendarEvent["longDesc"]
+                    descElement.setAttribute("class", "interactionLongDesc")
+                    eventElement.appendChild(descElement)
+                }
+            }
         }
+
         function createModalButton(buttonText, buttonFunction) {
             let leftMenuElement = document.getElementById("leftModalMenu")
             let createdElement = document.createElement("div")
