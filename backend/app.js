@@ -21,6 +21,7 @@ import getBasicInfoForModal from './getBasicInfoForHumanModal.js'
 import getOftenSeenWith from './getOftenSeenWith.js'
 import getHumanQuotes from './getHumanQuotes.js'
 import getHumanVisits from './getHumanVisits.js'
+import getHumanMeetings from './getHumanMeetings.js'
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -113,6 +114,17 @@ app.get('/get-human-quotes', async(req, res) => {
         res.send(error)
     }
 
+})
+
+app.get('/get-human-meetings', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const humanMeetingsList = await getHumanMeetings(humanId)
+        res.send(humanMeetingsList)
+    }
+    catch (error) {
+        res.send(error)
+    }
 })
 
 app.get('/get-human-visits', async(req, res) => {

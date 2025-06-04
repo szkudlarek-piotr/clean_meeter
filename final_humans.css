@@ -239,8 +239,8 @@ a {
 .visitDetailsDiv:last-of-type, .meetingsDetailsDiv:last-of-type, .eventDetailsDiv:last-of-type {
         border-bottom: none;
 }
-.interactionDateDiv {
-    font-size: 22px;
+.interactionDateDiv, .interactionPlaceDiv {
+    font-size: 18px;
     font-weight: 700;
 }
 .interactionTitle {
@@ -253,4 +253,8 @@ a {
     text-align: justify;
     margin-bottom: 10px;
     margin-top: 10px;
+}
+.meetingTitle {
+        font-size: 24px;
+    font-weight: 700;
 }

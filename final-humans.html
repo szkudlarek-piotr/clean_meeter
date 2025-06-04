@@ -195,6 +195,11 @@
             const quotesRequest = await fetch(`http://localhost:3000/get-human-quotes?humanId=${humanId}`)
             const quotesJson = await quotesRequest.json()
             let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+
+            let quotesHeader = document.createElement("h1")
+            quotesHeader.innerText = "Cytaty"
+            placeForHumanInfo.appendChild(quotesHeader)
+
             for (let quote of quotesJson) {
                 let quoteElement = document.createElement("div")
                 quoteElement.setAttribute("class", "quoteDivInModal")
@@ -204,7 +209,41 @@
         }
         async function showMeetings(humanId) {
             clearModalInfo()
-            console.log(`Pokażę teraz spotkania ${humanId}.`)
+            const meetingsReq = await fetch(`http://localhost:3000/get-human-meetings?humanId=${humanId}`)
+            const meetingsJson = await meetingsReq.json()
+            
+            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let meetingsHeader = document.createElement("h1")
+            meetingsHeader.innerText = "Spotkania"
+            placeForHumanInfo.appendChild(meetingsHeader)
+
+            for (const meeting of meetingsJson) {
+                let newMeetingDiv = document.createElement("div")
+                newMeetingDiv.setAttribute("class", "meetingsDetailsDiv")
+                placeForHumanInfo.appendChild(newMeetingDiv)
+
+                let meetingTitle = document.createElement("div")
+                meetingTitle.setAttribute("class", "meetingTitle")
+                meetingTitle.innerText = meeting["title"]
+                newMeetingDiv.appendChild(meetingTitle)
+
+                let dateDiv = document.createElement("div")
+                dateDiv.setAttribute("class", "interactionDateDiv")
+                dateDiv.innerText = meeting["date"]
+                newMeetingDiv.appendChild(dateDiv)
+
+                let placeDiv = document.createElement("div")
+                placeDiv.setAttribute("class", "interactionPlaceDiv")
+                placeDiv.innerText = meeting["place"]
+                newMeetingDiv.appendChild(placeDiv)
+
+                if (meeting["longDesc"]) {
+                    let meetingDescElement = document.createElement("div")
+                    meetingDescElement.setAttribute("class", "interactionLongDesc")
+                    meetingDescElement.innerHTML = meeting["longDesc"]
+                    newMeetingDiv.appendChild(meetingDescElement)
+                }
+            }
         }
         async function showVisits(humanId) {
             clearModalInfo()
@@ -217,7 +256,6 @@
             placeForHumanInfo.appendChild(visitsHeader)
 
             for (let visitDict of visitsJson) {
-                console.log(visitDict)
                 let singleVisitDiv = document.createElement("div")
                 singleVisitDiv.setAttribute("class", "visitDetailsDiv")
                 placeForHumanInfo.appendChild(singleVisitDiv)
