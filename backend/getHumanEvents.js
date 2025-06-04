@@ -17,7 +17,7 @@ export default async function getHumanEvents(humanId) {
         FROM event_companion
         WHERE event_companion.human_id = ?
     )
-    ORDER BY meComingDate;
+    ORDER BY meComingDate DESC
     `
     const [eventsQuery] = await pool.query(requestText, [humanId])
     const eventsList = []

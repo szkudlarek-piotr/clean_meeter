@@ -17,6 +17,7 @@ export default async function getHumanMeetings(humanId) {
         FROM meeting_human
         WHERE meeting_human.human_id = ?
     )
+    ORDER BY meetingDate DESC
     `
     const [meetingQuery] = await pool.query(queryText, [humanId])
     let meetingsList = []

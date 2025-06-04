@@ -24,7 +24,7 @@ export default async function getHumanVisits(humanId) {
         FROM visit_guest
         WHERE guest_id = ?
     )
-    ORDER BY visits.visit_date ASC
+    ORDER BY visits.visit_date DESC
     `
     const monthsDict = {0: "stycznia", 1: "lutego", 2: "marca", 3: "kwietnia", 4: "maja", 5: "czerwca", 6: "lipca", 7: "sierpnia", 8: "września", 9: "października", 10: "listopada", 11: "grudnia"}
     const [visitsData] = await pool.query(visitsReqText, [humanId])
