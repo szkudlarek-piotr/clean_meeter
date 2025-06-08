@@ -66,5 +66,41 @@ END AS spouse_name
             "spouse_id": getReq[0]["spouse_id"],
             "spouse_name": getReq[0]["spouse_name"]
         }
+
+
+        //I separated this part of a query to make it easier to manage
+        const lastInteractionQueryText = `
+        WITH rankedVisits AS (
+            SELECT visit_guest.guest_id AS humanId, 
+            visits.visit_date AS visitsDate,
+            visits.short_description AS interactionTitle,
+            ROW_NUMBER() OVER (PARTITION BY visit_guest.guest_id ORDER BY visits.visit_date DESC) AS visitRank
+            FROM visit_guest
+            JOIN visits ON visits.visit_id = visit_guest.visit_id
+            WHERE visits.visit_date <= NOW()
+        ),
+        rankedMeetings AS (
+            SELECT meeting_human.human_id AS humanId,
+            meetings.meeting_date AS meetingDate,
+            CONCAT(meetings.short_description, ' w miejscu ', meetings.Place) AS interactionTitle,
+            ROW_NUMBER() OVER (PARTITION BY meeting_human.human_id ORDER BY meetings.meeting_date DESC) AS meetingsRank
+            FROM meeting_human
+            JOIN meetings ON meeting_human.meeting_id = meetings.ID
+            WHERE meetings.meeting_date < NOW()
+        ),
+        rankedEvents AS (
+            SELECT event_companion.human_id AS humanId, events.meLeavingDate AS lastEventDate, CONCAT(events.nameOfEvent, ' w miejscu ', events.place) AS interactionTitle,
+            ROW_NUMBER() OVER (PARTITION BY event_companion.human_id ORDER BY events.dateStop DESC) AS eventsRank
+            FROM event_companion
+            JOIN events ON event_companion.event_id = events.id
+            WHERE events.meComingDate < NOW()
+        )
+        SELECT CONCAT(name, ' ', surname) AS fullName, rankedVisits.visitsDate AS lastVisitDate, rankedVisits.interactionTitle AS lastVisitDesc, rankedMeetings.meetingDate AS lastMeetingDate, rankedMeetings.interactionTitle AS lastMeetingTitle, rankedEvents.lastEventDate AS lastEventDate, rankedEvents.interactionTitle AS lastEventTitle
+        FROM party_people
+        LEFT JOIN rankedVisits ON party_people.ID = rankedVisits.humanId AND rankedVisits.visitRank = 1
+        LEFT JOIN rankedMeetings ON party_people.ID = rankedMeetings.humanId AND rankedMeetings.meetingsRank = 1
+        LEFT JOIN rankedEvents ON rankedEvents.humanId = party_people.ID AND rankedEvents.eventsRank = 1;
+        `
+
         return returnedDict
 }
