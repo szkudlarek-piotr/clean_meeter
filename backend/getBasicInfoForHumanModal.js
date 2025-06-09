@@ -94,12 +94,20 @@ END AS spouse_name
             FROM event_companion
             JOIN events ON event_companion.event_id = events.id
             WHERE events.meComingDate < NOW()
+        ),
+        rankedTrips AS (
+            SELECT citybreak_companion.human_id AS humanId, citybreaks.Date_stop AS lastTripDate, citybreaks.Place AS interactionTitle, 
+            ROW_NUMBER() OVER (PARTITION BY citybreak_companion.human_id ORDER BY citybreaks.Date_stop DESC) AS tripsRank
+            FROM citybreak_companion
+            JOIN citybreaks ON citybreaks.ID = citybreak_companion.citybreak_id
+            WHERE citybreaks.Date_start < NOW()
         )
-        SELECT CONCAT(name, ' ', surname) AS fullName, rankedVisits.visitsDate AS lastVisitDate, rankedVisits.interactionTitle AS lastVisitDesc, rankedMeetings.meetingDate AS lastMeetingDate, rankedMeetings.interactionTitle AS lastMeetingTitle, rankedEvents.lastEventDate AS lastEventDate, rankedEvents.interactionTitle AS lastEventTitle
+        SELECT CONCAT(name, ' ', surname) AS fullName, rankedVisits.visitsDate AS lastVisitDate, rankedVisits.interactionTitle AS lastVisitDesc, rankedMeetings.meetingDate AS lastMeetingDate, rankedMeetings.interactionTitle AS lastMeetingTitle, rankedEvents.lastEventDate AS lastEventDate, rankedEvents.interactionTitle AS lastEventTitle, rankedTrips.lastTripDate AS lastTripDate, rankedTrips.interactionTitle AS lastTripTitle
         FROM party_people
         LEFT JOIN rankedVisits ON party_people.ID = rankedVisits.humanId AND rankedVisits.visitRank = 1
         LEFT JOIN rankedMeetings ON party_people.ID = rankedMeetings.humanId AND rankedMeetings.meetingsRank = 1
-        LEFT JOIN rankedEvents ON rankedEvents.humanId = party_people.ID AND rankedEvents.eventsRank = 1;
+        LEFT JOIN rankedEvents ON rankedEvents.humanId = party_people.ID AND rankedEvents.eventsRank = 1
+        LEFT JOIN rankedTrips ON rankedTrips.humanId = party_people.ID AND rankedTrips.tripsRank = 1;
         `
 
         return returnedDict
