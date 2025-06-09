@@ -101,13 +101,21 @@ END AS spouse_name
             FROM citybreak_companion
             JOIN citybreaks ON citybreaks.ID = citybreak_companion.citybreak_id
             WHERE citybreaks.Date_start < NOW()
+        ),
+        weddingsHosts AS (
+            SELECT man_id, woman_id, weddings.date, weddings.info_after_hover AS interactionTitle
+            -- I don't need row_number() here because I have no friends that married tice. Yet.
+            FROM weddings
+            WHERE weddings.date <= NOW() AND weddings.was_i_invited = 1
         )
-        SELECT CONCAT(name, ' ', surname) AS fullName, rankedVisits.visitsDate AS lastVisitDate, rankedVisits.interactionTitle AS lastVisitDesc, rankedMeetings.meetingDate AS lastMeetingDate, rankedMeetings.interactionTitle AS lastMeetingTitle, rankedEvents.lastEventDate AS lastEventDate, rankedEvents.interactionTitle AS lastEventTitle, rankedTrips.lastTripDate AS lastTripDate, rankedTrips.interactionTitle AS lastTripTitle
+        SELECT CONCAT(name, ' ', surname) AS fullName, rankedVisits.visitsDate AS lastVisitDate, rankedVisits.interactionTitle AS lastVisitDesc, rankedMeetings.meetingDate AS lastMeetingDate, rankedMeetings.interactionTitle AS lastMeetingTitle, rankedEvents.lastEventDate AS lastEventDate, rankedEvents.interactionTitle AS lastEventTitle, rankedTrips.lastTripDate AS lastTripDate, rankedTrips.interactionTitle AS lastTripTitle, COALESCE(wh_husband.date, wh_wife.date) AS wedding_date, COALESCE(wh_husband.interactionTitle, wh_wife.interactionTitle) AS weddingTitle
         FROM party_people
         LEFT JOIN rankedVisits ON party_people.ID = rankedVisits.humanId AND rankedVisits.visitRank = 1
         LEFT JOIN rankedMeetings ON party_people.ID = rankedMeetings.humanId AND rankedMeetings.meetingsRank = 1
         LEFT JOIN rankedEvents ON rankedEvents.humanId = party_people.ID AND rankedEvents.eventsRank = 1
-        LEFT JOIN rankedTrips ON rankedTrips.humanId = party_people.ID AND rankedTrips.tripsRank = 1;
+        LEFT JOIN rankedTrips ON rankedTrips.humanId = party_people.ID AND rankedTrips.tripsRank = 1
+        LEFT JOIN weddingsHosts AS wh_husband ON wh_husband.man_id = party_people.ID
+        LEFT JOIN weddingsHosts AS wh_wife ON wh_wife.woman_id = party_people.ID;
         `
 
         return returnedDict
