@@ -104,7 +104,7 @@ END AS spouse_name
         ),
         weddingsHosts AS (
             SELECT man_id, woman_id, weddings.date, weddings.info_after_hover AS interactionTitle
-            -- I don't need row_number() here because I have no friends that married tice. Yet.
+            -- I don't need row_number() here because I have no friends that married twice. Yet.
             FROM weddings
             WHERE weddings.date <= NOW() AND weddings.was_i_invited = 1
         )
