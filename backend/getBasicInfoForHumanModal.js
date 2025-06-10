@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import mysql from 'mysql2'
-import getCliquePhoto from './getPhotoFromCliqueId.js'
 import getHumanPhotoDir from './getPhotoFromHumanId.js'
+import createDateString from './multiuseFunctions/dateToString.js'
 dotenv.config()
 const pool = mysql.createPool({
     host     : process.env.host,
@@ -70,13 +70,16 @@ END AS spouse_name
 
         //I separated this part of a query to make it easier to manage
         const lastInteractionQueryText = `
-        WITH rankedVisits AS (
+WITH rankedVisits AS (
             SELECT visit_guest.guest_id AS humanId, 
-            visits.visit_date AS visitsDate,
+			CASE 
+    			WHEN NOW() BETWEEN visits.visit_date AND ADDDATE(visits.visit_date, visits.visit_duration - 1) THEN NOW()
+    		ELSE ADDDATE(visits.visit_date, visits.visit_duration - 1) END AS visitsDate,
             visits.short_description AS interactionTitle,
             ROW_NUMBER() OVER (PARTITION BY visit_guest.guest_id ORDER BY visits.visit_date DESC) AS visitRank
             FROM visit_guest
             JOIN visits ON visits.visit_id = visit_guest.visit_id
+    		-- I only take visits that already started
             WHERE visits.visit_date <= NOW()
         ),
         rankedMeetings AS (
@@ -89,14 +92,21 @@ END AS spouse_name
             WHERE meetings.meeting_date < NOW()
         ),
         rankedEvents AS (
-            SELECT event_companion.human_id AS humanId, events.meLeavingDate AS lastEventDate, CONCAT(events.nameOfEvent, ' w miejscu ', events.place) AS interactionTitle,
+            SELECT event_companion.human_id AS humanId, 
+            CASE WHEN NOW() BETWEEN events.meComingDate AND events.meLeavingDate THEN NOW()
+            ELSE events.meLeavingDate END AS lastEventDate,
+            CONCAT(events.nameOfEvent, ' w miejscu ', events.place) AS interactionTitle,
             ROW_NUMBER() OVER (PARTITION BY event_companion.human_id ORDER BY events.dateStop DESC) AS eventsRank
             FROM event_companion
             JOIN events ON event_companion.event_id = events.id
             WHERE events.meComingDate < NOW()
         ),
         rankedTrips AS (
-            SELECT citybreak_companion.human_id AS humanId, citybreaks.Date_stop AS lastTripDate, citybreaks.Place AS interactionTitle, 
+            SELECT citybreak_companion.human_id AS humanId, 
+            CASE
+            WHEN NOW() BETWEEN citybreaks.Date_start AND citybreaks.Date_stop THEN NOW()
+            ELSE citybreaks.Date_stop END AS lastTripDate, 
+            citybreaks.Place AS interactionTitle, 
             ROW_NUMBER() OVER (PARTITION BY citybreak_companion.human_id ORDER BY citybreaks.Date_stop DESC) AS tripsRank
             FROM citybreak_companion
             JOIN citybreaks ON citybreaks.ID = citybreak_companion.citybreak_id
@@ -107,16 +117,63 @@ END AS spouse_name
             -- I don't need row_number() here because I have no friends that married twice. Yet.
             FROM weddings
             WHERE weddings.date <= NOW() AND weddings.was_i_invited = 1
-        )
-        SELECT CONCAT(name, ' ', surname) AS fullName, rankedVisits.visitsDate AS lastVisitDate, rankedVisits.interactionTitle AS lastVisitDesc, rankedMeetings.meetingDate AS lastMeetingDate, rankedMeetings.interactionTitle AS lastMeetingTitle, rankedEvents.lastEventDate AS lastEventDate, rankedEvents.interactionTitle AS lastEventTitle, rankedTrips.lastTripDate AS lastTripDate, rankedTrips.interactionTitle AS lastTripTitle, COALESCE(wh_husband.date, wh_wife.date) AS wedding_date, COALESCE(wh_husband.interactionTitle, wh_wife.interactionTitle) AS weddingTitle
+        ),
+        coweds AS (
+        	SELECT wedding_guest.guest_id AS humanId, weddings.date AS lastCowed, weddings.info_after_hover AS interactionTitle,
+            ROW_NUMBER() OVER (PARTITION BY wedding_guest.guest_id ORDER BY weddings.date DESC) AS cowedsRank
+            FROM wedding_guest
+            JOIN weddings ON wedding_guest.wedding_id = weddings.id
+            WHERE weddings.date <= NOW() AND weddings.was_i_invited = 1
+        ),
+        collective_data AS (SELECT party_people.id,  CONCAT(name, ' ', surname) AS fullName, COALESCE(rankedVisits.visitsDate, '1997-01-01') AS lastVisitDate, rankedVisits.interactionTitle AS lastVisitDesc, COALESCE(rankedMeetings.meetingDate, '1997-01-01') AS lastMeetingDate, rankedMeetings.interactionTitle AS lastMeetingTitle, COALESCE(rankedEvents.lastEventDate, '1997-01-01') AS lastEventDate, rankedEvents.interactionTitle AS lastEventTitle, COALESCE(rankedTrips.lastTripDate, '1997-01-01') AS lastTripDate, rankedTrips.interactionTitle AS lastTripTitle, COALESCE(COALESCE(wh_husband.date, wh_wife.date), '1997-01-01') AS wedding_date, COALESCE(wh_husband.interactionTitle, wh_wife.interactionTitle) AS weddingTitle, COALESCE(coweds.lastCowed, '1997-01-01') AS lastCowedDate, coweds.interactionTitle AS lastCowedTitle
         FROM party_people
         LEFT JOIN rankedVisits ON party_people.ID = rankedVisits.humanId AND rankedVisits.visitRank = 1
         LEFT JOIN rankedMeetings ON party_people.ID = rankedMeetings.humanId AND rankedMeetings.meetingsRank = 1
         LEFT JOIN rankedEvents ON rankedEvents.humanId = party_people.ID AND rankedEvents.eventsRank = 1
         LEFT JOIN rankedTrips ON rankedTrips.humanId = party_people.ID AND rankedTrips.tripsRank = 1
         LEFT JOIN weddingsHosts AS wh_husband ON wh_husband.man_id = party_people.ID
-        LEFT JOIN weddingsHosts AS wh_wife ON wh_wife.woman_id = party_people.ID;
+        LEFT JOIN weddingsHosts AS wh_wife ON wh_wife.woman_id = party_people.ID
+        LEFT JOIN coweds ON coweds.humanId = party_people.ID AND coweds.cowedsRank = 1)
+        SELECT fullName,
+        CASE
+        	WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastVisitDate THEN lastVisitDate
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastMeetingDate THEN lastMeetingDate
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastEventDate THEN lastEventDate
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastTripDate THEN lastTripDate
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = wedding_date THEN wedding_date
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastCowedDate THEN lastCowedDate
+        END AS lastInteractionDate,
+        CASE
+        	WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastVisitDate THEN lastVisitDesc
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastMeetingDate THEN lastMeetingTitle
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastEventDate THEN lastEventTitle
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastTripDate THEN lastTripTitle
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = wedding_date THEN weddingTitle
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastCowedDate THEN lastCowedTitle
+        END AS lastInteractionDesc,
+        CASE
+        	WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastVisitDate THEN DATEDIFF(NOW(), lastVisitDate)
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastMeetingDate THEN DATEDIFF(NOW(), lastMeetingDate)
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastEventDate THEN DATEDIFF(NOW(), lastEventDate)
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastTripDate THEN DATEDIFF(NOW(), lastTripDate)
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = wedding_date THEN DATEDIFF(NOW(), wedding_date)
+            WHEN GREATEST(lastVisitDate, lastMeetingDate, lastEventDate, lastTripDate, wedding_date, lastCowedDate) = lastCowedDate THEN DATEDIFF(NOW(), lastCowedDate)      	
+        END AS daysAgo
+        FROM collective_data
+        WHERE id = ?;
         `
-
+        const [lastInteractionReq] = await pool.query(lastInteractionQueryText, [humanId])
+        if (lastInteractionReq[0].daysAgo == 0) {
+            returnedDict["lastSeen"] = `Ostatni raz widzieliście się dzisiaj, do czego pretekstem jest ${lastInteractionReq[0].lastInteractionDesc}.`
+        }
+        else if (lastInteractionReq[0].daysAgo == 1) {
+            returnedDict["lastSeen"] = `Ostatni raz widzieliście się wczoraj (${createDateString(lastInteractionReq[0].lastInteractionDate)}), do czego pretekstem jest ${lastInteractionReq[0].lastInteractionDesc}.`
+        }
+        else if (lastInteractionReq[0].daysAgo > 1 && lastInteractionReq[0].daysAgo < 6000){
+            returnedDict["lastSeen"] = `Ostatni raz widzieliście się ${lastInteractionReq[0].daysAgo} dni temu. Pretekstem do tego spotkania było ${lastInteractionReq[0].lastInteractionDesc}. Miało to miejsce ${createDateString(lastInteractionReq[0].lastInteractionDate)}.`
+        }
+        else {
+            returnedDict["lastSeen"] = `W bazie nie ma danych o spotkaniach z tą osobą.`
+        }
         return returnedDict
 }
