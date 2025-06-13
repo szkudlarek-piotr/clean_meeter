@@ -90,6 +90,9 @@
             }
         }
         async function showHumanModal(humanId) {
+            const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
+            const basicInfoJson = await basicHumanInfoReq.json()
+
             let modalElement = document.getElementById("human_modal")
             modalElement.style.display = "block"
             let modalMenuELement = document.getElementById("leftModalMenu")
@@ -98,12 +101,12 @@
             modalMenuELement.appendChild(menuHeader)
             let numberOfModalOptions = modalMenuELement.getElementsByClassName("left_modal_option").length
             if (numberOfModalOptions == 0) {
-                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}, "relatiogram": {"text": "Relacjogram", "functionName": `showRelatiogram(${humanId})`}}
+                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}, "relatiogram": {"text": "Relacjogram", "functionName": `showRelatiogram("${humanId}", "${basicInfoJson["fullName"]}")`}}
                 
                 createModalButton("Dane ogólne", `showGeneralInfo(${humanId})`)
                 const modalButtonsKeys = Object.keys(modalButtonsDict)
-                const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
-                const basicInfoJson = await basicHumanInfoReq.json()
+
+                console.log(basicInfoJson)
                 basicInfoJson["visitsCount"] > 0 && createModalButton(modalButtonsDict["visits"]["text"], modalButtonsDict["visits"]["functionName"]);
                 basicInfoJson["meetingsCount"] > 0 && createModalButton(modalButtonsDict["meetings"]["text"], modalButtonsDict["meetings"]["functionName"]);
                 basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"], modalButtonsDict["events"]["functionName"]);
@@ -187,10 +190,15 @@
 
         }
         
-async function showRelatiogram(humanId) {
+async function showRelatiogram(humanId, fullName) {
     clearModalInfo()
 
     const placeForHumanInfo = document.getElementById("placeForHumanInfo")
+
+
+    let nameHeader = document.createElement("h2")
+    nameHeader.innerText = `${fullName} - relacjogram`
+    placeForHumanInfo.appendChild(nameHeader)
 
     const relationReq = await fetch(`http://localhost:3000/relatiogram?humanId=${humanId}`);
     const relationJson = await relationReq.json();
@@ -201,7 +209,7 @@ async function showRelatiogram(humanId) {
     if (!plotDiv) {
         plotDiv = document.createElement('div')
         plotDiv.id = 'relatiogramPlot'
-        plotDiv.style.width = '300 px'
+        plotDiv.style.width = '80%'
         plotDiv.style.marginLeft = '10%'
         plotDiv.style.marginRight = '10%'
         //plotDiv.style.height = '400px'
