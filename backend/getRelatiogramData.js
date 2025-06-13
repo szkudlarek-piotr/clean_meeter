@@ -10,7 +10,7 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 
-async function getRelatiogramData() {
+export default async function getRelatiogramData(humanId) {
     const queryText = `
     WITH RECURSIVE all_months AS (
         SELECT DATE('2023-12-01') AS month_date
@@ -202,10 +202,10 @@ async function getRelatiogramData() {
     LEFT JOIN cowed_human_count ON
     	cowed_human_count.human_id = party_people.ID
         AND cowed_human_count.formated_date = DATE_FORMAT(all_months.month_date, '%Y-%m')
-    WHERE party_people.ID IN (18, 15, 7, 27);
+    WHERE party_people.ID IN (?);
     `
     let dataDict = {}
-    const [relatiogramData] = await pool.query(queryText)
+    const [relatiogramData] = await pool.query(queryText, [humanId])
     for (let record of relatiogramData) {
         if (!(record.id in dataDict)) {
 
@@ -228,12 +228,14 @@ async function getRelatiogramData() {
         lines.push(line)
     }
     let layout = {
-        "width": 1200,
-        "height": 600,
         "xaxis": {
             "title": "Miesiąc",
                 titlefont: {
                     size: 18,
+                    weight: 700
+                },
+                tickfont: {
+                    size:14,
                     weight: 700
                 }
         },
@@ -242,15 +244,19 @@ async function getRelatiogramData() {
                 titlefont: {
                     size: 18,
                     weight: 700
-                }
-        },
-        "xticks": {
-                titlefont: {
-                    size: 18,
+                },
+                tickfont: {
+                    size:14,
                     weight: 700
                 }
+        },
+        "legend": {
+            font: {
+                size: 14,
+                weight: 700
+            }
         }
     }
-    plot(lines, layout)    
+    return { data: lines, layout }; 
 }
-getRelatiogramData()
+

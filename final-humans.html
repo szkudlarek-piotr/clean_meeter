@@ -39,10 +39,12 @@
     </body>
     <script src="./dateToText.js"></script>
     <script src="./createLeftMenu.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
     <script>
         createLeftMenu()
         async function createHumanTiles() {
             const humansQuery = await fetch("http://localhost:3000/get-humans")
+            
             const humansJson = await humansQuery.json()
             const mainContent = document.getElementById("main")
             for (human of humansJson) {
@@ -96,7 +98,7 @@
             modalMenuELement.appendChild(menuHeader)
             let numberOfModalOptions = modalMenuELement.getElementsByClassName("left_modal_option").length
             if (numberOfModalOptions == 0) {
-                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}}
+                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}, "relatiogram": {"text": "Relacjogram", "functionName": `showRelatiogram(${humanId})`}}
                 
                 createModalButton("Dane ogólne", `showGeneralInfo(${humanId})`)
                 const modalButtonsKeys = Object.keys(modalButtonsDict)
@@ -106,6 +108,7 @@
                 basicInfoJson["meetingsCount"] > 0 && createModalButton(modalButtonsDict["meetings"]["text"], modalButtonsDict["meetings"]["functionName"]);
                 basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"], modalButtonsDict["events"]["functionName"]);
                 basicInfoJson["quotesCount"] > 0 && createModalButton(modalButtonsDict["quotes"]["text"], modalButtonsDict["quotes"]["functionName"]);
+                createModalButton(modalButtonsDict["relatiogram"]["text"], modalButtonsDict["relatiogram"]["functionName"])
             }
             showGeneralInfo(humanId)
         }
@@ -183,6 +186,34 @@
             }
 
         }
+        
+async function showRelatiogram(humanId) {
+    clearModalInfo()
+
+    const placeForHumanInfo = document.getElementById("placeForHumanInfo")
+
+    const relationReq = await fetch(`http://localhost:3000/relatiogram?humanId=${humanId}`);
+    const relationJson = await relationReq.json();
+    const {data, layout} = relationJson
+    console.log(data)
+
+    let plotDiv = document.getElementById('relatiogramPlot')
+    if (!plotDiv) {
+        plotDiv = document.createElement('div')
+        plotDiv.id = 'relatiogramPlot'
+        plotDiv.style.width = '300 px'
+        plotDiv.style.marginLeft = '10%'
+        plotDiv.style.marginRight = '10%'
+        //plotDiv.style.height = '400px'
+        placeForHumanInfo.appendChild(plotDiv)
+    } else {
+        // Jeśli już istnieje, wyczyść go
+        Plotly.purge(plotDiv)
+    }
+
+    Plotly.newPlot(plotDiv, data, layout)
+}
+
         function createInteractingPersonObj(humanName, photoDir) {
             let placeForHumanInfo = document.getElementById("placeForInteractingPeople")
 

@@ -23,6 +23,7 @@ import getHumanQuotes from './getHumanQuotes.js'
 import getHumanVisits from './getHumanVisits.js'
 import getHumanMeetings from './getHumanMeetings.js'
 import getHumanEvents from './getHumanEvents.js'
+import getRelatiogramData from './getRelatiogramData.js'
 
 const app = express()
 app.use(cors())
@@ -148,6 +149,17 @@ app.get('/get-human-events', async(req, res) => {
     catch (error) {
         res.send(error)
     } 
+})
+
+app.get('/relatiogram', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const dataToSend = await getRelatiogramData(humanId)
+        res.send(dataToSend)
+    }
+    catch (error) {
+        res.send(error)
+    }
 })
 
 app.post('/add-human', async(req, res) => {
