@@ -17,7 +17,7 @@ export default async function getRelatiogramData(humanId) {
         UNION ALL
         SELECT DATE_ADD(month_date, INTERVAL 1 MONTH)
         FROM all_months
-        WHERE month_date < CURRENT_DATE()
+        WHERE DATE_ADD(month_date, INTERVAL 1 MONTH) < CURRENT_DATE()
     ), 
     visit_human_count AS (
         SELECT DATE_FORMAT(visits.visit_date, '%Y-%m') AS formated_date, visit_guest.guest_id AS human_id, COUNT(guest_id) AS visits_in_month
