@@ -189,6 +189,9 @@ a {
     font-size: 36px;
 }
 .lineInGeneralInfo {
+    margin-left: 10%;
+    width: 80%;
+    margin-left: 10%;
     font-family: 'Comic Sans MS';
     font-size: 20px;
 }
