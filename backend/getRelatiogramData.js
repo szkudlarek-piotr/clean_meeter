@@ -248,7 +248,8 @@ export default async function getRelatiogramData(humanId) {
                 tickfont: {
                     size:14,
                     weight: 700
-                }
+                },
+                rangemode: 'tozero'
         },
         "legend": {
             font: {
