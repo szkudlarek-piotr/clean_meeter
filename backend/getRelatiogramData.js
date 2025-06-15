@@ -41,28 +41,28 @@ export default async function getRelatiogramData(humanId) {
         SELECT DATE_FORMAT(weddings.date, '%Y-%m') AS formated_date, man_id AS human_id, COUNT(man_id) AS huswed_in_month
         FROM weddings
         JOIN party_people AS pp_husband ON pp_husband.ID = weddings.man_id
-        WHERE pp_husband.klika_id != 5
+        WHERE pp_husband.klika_id != 5 AND was_i_invited = 1
         GROUP BY human_id
     ),
     huswed_acc_human_count AS (
         SELECT DATE_FORMAT(weddings.date, '%Y-%m') AS formated_date, man_id AS human_id, COUNT(man_id) AS huswed_in_month
         FROM weddings
         JOIN party_people AS pp_husband ON pp_husband.ID = weddings.man_id
-        WHERE pp_husband.klika_id = 5
+        WHERE pp_husband.klika_id = 5 AND was_i_invited = 1
         GROUP BY human_id
     ),
     wifewed_human_count AS (
         SELECT DATE_FORMAT(weddings.date, '%Y-%m') AS formated_date, woman_id AS human_id, COUNT(woman_id) AS wifewed_in_month
         FROM weddings
         JOIN party_people AS pp_wife ON pp_wife.ID = weddings.woman_id
-        WHERE pp_wife.klika_id != 5
+        WHERE pp_wife.klika_id != 5 AND was_i_invited = 1
         GROUP BY human_id
     ),
     wifewed_acc_human_count AS (
         SELECT DATE_FORMAT(weddings.date, '%Y-%m') AS formated_date, woman_id AS human_id, COUNT(woman_id) AS wifewed_in_month
         FROM weddings
         JOIN party_people AS pp_wife ON pp_wife.ID = weddings.woman_id
-        WHERE pp_wife.klika_id = 5
+        WHERE pp_wife.klika_id = 5 AND was_i_invited = 1
         GROUP BY human_id
     ),
     trips_human_count AS (
