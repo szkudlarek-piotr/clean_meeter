@@ -91,7 +91,6 @@
             const eventPlace = document.getElementById("meetingPLaceInput").value
             const longDesc = document.getElementById("longDescInput").value
             if (document.querySelector(`input[name="photoSource"]:checked`).value == "link") {
-                console.log(document.getElementById("hiddenPhotoNameInput").value)
                 if (document.getElementById("hiddenPhotoNameInput").value.length > 0) {
                     let eventPhotoName = document.getElementById("hiddenPhotoNameInput").value
                     const photoLink = document.getElementById("photoLinkInput").value
@@ -127,9 +126,31 @@
                             name: eventPhotoName,
                             link: photoLink
                         }
-                })})
+                    })})
                 console.log(await sendReq.json())
                 }
+            }
+            else if (document.querySelector(`input[name="photoSource"]:checked`).value == "database") {
+                const phonoName = document.getElementById("hiddenPhotoNameInput").value
+                const sendReq = await fetch(`http://localhost:3000/add-event`, {method: "POST", 
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        eventName: eventName,
+                        dateStart: startDate,
+                        dateStop: stopDate,
+                        comingDate: comingDate,
+                        leavingDate: leavingDate,
+                        placeName: eventPlace,
+                        longDesc: longDesc, 
+                        photoAddingInfo: {
+                            mode: "database",
+                            name: phonoName
+                        }
+                    })})
+                let addEventResponse = await sendReq.json()
+                console.log(addEventResponse)
             }
         }
         function clearSuggestedHumans() {
