@@ -34,11 +34,11 @@
                     <input type="datetime-local" id="meLeavingDateInput"/>
 
                     <h2 class="inputHeader">Miejsce wydarzenie</h2>
-                    <input type="text" id="meetingPLaceInput"/>
+                    <input type="text" id="meetingPlaceInput"/>
 
 
                     
-                    <h2 class="inputHeader">Dlługi opis eventu</h2>
+                    <h2 class="inputHeader">Długi opis eventu</h2>
                     <textarea id="longDescInput" rows=10 cols=120></textarea>
                     <h2 class="inputHeader">Wybierz towarzystwo</h2>
                     <input type="text" id="searchedHumanInput" onkeyup="createHumansTilesFromName()" placeholder="Wyszukaj towarzysza..."/>
@@ -87,7 +87,7 @@
             const stopDate = document.getElementById("dateStopInput").value
             const comingDate = document.getElementById("meComingDateInput").value
             const leavingDate = document.getElementById("meLeavingDateInput").value
-            const eventPlace = document.getElementById("meetingPLaceInput").value
+            const eventPlace = document.getElementById("meetingPlaceInput").value
             const longDesc = document.getElementById("longDescInput").value
             if (document.querySelector(`input[name="photoSource"]:checked`).value == "link") {
                 if (document.getElementById("hiddenPhotoNameInput").value.length > 0) {
