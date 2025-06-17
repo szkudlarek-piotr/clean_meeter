@@ -124,7 +124,9 @@
                             link: photoLink
                         }
                     })})
-                console.log(await sendReq.json())
+                const addEventJson = await sendReq.json()
+                console.log(addEventJson)
+                await addHumansToEvent(addEventJson.insertId)
                 }
             }
             else if (document.querySelector(`input[name="photoSource"]:checked`).value == "database") {
@@ -148,6 +150,7 @@
                     })})
                 let addEventResponse = await sendReq.json()
                 console.log(addEventResponse)
+                await addHumansToEvent(addEventResponse.insertId)
             }
         }
         function clearSuggestedHumans() {
@@ -318,6 +321,28 @@
                 clearElementById("suggestedPhotosContainer")
             }
 
+        }
+        async function addHumansToEvent(eventId) {
+            let arrayOfHumansToAdd = []
+            let chosenHumans = document.getElementsByClassName("chosen_human_tile")
+            if (chosenHumans.length > 0) {
+                for (let human of chosenHumans) {
+                    let humanId = parseInt(human.getAttribute("id").replace("removableHuman-", ""), 10)
+                    arrayOfHumansToAdd.push(humanId)
+                }
+                const addHumansReq = await fetch(`http://localhost:3000/add-event-human`, {method: "POST", 
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        eventId: eventId,
+                        humansList: arrayOfHumansToAdd
+                    })})
+                const responseJson = await addHumansReq.json()
+                console.log(responseJson)
+            }
+
+        
         }
 
     </script>

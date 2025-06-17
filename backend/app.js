@@ -24,6 +24,7 @@ import getHumanVisits from './getHumanVisits.js'
 import getHumanMeetings from './getHumanMeetings.js'
 import getHumanEvents from './getHumanEvents.js'
 import getRelatiogramData from './getRelatiogramData.js'
+import addEventCompanion from './addEventCompanion.js'
 
 const app = express()
 app.use(cors())
@@ -156,6 +157,18 @@ app.get('/relatiogram', async(req, res) => {
         const humanId = req.query.humanId
         const dataToSend = await getRelatiogramData(humanId)
         res.send(dataToSend)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.post('/add-event-human', async(req, res) => {
+    try {
+        const eventId = req.body.eventId
+        const humansList = req.body.humansList
+        const addingData = await addEventCompanion(eventId, humansList)
+        res.send(addingData)
     }
     catch (error) {
         res.send(error)
