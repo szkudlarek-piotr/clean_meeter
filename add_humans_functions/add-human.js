@@ -1,5 +1,4 @@
 async function addHuman(event) {
-    event.preventDefault()
     const addedHumanName = document.getElementById("addedHumanNameInput").value
     const addedHumanSurname = document.getElementById("addedHumanSurnameInput").value
     const addedHumanGender = document.querySelector('input[name="sex"]:checked')?.value
@@ -15,7 +14,7 @@ async function addHuman(event) {
         cliqueId: cliqueId
     }
     const queryString = new URLSearchParams(reqParams).toString()
-    if (photoLink.length > 2 && photoLink.includes("https://") && cliqueId && addedHumanGender) {
+    if ( cliqueId && addedHumanGender) {
         try {
             const cliqueAddReq = await fetch(`http://localhost:3000/add-human?${queryString}`, {method: "POST"})
             const responseJson = await cliqueAddReq.json()
