@@ -15,6 +15,22 @@
             Baza danych spotkań
         </header>
         <div class="container">
+
+            <div id="day_modal">
+                <div id="topOfDayModal">
+                    <div id="closingDiv" onclick="closeModal()">X</div>
+                </div>
+                <div id="restOfModal">
+                    <div id="leftModalMenu">
+                        <h2>Menu</h2>
+                    </div>
+                    <div id="placeForDayInfo">
+
+                    </div>
+                </div>
+            </div>
+
+
             <nav class="left-menu">
             </nav>
             <div id="main">
@@ -66,12 +82,23 @@
                 let thing_to_write = `${dayOfMonth} ${startOfMonth}`
                 let date_id = `${dayOfMonth}_${startOfMonth}_${day.getFullYear()}`
                 addedDayRectangle.innerHTML = thing_to_write
-
+                addedDayRectangle.setAttribute("onclick", `showDayModal("${day}")`)
                 addedDayRectangle.setAttribute("id", date_id)
                 containerForCalendar.appendChild(addedDayRectangle)
             }
             addThingsToCalendar(year)
         }
+        async function showDayModal(date) {
+            let dateAsDate = new Date(date)
+            console.log(dateAsDate.toDateString())
+            let modalElement = document.getElementById("day_modal")
+            modalElement.style.display = "block"
+            const dateString = `${dateAsDate.getFullYear()}-${dateAsDate.getMonth() + 1}-${dateAsDate.getDate()}`
+            const dayReq = await fetch(`http://localhost:3000/basic-day-info?dateString=${dateString}`)
+            let dayJson = await dayReq.json()
+            console.log(dayJson)
+        }
+
         function createSlider(modifiedDivId, array_of_photos, divColor) {
             let modifiedDiv = document.getElementById(modifiedDivId)
             let sliderDiv = document.createElement("div")
@@ -181,6 +208,12 @@
                 modifiedDiv.setAttribute("title", activity["computedTitle"])
                 }
 
+        }
+        function closeModal() {
+            let dayInfoElement = document.getElementById("placeForDayInfo")
+            let modalElement = document.getElementById("day_modal")
+            dayInfoElement.innerHTML = ""
+            modalElement.style.display = "none"
         }
         createLeftMenu()
         makeCalendar(2025)
