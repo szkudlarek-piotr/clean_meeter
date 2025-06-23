@@ -173,12 +173,15 @@
             placeForHumanInfo.appendChild(lastSeenDiv)
 
 
-            let closeFriendsHeader = document.createElement("h3")
-            basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
-            placeForHumanInfo.appendChild(closeFriendsHeader)
 
             const usualCompanionsReq = await fetch(`http://localhost:3000/get-often-seen-with?humanId=${humanId}`)
             const usualCompanionsJson = await usualCompanionsReq.json()
+
+            if (usualCompanionsJson.length > 0) {
+            
+                let closeFriendsHeader = document.createElement("h3")
+            basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
+            placeForHumanInfo.appendChild(closeFriendsHeader)
 
             let placeForInteractingPeople = document.createElement("div")
             placeForInteractingPeople.id = "placeForInteractingPeople"
@@ -186,6 +189,8 @@
 
             for (let human of usualCompanionsJson) {
                 createInteractingPersonObj(human.fullName, human.photoDir)
+            }
+
             }
 
         }
