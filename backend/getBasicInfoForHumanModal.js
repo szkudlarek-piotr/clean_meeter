@@ -164,16 +164,78 @@ WITH rankedVisits AS (
         `
         const [lastInteractionReq] = await pool.query(lastInteractionQueryText, [humanId])
         if (lastInteractionReq[0].daysAgo == 0) {
-            returnedDict["lastSeen"] = `Ostatni raz widzieliście się dzisiaj, do czego pretekstem jest ${lastInteractionReq[0].lastInteractionDesc}.`
+            returnedDict["lastSeen"] = `Ostatni raz widzieliście się dzisiaj, do czego pretekstem jest ${lastInteractionReq[0].lastInteractionDesc}.\n`
         }
         else if (lastInteractionReq[0].daysAgo == 1) {
-            returnedDict["lastSeen"] = `Ostatni raz widzieliście się wczoraj (${createDateString(lastInteractionReq[0].lastInteractionDate)}), do czego pretekstem jest ${lastInteractionReq[0].lastInteractionDesc}.`
+            returnedDict["lastSeen"] = `Ostatni raz widzieliście się wczoraj (${createDateString(lastInteractionReq[0].lastInteractionDate)}), do czego pretekstem jest ${lastInteractionReq[0].lastInteractionDesc}.\n`
         }
         else if (lastInteractionReq[0].daysAgo > 1 && lastInteractionReq[0].daysAgo < 6000){
-            returnedDict["lastSeen"] = `Ostatni raz widzieliście się ${lastInteractionReq[0].daysAgo} dni temu. Pretekstem do tego spotkania było ${lastInteractionReq[0].lastInteractionDesc}. Miało to miejsce ${createDateString(lastInteractionReq[0].lastInteractionDate)}.`
+            returnedDict["lastSeen"] = `Ostatni raz widzieliście się ${lastInteractionReq[0].daysAgo} dni temu. Pretekstem do tego spotkania było ${lastInteractionReq[0].lastInteractionDesc}. Miało to miejsce ${createDateString(lastInteractionReq[0].lastInteractionDate)}.\n`
         }
         else {
             returnedDict["lastSeen"] = `W bazie nie ma danych o spotkaniach z tą osobą.`
         }
+        const notSeeingStats = `
+        WITH all_interactions AS (
+            SELECT meetings.meeting_date AS startDate, meetings.meeting_date AS stopDate, meeting_human.human_id AS humanId
+            FROM meeting_human
+            JOIN meetings ON meeting_human.meeting_id = meetings.ID
+            WHERE YEAR(meetings.meeting_date) > 2023
+            UNION
+            SELECT visits.visit_date AS startDate, ADDDATE(visits.visit_date, visits.visit_duration-1), visit_guest.guest_id AS humanId
+            FROM visit_guest
+            JOIN visits ON visit_guest.visit_id = visits.visit_id
+            WHERE YEAR(visits.visit_date) > 2023
+            UNION
+            SELECT events.meComingDate AS startDate, events.meLeavingDate AS stopDate, event_companion.human_id AS humanId
+            FROM event_companion
+            JOIN events ON event_companion.event_id = events.id
+            WHERE YEAR(events.meComingDate) > 2023
+            UNION
+            SELECT weddings.date AS startDate, ADDDATE(weddings.date, 1) AS stopDate, wedding_guest.guest_id AS humanId
+            FROM wedding_guest
+            JOIN weddings ON wedding_guest.wedding_id = weddings.id
+            WHERE YEAR(weddings.date) > 2023
+            UNION
+            SELECT weddings.date AS startDate, ADDDATE(weddings.date, 1) AS stopDate, weddings.man_id AS humanId
+            FROM weddings
+            WHERE YEAR(weddings.date) > 2023
+            UNION
+            SELECT weddings.date AS startDate, ADDDATE(weddings.date, 1) AS stopDate, weddings.woman_id AS humanId
+            FROM weddings
+            WHERE YEAR(weddings.date) > 2023
+            UNION
+            SELECT citybreaks.Date_start AS startDate, citybreaks.Date_stop AS stopDate, citybreak_companion.human_id AS humanId
+            FROM citybreak_companion
+            JOIN citybreaks ON citybreak_companion.citybreak_id = citybreaks.ID
+            WHERE YEAR(citybreaks.Date_start) > 2023
+        ),
+        differences AS (
+        SELECT startDate,
+                DATEDIFF(startDate, LAG(stopDate) OVER (ORDER BY stopDate)) AS notSeeingPeriod
+        FROM (
+            SELECT startDate, stopDate
+            FROM all_interactions
+            WHERE humanId = ?
+        ) AS person_interactions
+        )
+        SELECT ROUND(AVG(notSeeingPeriod), 2) AS averageNotSeeing, ROUND(STD(notSeeingPeriod), 2) AS notSeeingStd, MAX(notSeeingPeriod) AS notSeeingMax
+        FROM differences
+        WHERE startDate >= '2024-05-01' AND notSeeingPeriod > 0;
+        `
+        const [notSeeingReq] =  await pool.query(notSeeingStats, [humanId])
+        let averageNotSeeing = parseFloat(notSeeingReq[0]["averageNotSeeing"])
+        let notSeeingStd = parseFloat(notSeeingReq[0]["notSeeingStd"])
+        let notSeeingSum = averageNotSeeing + notSeeingStd
+        //std = 0 when there are only two interactions and calculating those stats makes no sense
+        if (notSeeingStd > 0) {
+            if (notSeeingSum < lastInteractionReq[0].daysAgo) {
+                returnedDict["lastSeen"] += `Biorac pod uwagę okres od 1 stycznia 2024, widujecie się co ${notSeeingReq[0].averageNotSeeing} ± ${notSeeingReq[0]["notSeeingStd"]} dni. Wypadałoby się spotkać, bo haniebnie zaniżasz statystyki.`
+            }
+            else {
+                returnedDict["lastSeen"] += `Biorac pod uwagę okres od 1 stycznia 2024, widujecie się co ${notSeeingReq[0].averageNotSeeing} ± ${notSeeingReq[0]["notSeeingStd"]} dni.`
+            }
+        }
         return returnedDict
 }
+getBasicInfoForModal(7)
