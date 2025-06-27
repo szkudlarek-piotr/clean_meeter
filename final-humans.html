@@ -167,30 +167,36 @@
                 placeForHumanInfo.appendChild(spouseLine)
             }
 
-            let placeForTableDiv = document.createElement("div")
-            placeForTableDiv.setAttribute("id", "placeForTableDiv")
-            placeForHumanInfo.appendChild(placeForTableDiv)
 
-            let placesCategoriesHeader = document.createElement("h3")
-            placesCategoriesHeader.innerText = "Gdzie się spotykacie?"
-            placeForTableDiv.appendChild(placesCategoriesHeader)
+            if (basicInfoJson["interactionPlacesCategories"].length > 0) {
+                let placeForTableDiv = document.createElement("div")
+                placeForTableDiv.setAttribute("id", "placeForTableDiv")
+                placeForHumanInfo.appendChild(placeForTableDiv)
 
-            let interactionPlacesTable = document.createElement("table")
-            interactionPlacesTable.innerHTML = `
-            <tr> <th>Kategoria miejsca</th> 
-                <th> Liczba interakcji</th>
-            </tr>
-            `
-            const placesInfo = basicInfoJson["interactionPlacesCategories"]
-            console.log(placesInfo)
-            for (let category of placesInfo) {
-                let row = interactionPlacesTable.insertRow(-1)
-                let categoryCell = row.insertCell(0)
-                categoryCell.innerHTML = category["category"]
-                let countCell = row.insertCell(1)
-                countCell.innerHTML = category["category_count"]
+                let placesCategoriesHeader = document.createElement("h3")
+                placesCategoriesHeader.innerText = "Gdzie się spotykacie poza tripami?"
+                placeForTableDiv.appendChild(placesCategoriesHeader)
+
+                let interactionPlacesTable = document.createElement("table")
+                interactionPlacesTable.innerHTML = `
+                <tr> <th>Kategoria miejsca</th> 
+                    <th> Liczba interakcji</th>
+                </tr>
+                `
+                const placesInfo = basicInfoJson["interactionPlacesCategories"]
+                console.log(placesInfo)
+                for (let category of placesInfo) {
+                    let row = interactionPlacesTable.insertRow(-1)
+                    let categoryCell = row.insertCell(0)
+                    categoryCell.innerHTML = category["category"]
+                    let countCell = row.insertCell(1)
+                    countCell.innerHTML = category["category_count"]
+                }
+                placeForTableDiv.appendChild(interactionPlacesTable)
+
             }
-            placeForTableDiv.appendChild(interactionPlacesTable)
+
+            
 
 
 
