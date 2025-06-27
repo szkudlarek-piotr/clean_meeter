@@ -268,6 +268,7 @@ WITH rankedVisits AS (
             JOIN places p ON p.id = w.party_place_id
             WHERE w.man_id = ? OR w.woman_id = ? OR w.partner_id = ?
             AND w.party_place_id IS NOT NULL
+            AND w.was_i_invited = 1
         ),
         wedding_guest_place_id AS (
             SELECT p.category
@@ -276,6 +277,7 @@ WITH rankedVisits AS (
             JOIN places p ON p.id = w.party_place_id
             WHERE wg.guest_id = ?
             AND w.party_place_id IS NOT NULL
+            AND w.was_i_invited = 1
         ),
         all_interactions AS (
             SELECT category FROM meeting_categories
