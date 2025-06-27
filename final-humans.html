@@ -167,65 +167,89 @@
                 placeForHumanInfo.appendChild(spouseLine)
             }
 
+            let placeForTableDiv = document.createElement("div")
+            placeForTableDiv.setAttribute("id", "placeForTableDiv")
+            placeForHumanInfo.appendChild(placeForTableDiv)
+
+            let placesCategoriesHeader = document.createElement("h3")
+            placesCategoriesHeader.innerText = "Gdzie się spotykacie?"
+            placeForTableDiv.appendChild(placesCategoriesHeader)
+
+            let interactionPlacesTable = document.createElement("table")
+            interactionPlacesTable.innerHTML = `
+            <tr> <th>Kategoria miejsca</th> 
+                <th> Liczba interakcji</th>
+            </tr>
+            `
+            const placesInfo = basicInfoJson["interactionPlacesCategories"]
+            console.log(placesInfo)
+            for (let category of placesInfo) {
+                let row = interactionPlacesTable.insertRow(-1)
+                let categoryCell = row.insertCell(0)
+                categoryCell.innerHTML = category["category"]
+                let countCell = row.insertCell(1)
+                countCell.innerHTML = category["category_count"]
+            }
+            placeForTableDiv.appendChild(interactionPlacesTable)
+
+
+
             let lastSeenDiv = document.createElement("div")
             lastSeenDiv.innerText = basicInfoJson["lastSeen"]
             lastSeenDiv.setAttribute("class", "lineInGeneralInfo")
             placeForHumanInfo.appendChild(lastSeenDiv)
 
 
-
             const usualCompanionsReq = await fetch(`http://localhost:3000/get-often-seen-with?humanId=${humanId}`)
             const usualCompanionsJson = await usualCompanionsReq.json()
 
             if (usualCompanionsJson.length > 0) {
-            
                 let closeFriendsHeader = document.createElement("h3")
-            basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
-            placeForHumanInfo.appendChild(closeFriendsHeader)
+                basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
+                placeForHumanInfo.appendChild(closeFriendsHeader)
 
-            let placeForInteractingPeople = document.createElement("div")
-            placeForInteractingPeople.id = "placeForInteractingPeople"
-            placeForHumanInfo.appendChild(placeForInteractingPeople)
+                let placeForInteractingPeople = document.createElement("div")
+                placeForInteractingPeople.id = "placeForInteractingPeople"
+                placeForHumanInfo.appendChild(placeForInteractingPeople)
 
-            for (let human of usualCompanionsJson) {
-                createInteractingPersonObj(human.fullName, human.photoDir)
-            }
-
+                for (let human of usualCompanionsJson) {
+                    createInteractingPersonObj(human.fullName, human.photoDir)
+                }
             }
 
         }
         
-async function showRelatiogram(humanId, fullName) {
-    clearModalInfo()
+    async function showRelatiogram(humanId, fullName) {
+        clearModalInfo()
 
-    const placeForHumanInfo = document.getElementById("placeForHumanInfo")
+        const placeForHumanInfo = document.getElementById("placeForHumanInfo")
 
 
-    let nameHeader = document.createElement("h2")
-    nameHeader.innerText = `${fullName} - relacjogram`
-    placeForHumanInfo.appendChild(nameHeader)
+        let nameHeader = document.createElement("h2")
+        nameHeader.innerText = `${fullName} - relacjogram`
+        placeForHumanInfo.appendChild(nameHeader)
 
-    const relationReq = await fetch(`http://localhost:3000/relatiogram?humanId=${humanId}`);
-    const relationJson = await relationReq.json();
-    const {data, layout} = relationJson
-    console.log(data)
+        const relationReq = await fetch(`http://localhost:3000/relatiogram?humanId=${humanId}`);
+        const relationJson = await relationReq.json();
+        const {data, layout} = relationJson
+        console.log(data)
 
-    let plotDiv = document.getElementById('relatiogramPlot')
-    if (!plotDiv) {
-        plotDiv = document.createElement('div')
-        plotDiv.id = 'relatiogramPlot'
-        plotDiv.style.width = '80%'
-        plotDiv.style.marginLeft = '10%'
-        plotDiv.style.marginRight = '10%'
-        //plotDiv.style.height = '400px'
-        placeForHumanInfo.appendChild(plotDiv)
-    } else {
-        // Jeśli już istnieje, wyczyść go
-        Plotly.purge(plotDiv)
+        let plotDiv = document.getElementById('relatiogramPlot')
+        if (!plotDiv) {
+            plotDiv = document.createElement('div')
+            plotDiv.id = 'relatiogramPlot'
+            plotDiv.style.width = '80%'
+            plotDiv.style.marginLeft = '10%'
+            plotDiv.style.marginRight = '10%'
+            //plotDiv.style.height = '400px'
+            placeForHumanInfo.appendChild(plotDiv)
+        } else {
+            // Jeśli już istnieje, wyczyść go
+            Plotly.purge(plotDiv)
+        }
+
+        Plotly.newPlot(plotDiv, data, layout)
     }
-
-    Plotly.newPlot(plotDiv, data, layout)
-}
 
         function createInteractingPersonObj(humanName, photoDir) {
             let placeForHumanInfo = document.getElementById("placeForInteractingPeople")

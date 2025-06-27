@@ -184,6 +184,26 @@ a {
     margin-bottom: 15px;
 
 }
+#placeForTableDiv {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+table {
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px 20px;
+    border-bottom: 1px solid black;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
 .nameInGeneralInfo {
     font-family: 'Comic Sans MS';
     font-size: 36px;

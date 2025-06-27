@@ -236,6 +236,65 @@ WITH rankedVisits AS (
                 returnedDict["lastSeen"] += `Biorac pod uwagę okres od 1 stycznia 2024, widujecie się co ${notSeeingReq[0].averageNotSeeing} ± ${notSeeingReq[0]["notSeeingStd"]} dni.`
             }
         }
+
+        const placesCategoriesQueryText = `
+        WITH meeting_categories AS (
+                    SELECT p.category
+                    FROM meeting_human mh
+                    JOIN meetings m ON m.ID = mh.meeting_id
+                    JOIN places p ON p.id = m.place_id
+                    WHERE mh.human_id = ?
+                    AND m.place_id IS NOT NULL
+                ),
+        visit_categories AS (
+                    SELECT p.category
+                    FROM visit_guest vg
+                    JOIN visits v ON v.visit_id = vg.visit_id
+                    JOIN places p ON p.id = v.place_id
+                    WHERE vg.guest_id = ?
+                    AND v.place_id IS NOT NULL
+                ),
+        event_categories AS (
+                    SELECT p.category
+                    FROM event_companion ec
+                    JOIN events e ON ec.event_id = e.id
+                    JOIN places p ON p.id = e.place_id
+                    WHERE ec.human_id = ?
+                    AND e.place_id IS NOT NULL
+                ),
+        wedding_party_heros_place_id AS (
+            SELECT p.category
+            FROM weddings w
+            JOIN places p ON p.id = w.party_place_id
+            WHERE w.man_id = ? OR w.woman_id = ? OR w.partner_id = ?
+            AND w.party_place_id IS NOT NULL
+        ),
+        wedding_guest_place_id AS (
+            SELECT p.category
+            FROM wedding_guest wg
+            JOIN weddings w ON wg.wedding_id = w.id
+            JOIN places p ON p.id = w.party_place_id
+            WHERE wg.guest_id = ?
+            AND w.party_place_id IS NOT NULL
+        ),
+        all_interactions AS (
+            SELECT category FROM meeting_categories
+            UNION ALL
+            SELECT category FROM visit_categories
+            UNION ALL
+            SELECT category FROM event_categories
+            UNION ALL
+            SELECT category FROM wedding_party_heros_place_id
+            UNION ALL
+            SELECT category FROM wedding_guest_place_id
+        )
+        SELECT category, COUNT(*) AS category_count
+        FROM all_interactions
+        GROUP BY category
+        ORDER BY category_count DESC;
+        `
+        const [placesCategoriesQuery] = await pool.query(placesCategoriesQueryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId])
+        returnedDict["interactionPlacesCategories"] = placesCategoriesQuery
         return returnedDict
 }
-getBasicInfoForModal(7)
+//getBasicInfoForModal(41)
