@@ -5,6 +5,9 @@ import path from "path"
 import { fileURLToPath } from "url";
 import createDateId from './multiuseFunctions/createDateId.js'
 import getHumanPhotoDir from './getPhotoFromHumanId.js'
+import { imageSizeFromFile } from 'image-size/fromFile'
+
+
 dotenv.config()
 const pool = mysql.createPool({
     host     : process.env.host,
@@ -196,8 +199,17 @@ export default async function getCalendar(year) {
         }
 
         for (const photoName of photosList) {
-            photosToAdd.push(path.join(tripPhotosDir, photoName))
+            const photoPath =  path.join(tripPhotosDir, photoName)
+            const dimensions = await imageSizeFromFile(photoPath)
+            console.log(dimensions)
+            const proportion = dimensions["height"]/dimensions["width"]
+            console.log(proportion)
+            if (proportion > 0.99 && proportion < 1.02) {
+                photosToAdd.push(path.join(tripPhotosDir, photoName))
+            }
+
         }
+
         if (humanPhotoDir.length > 3 && !(photosToAdd.includes(humanPhotoDir))) {
             photosToAdd.push(humanPhotoDir)
         }
@@ -258,4 +270,4 @@ export default async function getCalendar(year) {
     }
     return returnedDict
     }
-    //getCalendar(2025)
+//getCalendar(2025)
