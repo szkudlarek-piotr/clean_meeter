@@ -201,9 +201,7 @@ export default async function getCalendar(year) {
         for (const photoName of photosList) {
             const photoPath =  path.join(tripPhotosDir, photoName)
             const dimensions = await imageSizeFromFile(photoPath)
-            console.log(dimensions)
             const proportion = dimensions["height"]/dimensions["width"]
-            console.log(proportion)
             if (proportion > 0.99 && proportion < 1.02) {
                 photosToAdd.push(path.join(tripPhotosDir, photoName))
             }
