@@ -14,7 +14,6 @@ const pool = mysql.createPool({
 }).promise()
 
 export default async function addCalendarEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo) {
-    console.log(dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo)
     const eventPhotosDir = path.join(__dirname, "events")
     const addEventText = "INSERT INTO `events` (`id`, `nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?);"
     if (photoAddingInfo.mode == "link") {
