@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Meeter - portal dla wszystkich oprócz Amerykanów</title>
+        <title>Real Meeter - baza danych interakcji społecznych</title>
         <link rel="stylesheet" href="styles.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,22 @@
             Baza danych spotkań
         </header>
         <div class="container">
+
+            <div id="day_modal">
+                <div id="topOfDayModal">
+                    <div id="closingDiv" onclick="closeModal()">X</div>
+                </div>
+                <div id="restOfModal">
+                    <div id="leftModalMenu">
+                        <h2>Menu</h2>
+                    </div>
+                    <div id="placeForDayInfo">
+
+                    </div>
+                </div>
+            </div>
+
+
             <nav class="left-menu">
             </nav>
             <div id="main">
@@ -66,12 +82,23 @@
                 let thing_to_write = `${dayOfMonth} ${startOfMonth}`
                 let date_id = `${dayOfMonth}_${startOfMonth}_${day.getFullYear()}`
                 addedDayRectangle.innerHTML = thing_to_write
-
+                addedDayRectangle.setAttribute("onclick", `showDayModal("${day}")`)
                 addedDayRectangle.setAttribute("id", date_id)
                 containerForCalendar.appendChild(addedDayRectangle)
             }
             addThingsToCalendar(year)
         }
+        async function showDayModal(date) {
+            let dateAsDate = new Date(date)
+            console.log(dateAsDate.toDateString())
+            let modalElement = document.getElementById("day_modal")
+            modalElement.style.display = "block"
+            const dateString = `${dateAsDate.getFullYear()}-${dateAsDate.getMonth() + 1}-${dateAsDate.getDate()}`
+            const dayReq = await fetch(`http://localhost:3000/basic-day-info?dateString=${dateString}`)
+            let dayJson = await dayReq.json()
+            console.log(dayJson)
+        }
+
         function createSlider(modifiedDivId, array_of_photos, divColor) {
             let modifiedDiv = document.getElementById(modifiedDivId)
             let sliderDiv = document.createElement("div")
@@ -95,13 +122,20 @@
 
         }
         async function addThingsToCalendar(year) {
+            let allClasses = []
             const yearEvents = await fetch(`http://localhost:3000/get-calendar?year=${year}`)
             const yearJson = await yearEvents.json()
             const ringsPhotoDir = "backend\\functionalPhotos\\rings.png"
             for (let [dateId, activity] of Object.entries(yearJson)) {
+                if (!(allClasses.includes(activity["interactionClass"]))) {
+                    allClasses.push(activity["interactionClass"])
+                }
                 let modifiedDiv = document.getElementById(dateId)
                 modifiedDiv.innerHTML = ""
-                if (activity["interactionClass"] == "visit") {
+                if (activity["interactionClass"].includes("trip")) {
+                    createSlider(dateId, activity["photos"], "olive")
+                }
+                else if (activity["interactionClass"] == "visit") {
                     createSlider(dateId, activity["photos"], "red")
                 }
                 else if (activity["interactionClass"] == "meeting") {
@@ -109,6 +143,18 @@
                 }
                 else if (activity["interactionClass"] == "event") {
                     createSlider(dateId, activity["photos"], "green")
+                }
+                else if (activity["interactionClass"] == "visit_meeting") {
+                    createSlider(dateId, activity["photos"], "#ff8000")
+                }
+                else if (activity["interactionClass"] == "visit_event") {
+                    createSlider(dateId, activity["photos"], "#cc00cc")
+                }
+                else if (activity["interactionClass"] == "meeting_event") {
+                    createSlider(dateId, activity["photos"], "#00cccc")
+                }
+                else if (activity["interactionClass"].includes("trip")) {
+                    createSlider(dateId, activity["photos"], "#c5c564")
                 }
                 else if (activity["interactionClass"] == "wedding") {
                     modifiedDiv.setAttribute("style", "background-color: #ff72fb")
@@ -159,8 +205,15 @@
                         modifiedDiv.appendChild(partnerPhotoElement)
                     }
                 }
-                modifiedDiv.setAttribute("title", activity["title"])
+                modifiedDiv.setAttribute("title", activity["computedTitle"])
                 }
+
+        }
+        function closeModal() {
+            let dayInfoElement = document.getElementById("placeForDayInfo")
+            let modalElement = document.getElementById("day_modal")
+            dayInfoElement.innerHTML = ""
+            modalElement.style.display = "none"
         }
         createLeftMenu()
         makeCalendar(2025)

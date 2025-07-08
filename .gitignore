@@ -7,5 +7,3 @@
 /backend/meetings/
 /backend/.env_real
 /backend/.env
-/backend/.env_clean
-/backend/.gitignore

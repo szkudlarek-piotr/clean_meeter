@@ -115,8 +115,8 @@ a {
     display: none;
     width:70%;
     top: 5%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 15%;
+    margin-right: 15%;
     height: 90%;
     background-color: antiquewhite;
     position: fixed;
@@ -124,21 +124,25 @@ a {
     margin-bottom: 10px;
     z-index: 100;
     border-radius: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 #topOfHumanModal {
     height: 50px;
     margin-top: 0px;
     padding-top: 0px;
 }
-#topOfHumanModal > .closingDiv {
+#topOfHumanModal > #closingDiv {
     height: 30px;
     border: 1px solid black;
     font-size: 30px;
     border-radius: 15px;
     width: 30px;
     position: absolute;
+    text-align: center;
     right: 10px;
     top: 10px;
+    cursor: pointer;
 }
 #restOfModal {
     height: calc(100% - 40px);
@@ -150,7 +154,7 @@ a {
 #leftModalMenu {
     width: 25%;
     font-family: 'Times New Roman', Times, serif;
-    border-right: 1px solid black;
+    text-align: center;
 }
 .left_modal_option {
     font-weight: 300;
@@ -164,6 +168,7 @@ a {
 .humanPhotoInModal {
     margin-top: 20px;
     margin-bottom: 20px;
+    border-radius: 20px;
     width:30%;
     border: 1px solid black;
 
@@ -179,14 +184,43 @@ a {
     margin-bottom: 15px;
 
 }
+#placeForTableDiv {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+table {
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px 20px;
+    border-bottom: 1px solid black;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
 .nameInGeneralInfo {
     font-family: 'Comic Sans MS';
+    font-size: 36px;
+}
+.lineInGeneralInfo {
+    margin-left: 10%;
+    width: 80%;
+    margin-left: 10%;
+    font-family: 'Comic Sans MS';
+    font-size: 20px;
 }
 
 #placeForInteractingPeople {
     justify-content: space-evenly;
     margin-left: 10%;
     margin-right: 10%;
+    margin-bottom: 40px;
 }
 
 .interactingPersonImage {
@@ -205,17 +239,45 @@ a {
     font-family: serif;
     font-style: italic;
     font-size: 24px;
-    margin-top: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid black;
+}
+.quoteDivInModal:last-of-type {
+    padding-bottom: 30px;
+    border-bottom: none;
 }
 .quoteAuthorPhoto {
     width:30%;
     border: 1px solid black;
 }
 .visitDetailsDiv, .meetingsDetailsDiv, .eventDetailsDiv {
-    text-align: justify;
-    font-family: 'Arial';
+    margin-top: 20px;
+    margin-left: 5%;
+    width: 90%;
+    margin-right: 5%;
+    margin-bottom: 20px;
+    border-bottom: 1px solid black;
+}
+.visitDetailsDiv:last-of-type, .meetingsDetailsDiv:last-of-type, .eventDetailsDiv:last-of-type {
+        border-bottom: none;
+}
+.interactionDateDiv, .interactionPlaceDiv {
     font-size: 18px;
-    margin-left: 10%;
-    width: 80%;
-    margin-left: 10%;
+    font-weight: 700;
+}
+.interactionTitle {
+    font-size: 18px;
+    font-weight: 500;
+}
+.interactionLongDesc {
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.meetingTitle {
+        font-size: 24px;
+    font-weight: 700;
 }

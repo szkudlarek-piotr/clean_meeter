@@ -17,6 +17,15 @@ import addWedding from './addWedding.js'
 import getCalendar from './getCalendar.js'
 import getHumanNameFromId from './getHumanNameFromId.js'
 import getSuggestedEventPhotos from './getSuggestedEventPhotos.js'
+import getBasicInfoForModal from './getBasicInfoForHumanModal.js'
+import getOftenSeenWith from './getOftenSeenWith.js'
+import getHumanQuotes from './getHumanQuotes.js'
+import getHumanVisits from './getHumanVisits.js'
+import getHumanMeetings from './getHumanMeetings.js'
+import getHumanEvents from './getHumanEvents.js'
+import getRelatiogramData from './getRelatiogramData.js'
+import addEventCompanion from './addEventCompanion.js'
+
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
@@ -46,9 +55,14 @@ app.get('/get-human-name-from-id', async(req,res) => {
 })
 
 app.get('/get-cliques-from-subs', async(req, res) => {
-    const deliveredSubstring = req.query.cliqueInput
-    const returnedArray = await getCliquesFromSubstring(deliveredSubstring)
-    res.send(returnedArray)
+    try {
+        const deliveredSubstring = req.query.cliqueInput
+        const returnedArray = await getCliquesFromSubstring(deliveredSubstring)
+        res.send(returnedArray)
+    }
+    catch (error) {
+        res.send(error)
+    }
 })
 
 app.get('/get-all-cliques', async(req,res) => {
@@ -75,6 +89,91 @@ app.get('/get-human-from-substring', async (req, res) => {
         res.status(500).send({ error: "Internal Server Error" });
     }
 });
+
+app.get('/basic-info-for-human-modal', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const requestResult = await getBasicInfoForModal(humanId)
+        res.send(requestResult)
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+})
+
+app.get('/get-often-seen-with', async(req, res) => {
+    const humanId = req.query.humanId
+    const returnedList = await getOftenSeenWith(humanId)
+    res.send(returnedList)
+})
+
+app.get('/get-human-quotes', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const humanQuotesList = await getHumanQuotes(humanId)
+        res.send(humanQuotesList)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.get('/get-human-meetings', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const humanMeetingsList = await getHumanMeetings(humanId)
+        res.send(humanMeetingsList)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.get('/get-human-visits', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const humanVisitsData = await getHumanVisits(humanId)
+        res.send(humanVisitsData)
+    }
+    catch (error) {
+        res.send(humanVisitsData)
+    }
+})
+
+app.get('/get-human-events', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const humanEventsData = await getHumanEvents(humanId)
+        res.send(humanEventsData)
+    }
+    catch (error) {
+        res.send(error)
+    } 
+})
+
+app.get('/relatiogram', async(req, res) => {
+    try {
+        const humanId = req.query.humanId
+        const dataToSend = await getRelatiogramData(humanId)
+        res.send(dataToSend)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.post('/add-event-human', async(req, res) => {
+    try {
+        const eventId = req.body.eventId
+        const humansList = req.body.humansList
+        const addingData = await addEventCompanion(eventId, humansList)
+        res.send(addingData)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
 
 app.post('/add-human', async(req, res) => {
     const name = req.query.name

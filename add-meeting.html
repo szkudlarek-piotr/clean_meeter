@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Meeter - portal dla wszystkich oprócz Amerykanów</title>
+        <title>Real Meeter - baza danych interakcji społecznych</title>
         <link rel="stylesheet" href="styles.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,7 @@
                     <div id="chosenHumansContainer">
 
                     </div>
-                    <button onclick="addMeetingWithGuests(event)">Dodaj wizytę!</button>
+                    <button onclick="addMeetingWithGuests(event)">Dodaj spotkanie!</button>
                 </form>
 
             </div>
@@ -117,7 +117,7 @@
             const shortDesc = document.getElementById("shortDescInput").value
             const longDesc = document.getElementById("longDescInput").value
             const humansArray = document.querySelectorAll("div.chosen_human_tile")
-            if (humansArray.length > 0 && meetingDate && meetingPlace.length > 0 && shortDesc.length > 0 && longDesc.length >1) {
+            if (humansArray.length > 0 && meetingDate && meetingPlace.length > 0 && shortDesc.length > 0) {
                 const meetingParams = {
                     date: meetingDate,
                     place: meetingPlace,
@@ -150,8 +150,9 @@
             else {
                 alert("Podane przez Ciebie dane zostały uznane za niewystarczające.")
             }
-
-
         }
+        async function showBasicDayInfo(dateId) {
+            
+        } 
     </script>
 </html>

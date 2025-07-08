@@ -5,6 +5,9 @@ import path from "path"
 import { fileURLToPath } from "url";
 import createDateId from './multiuseFunctions/createDateId.js'
 import getHumanPhotoDir from './getPhotoFromHumanId.js'
+import { imageSizeFromFile } from 'image-size/fromFile'
+
+
 dotenv.config()
 const pool = mysql.createPool({
     host     : process.env.host,
@@ -29,7 +32,7 @@ function getEventPhotoFromName(photoName) {
 function getEventPhotoFromId(eventId) {
     const eventPhotosDir = path.join(__dirname, "events")
     let returnedDir = ""
-    for (let fileName of fs.linkSync(eventPhotosDir)) {
+    for (let fileName of fs.readdirSync(eventPhotosDir)) {
         const nameWoExtension = fileName.split(".")[0]
         if (nameWoExtension == eventId) {
             returnedDir = path.join(eventPhotosDir, fileName)
@@ -40,7 +43,7 @@ function getEventPhotoFromId(eventId) {
 
 export default async function getCalendar(year) {
     let returnedDict = {}
-    const weddingsQueryText = `SELECT date, man_id, woman_id, partner_id, info_after_hover FROM weddings WHERE YEAR(date) = ?`
+    const weddingsQueryText = `SELECT date, man_id, woman_id, partner_id, info_after_hover FROM weddings WHERE YEAR(date) = ? AND was_i_invited = 1`
     const [wedQuery] = await pool.query(weddingsQueryText, [year])
     for (let wedding of wedQuery) {
         const wedDate = wedding.date
@@ -50,7 +53,7 @@ export default async function getCalendar(year) {
             returnedDict[wedDateId] = dictToAdd
         }
         else {
-            const dictToAdd = {"interactionClass": "wedding", "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id), "title": wedding.info_after_hover}
+            const dictToAdd = {"interactionClass": "wedding", "manPhoto": getHumanPhotoDir(wedding.man_id), "womanPhoto": getHumanPhotoDir(wedding.woman_id), "title": wedding.info_after_hover, "computedTitle": wedding.info_after_hover}
             returnedDict[wedDateId] = dictToAdd
         }
     }
@@ -65,23 +68,41 @@ export default async function getCalendar(year) {
     const [visitsReq] = await pool.query(visitsQueryText, [year, year])
     
     for (let record of visitsReq) {
-        const visitStartDate = record.visitDate
-        let dateId = createDateId(visitStartDate)
+        let visitAddedDate = record.visitDate
+        let dateId = createDateId(visitAddedDate)
         if (!(returnedDict[dateId])) {
-            returnedDict[dateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc}
+            returnedDict[dateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc, "titlesDict": {[visitAddedDate.toISOString()]: record.visitShortDesc}}
+        }
+        else {
+            if (!(Object.values(returnedDict[dateId]["titlesDict"]).includes(record.visitShortDesc))) {
+                while (Object.keys(returnedDict[dateId]["titlesDict"]).includes(visitAddedDate.toISOString())) {
+                    visitAddedDate = new Date(visitAddedDate.getTime() + 5000)
+                }
+                returnedDict[dateId]["titlesDict"][visitAddedDate.toISOString()] = record.visitShortDesc
+            }
         }
         returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
         if (record.visitDuration > 1) {
             for (let addedDays = 1; addedDays<record.visitDuration; addedDays+=1) {
-                let newDate = addDays(visitStartDate, addedDays)
+                let newDate = addDays(visitAddedDate, addedDays)
                 const newDateId = createDateId(newDate)
                 if (!(returnedDict[newDateId])) {
-                    returnedDict[newDateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc}
+                    returnedDict[newDateId] = {"interactionClass": "visit","photos": [], "title": record.visitShortDesc, "titlesDict": {[visitAddedDate.toISOString()]: record.visitShortDesc}}
+                }
+                else {
+                    if (!(Object.values(returnedDict[dateId]["titlesDict"]).includes(record.visitShortDesc))) {
+                        while (Object.keys(returnedDict[dateId]["titlesDict"]).includes(newDate.toISOString())) {
+                            newDate = new Date(newDate.getTime() + 5000)
+                        }
+                        returnedDict[dateId]["titlesDict"][newDate.toISOString()] = record.visitShortDesc
+                    }
                 }
                 returnedDict[newDateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
         }
     }
+
+
     const meetingsReqText = `SELECT meetings.meeting_date as meetingDate, 
     meetings.short_description as shortDesc, meeting_human.human_id AS humanId
     FROM meeting_human
@@ -90,12 +111,21 @@ export default async function getCalendar(year) {
     `
     const [meetingReq] = await pool.query(meetingsReqText, [year])
     for (let record of meetingReq) {
-        const recordDate = record.meetingDate
+        let recordDate = new Date(record.meetingDate);
         const dateId = createDateId(recordDate)
         if (!(returnedDict[dateId])) {
-            returnedDict[dateId] = {"interactionClass": "meeting", "photos": [getHumanPhotoDir(record.humanId)], "title": record.shortDesc}
+            returnedDict[dateId] = {"interactionClass": "meeting", "photos": [getHumanPhotoDir(record.humanId)], "title": record.shortDesc, "titlesDict": {[recordDate.toISOString()]: record.shortDesc}}
         }
+        //if date is already in the returnedDict
         else {
+            const descriptionsSoFar= Object.values(returnedDict[dateId]["titlesDict"])
+            if (!(descriptionsSoFar.includes(record.shortDesc))) {
+                while(Object.keys(returnedDict[dateId]["titlesDict"]).includes(recordDate.toISOString())) {
+                    recordDate = new Date(recordDate.getTime() + 5000)
+                }
+                returnedDict[dateId]["titlesDict"][recordDate.toISOString()] = record.shortDesc
+            }
+
             if (returnedDict[dateId]["interactionClass"].includes("meeting")) {
                 returnedDict[dateId]["photos"].push(getHumanPhotoDir(record.humanId))
             }
@@ -113,7 +143,7 @@ export default async function getCalendar(year) {
     const [eventsReq] = await pool.query(eventsReqText, [year, year])
 
     for (let record of eventsReq) {
-        let currentDay = record.comingDate
+        let currentDatetime = record.comingDate
         let photosToAdd = []
         if (record.generic_photo.length > 3) {
             photosToAdd.push(getEventPhotoFromName(record.generic_photo))
@@ -124,24 +154,118 @@ export default async function getCalendar(year) {
         if (record.human_id != null) {
             photosToAdd.push(getHumanPhotoDir(record.human_id))
         }
-        while (createDateId(currentDay) != createDateId(addDays(record.leavingDate, 1))) {
-            let currentDayId = createDateId(currentDay)
-            if (!(currentDayId in returnedDict)) {
-                returnedDict[currentDayId] = {"interactionClass": "event", "photos": photosToAdd, "title": record.eventName}
+        while (createDateId(currentDatetime) != createDateId(addDays(record.leavingDate, 1))) {
+            let currentDatetimeId = createDateId(currentDatetime)
+            if (!(currentDatetimeId in returnedDict)) {
+                returnedDict[currentDatetimeId] = {"interactionClass": "event", "photos": photosToAdd, "title": record.eventName, "titlesDict": {[currentDatetime.toISOString()]: record.eventName}}
             }
             else {
-                for (let photoDirectory of photosToAdd) {
-                    if (!(returnedDict[currentDayId]["interactionClass"].includes("event"))) {
-                        returnedDict[currentDayId]["interactionClass"] += "_event"
+                //if a given eventName is not in titlesDict
+                if (!(Object.values(returnedDict[currentDatetimeId]["titlesDict"]).includes(record.eventName))) {
+                    while(Object.keys(returnedDict[currentDatetimeId]["titlesDict"]).includes(currentDatetime.toISOString())) {
+                        currentDatetime = new Date(currentDatetime.getTime() + 5000)
                     }
-                    if (!(returnedDict[currentDayId]["photos"].includes(photoDirectory))) {
-                        returnedDict[currentDayId]["photos"].push(photoDirectory)
+                    
+                    returnedDict[currentDatetimeId]["titlesDict"][currentDatetime.toISOString()] = record.eventName
+                }
+                for (let photoDirectory of photosToAdd) {
+                    if (!(returnedDict[currentDatetimeId]["interactionClass"].includes("event"))) {
+                        returnedDict[currentDatetimeId]["interactionClass"] += "_event"
+                    }
+                    if (!(returnedDict[currentDatetimeId]["photos"].includes(photoDirectory))) {
+                        returnedDict[currentDatetimeId]["photos"].push(photoDirectory)
                     }
                 }
             }
-            currentDay = addDays(currentDay, 1)
+            currentDatetime = addDays(currentDatetime, 1)
+        }
+    }
+    
+    const tripsReqText = `
+    SELECT citybreaks.ID AS id, citybreaks.Place as tripName, citybreaks.Date_start as dateStart, citybreaks.Date_stop AS dateStop, citybreak_companion.human_id AS humanId
+    FROM citybreaks
+    LEFT JOIN citybreak_companion ON citybreak_companion.citybreak_id = citybreaks.ID
+    WHERE YEAR(citybreaks.Date_start) = ? OR YEAR(citybreaks.Date_stop) = ?;
+    `
+    const [tripsQuery] = await pool.query(tripsReqText, [year, year])
+
+    for (let trip of tripsQuery) {
+        let photosToAdd = []
+        const tripPhotosDir = path.join(__dirname, "trips", trip.id.toString())
+        const photosList = fs.readdirSync(tripPhotosDir)
+        let humanPhotoDir = ""
+        if (trip.humanId != null) {
+            humanPhotoDir = getHumanPhotoDir(trip.humanId)
+        }
+
+        for (const photoName of photosList) {
+            const photoPath =  path.join(tripPhotosDir, photoName)
+            const dimensions = await imageSizeFromFile(photoPath)
+            const proportion = dimensions["height"]/dimensions["width"]
+            if (proportion > 0.99 && proportion < 1.02) {
+                photosToAdd.push(path.join(tripPhotosDir, photoName))
+            }
+
+        }
+
+        if (humanPhotoDir.length > 3 && !(photosToAdd.includes(humanPhotoDir))) {
+            photosToAdd.push(humanPhotoDir)
+        }
+        let tripTitle = trip.tripName
+        let currentDatetime = trip.dateStart
+        let endDate = trip.dateStop
+        while (createDateId(currentDatetime) != createDateId(addDays(endDate, 1))) {
+            let dateId = createDateId(currentDatetime)
+            if (!(returnedDict[dateId])) {
+                returnedDict[dateId] = {"interactionClass": "trip", "title": tripTitle, "photos": photosToAdd, "titlesDict": {[currentDatetime.toISOString()]: tripTitle}}
+            }
+            else {
+                returnedDict[dateId]["interactionClass"] += "_trip"
+                for (let photoDir of photosToAdd) {
+                    if (!(returnedDict[dateId]["photos"].includes(photoDir))) {
+                        returnedDict[dateId]["photos"].push(photoDir)
+                    }
+                }
+                returnedDict[dateId]["titlesDict"][currentDatetime.toISOString()] = tripTitle
+            }
+           currentDatetime = addDays(currentDatetime, 1)
+        }
+    }
+
+
+
+    for (let dateIdentifier in returnedDict) {
+        if (returnedDict[dateIdentifier]["interactionClass"] != "wedding") {
+            if (Object.keys(returnedDict[dateIdentifier]["titlesDict"]).length == 1) {
+                returnedDict[dateIdentifier]["computedTitle"] = Object.values(returnedDict[dateIdentifier]["titlesDict"])[0]
+            }
+            if (Object.keys(returnedDict[dateIdentifier]["titlesDict"]).length == 2) {
+                let sortedKeys = Object.keys(returnedDict[dateIdentifier]["titlesDict"]).sort()
+                let sortedValues = []
+                for (let key of sortedKeys) {
+                    sortedValues.push(returnedDict[dateIdentifier]["titlesDict"][key])
+                }
+                let computedTitle = `${sortedValues[0]} oraz ${sortedValues[1]}`
+                returnedDict[dateIdentifier]["computedTitle"] = computedTitle
+            }
+            if (Object.keys(returnedDict[dateIdentifier]["titlesDict"]).length > 2) {
+                let sortedKeys = Object.keys(returnedDict[dateIdentifier]["titlesDict"]).sort()
+                let sortedValues = []
+                for (let key of sortedKeys) {
+                    sortedValues.push(returnedDict[dateIdentifier]["titlesDict"][key])
+                }
+                let computedTitle = ""
+                for (let description of sortedValues.slice(0,-1)) {
+                    computedTitle = computedTitle + `${description}, `
+                }
+                computedTitle = computedTitle + ` oraz ${sortedValues.at(-1)}`
+                returnedDict[dateIdentifier]["computedTitle"] = computedTitle
+            }
+        }
+        else {
+            returnedDict[dateIdentifier]["computedTitle"] = returnedDict[dateIdentifier]["title"]
         }
     }
     return returnedDict
     }
-getCalendar(2025)
+//getCalendar(2025)
