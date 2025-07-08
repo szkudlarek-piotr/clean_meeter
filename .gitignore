@@ -5,6 +5,7 @@
 /backend/trips/
 /backend/events/
 /backend/meetings/
+/backend/.env_real
 /backend/.env
 /backend/.env_clean
 /backend/getCalendarTest.js
