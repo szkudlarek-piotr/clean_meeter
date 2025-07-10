@@ -13,9 +13,16 @@ const pool = mysql.createPool({
 export default async function getFinalHumans(){ 
     let returnedArr = []
     const queryText =  `
-        WITH visits_count AS ( 
+WITH visits_count AS ( 
         SELECT guest_id AS human_id, COUNT(guest_id) AS visit_c
         FROM visit_guest
+        GROUP BY guest_id
+    ),
+    recent_visits_count AS ( 
+        SELECT guest_id AS human_id, COUNT(guest_id) AS visit_c
+        FROM visit_guest
+        JOIN visits ON visits.visit_id = visit_guest.visit_id
+        WHERE visits.visit_date >= CURDATE() - INTERVAL 2 YEAR
         GROUP BY guest_id
     ),
     meetings_count AS (
@@ -23,9 +30,23 @@ export default async function getFinalHumans(){
         FROM meeting_human
         GROUP BY human_id
     ),
+    recent_meetings_count AS (
+        SELECT human_id, COUNT(human_id) AS meeting_c
+        FROM meeting_human
+        JOIN meetings ON meetings.ID = meeting_human.meeting_id
+        WHERE meetings.meeting_date >= CURDATE() - INTERVAL 1 YEAR
+        GROUP BY human_id
+    ),
     events_count AS (
         SELECT human_id, COUNT(human_id) AS event_c
         FROM event_companion
+        GROUP BY human_id
+    ),
+    recent_events_count AS (
+        SELECT human_id, COUNT(human_id) AS event_c
+        FROM event_companion
+        JOIN events ON event_companion.event_id = events.id
+        WHERE events.meLeavingDate >= CURDATE() - INTERVAL 6 MONTH
         GROUP BY human_id
     ),
     wed_inv_count AS (
@@ -72,9 +93,22 @@ export default async function getFinalHumans(){
         FROM weddings
         GROUP BY partner_id
     ),
+    recent_wed_partner_count AS (
+        SELECT partner_id, COUNT(partner_id) AS wed_partner_c
+        FROM weddings
+        WHERE weddings.date >= CURDATE() - INTERVAL 2 YEAR
+        GROUP BY partner_id
+    ),
     wed_guest_count AS (
         SELECT guest_id, COUNT(guest_id) AS wed_guest_c
         FROM wedding_guest
+        GROUP BY guest_id
+    ),
+    recent_wed_guest_count AS (
+        SELECT guest_id, COUNT(guest_id) AS wed_guest_c
+        FROM wedding_guest
+        JOIN weddings ON weddings.id = wedding_guest.wedding_id
+        WHERE weddings.date >= CURDATE() - INTERVAL 1 YEAR
         GROUP BY guest_id
     ),
     trips_count AS (
@@ -98,20 +132,25 @@ export default async function getFinalHumans(){
         COALESCE(trips_count.trips_c, 0) AS trips_c,
         (SELECT quote FROM golden_quotes WHERE golden_quotes.is_public=1 AND golden_quotes.human_id = party_people.ID ORDER BY RAND() LIMIT 1) AS quote,
         COALESCE(meetings_count.meeting_c, 0) + COALESCE(events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) + COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) +  COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) AS other_interactions_c,
-        6 * COALESCE(visits_count.visit_c, 0) + 3 * COALESCE(meetings_count.meeting_c, 0) + COALESCE(events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 AS rank_points
+        6 * COALESCE(recent_visits_count.visit_c, 0) + 3 * COALESCE(recent_meetings_count.meeting_c, 0) + COALESCE(recent_events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(recent_wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 AS rank_points
 
     FROM party_people 
     LEFT JOIN cliques_names ON cliques_names.id = party_people.klika_id
     LEFT JOIN visits_count ON visits_count.human_id = party_people.id
+    LEFT JOIN recent_visits_count ON recent_visits_count.human_id = party_people.id
     LEFT JOIN meetings_count ON meetings_count.human_id = party_people.id
+    LEFT JOIN recent_meetings_count ON recent_meetings_count.human_id = party_people.id
     LEFT JOIN events_count ON events_count.human_id = party_people.id
+    LEFT JOIN recent_events_count ON recent_events_count.human_id = party_people.id
     LEFT JOIN wed_inv_count ON wed_inv_count.person_id = party_people.id
     LEFT JOIN wed_acc_count ON wed_acc_count.person_id = party_people.id
     LEFT JOIN wed_partner_count ON wed_partner_count.partner_id = party_people.id
+    LEFT JOIN recent_wed_partner_count ON recent_wed_partner_count.partner_id = party_people.id
     LEFT JOIN wed_guest_count ON wed_guest_count.guest_id = party_people.id
+    LEFT JOIN recent_wed_guest_count ON recent_wed_guest_count.guest_id = party_people.id
     LEFT JOIN trips_count ON trips_count.human_id = party_people.id
     WHERE party_people.klika_id != 15 AND 6 * COALESCE(visits_count.visit_c, 0) + 3 * COALESCE(meetings_count.meeting_c, 0) + COALESCE(events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 > 1
-    ORDER BY 6 * COALESCE(visits_count.visit_c, 0) + 3 * COALESCE(meetings_count.meeting_c, 0) + COALESCE(events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 DESC;
+    ORDER BY rank_points DESC;
     `
     //I created a view in my database that has almost all info I need to create human tiles
     const [humansArr] = await pool.query(queryText)
