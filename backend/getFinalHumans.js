@@ -149,7 +149,7 @@ WITH visits_count AS (
     LEFT JOIN wed_guest_count ON wed_guest_count.guest_id = party_people.id
     LEFT JOIN recent_wed_guest_count ON recent_wed_guest_count.guest_id = party_people.id
     LEFT JOIN trips_count ON trips_count.human_id = party_people.id
-    WHERE party_people.klika_id != 15 AND 6 * COALESCE(visits_count.visit_c, 0) + 3 * COALESCE(meetings_count.meeting_c, 0) + COALESCE(events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 > 1
+    WHERE party_people.klika_id != 15 AND 6 * COALESCE(recent_visits_count.visit_c, 0) + 3 * COALESCE(recent_meetings_count.meeting_c, 0) + COALESCE(recent_events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(recent_wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 > 1
     ORDER BY rank_points DESC;
     `
     //I created a view in my database that has almost all info I need to create human tiles
