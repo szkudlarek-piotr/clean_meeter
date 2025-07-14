@@ -138,15 +138,15 @@ export default async function getRelatiogramData(humanId) {
         6 * SUM(COALESCE(visit_human_count.visits_in_month, 0)) OVER (
             PARTITION BY party_people.id 
             ORDER BY all_months.month_date
-            ROWS UNBOUNDED PRECEDING
+            ROWS 24 PRECEDING
         ) + 3 * SUM(COALESCE(meeting_human_count.meetings_in_month, 0)) OVER (
             PARTITION BY party_people.id 
             ORDER BY all_months.month_date
-            ROWS UNBOUNDED PRECEDING
+            ROWS 12 PRECEDING
         ) + 1* SUM(COALESCE(event_human_count.events_in_month, 0)) OVER (
             PARTITION BY party_people.id 
             ORDER BY all_months.month_date
-            ROWS UNBOUNDED PRECEDING
+            ROWS 6 PRECEDING
         ) + 15 * SUM(COALESCE(huswed_human_count.huswed_in_month, 0)) OVER (
             PARTITION BY party_people.id 
             ORDER BY all_months.month_date
@@ -170,7 +170,7 @@ export default async function getRelatiogramData(humanId) {
         ) + 1 * SUM(COALESCE(cowed_human_count.coweds_in_month, 0)) OVER (
         	PARTITION BY party_people.id 
             ORDER BY all_months.month_date
-            ROWS UNBOUNDED PRECEDING
+            ROWS 6 PRECEDING
         )
         AS points_so_far
     FROM party_people
