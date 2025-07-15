@@ -281,3 +281,7 @@ tr:last-child td {
         font-size: 24px;
     font-weight: 700;
 }
+#interactionsMapContainer {
+    width: 80%;
+    aspect-ratio: 3/2;
+}

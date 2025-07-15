@@ -40,6 +40,12 @@
     <script src="./dateToText.js"></script>
     <script src="./createLeftMenu.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
     <script>
         createLeftMenu()
         async function createHumanTiles() {
@@ -101,7 +107,7 @@
             modalMenuELement.appendChild(menuHeader)
             let numberOfModalOptions = modalMenuELement.getElementsByClassName("left_modal_option").length
             if (numberOfModalOptions == 0) {
-                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}, "relatiogram": {"text": "Relacjogram", "functionName": `showRelatiogram("${humanId}", "${basicInfoJson["fullName"]}")`}}
+                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}, "relatiogram": {"text": "Relacjogram", "functionName": `showRelatiogram("${humanId}", "${basicInfoJson["fullName"]}")`}, "map": {"text": "Mapa interakcji", "functionName": `showInteractionsMap(${humanId})`}}
                 
                 createModalButton("Dane ogólne", `showGeneralInfo(${humanId})`)
                 const modalButtonsKeys = Object.keys(modalButtonsDict)
@@ -112,6 +118,7 @@
                 basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"], modalButtonsDict["events"]["functionName"]);
                 basicInfoJson["quotesCount"] > 0 && createModalButton(modalButtonsDict["quotes"]["text"], modalButtonsDict["quotes"]["functionName"]);
                 createModalButton(modalButtonsDict["relatiogram"]["text"], modalButtonsDict["relatiogram"]["functionName"])
+                createModalButton(modalButtonsDict["map"]["text"], modalButtonsDict["map"]["functionName"])
             }
             showGeneralInfo(humanId)
         }
@@ -398,6 +405,28 @@
                     eventElement.appendChild(descElement)
                 }
             }
+        }
+        
+        async function showInteractionsMap(humanId) {
+            clearModalInfo()
+            let placesQuery = await fetch(`http://localhost:3000/places-data?humanId=${humanId}`)
+            let placesData = await placesQuery.json()
+            console.log(placesData)
+            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let mapContainer = document.createElement("div")
+            mapContainer.id = "interactionsMapContainer"
+            placeForHumanInfo.appendChild(mapContainer)
+            const map = L.map("interactionsMapContainer")
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map)
+            let markersGroup = []
+            for (let place of placesData) {
+                let marker = L.marker([place.lat, place.lng]).addTo(map)
+                marker.bindPopup(`<b>${place.place_name}</b><br>${place.category}`)
+                markersGroup.push(marker)
+            }
+            map.fitBounds(L.featureGroup(markersGroup).getBounds())
         }
 
         function createModalButton(buttonText, buttonFunction) {
