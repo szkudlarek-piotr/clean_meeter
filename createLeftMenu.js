@@ -4,7 +4,7 @@ async function createLeftMenu() {
         {"id": "calendar","href": "calendar.html", "text": "Zobacz kalendarz"},
          {"id": "showAllCliques","href": "all-cliques.html", "text": "Pokaż wszystkie kliki"},
           {"id": "showAllPeople","href": "final-humans.html", "text": "Zobacz wszystkich ludzi"}, 
-          {"id": "addNewMeeting", "href": "add-meeting.html", "text": "Dodaj nowe spotanie"}, 
+          {"id": "addNewMeeting", "href": "add-meeting.html", "text": "Dodaj nowe spotkanie"}, 
           {"id": "addNewClique", "href": "add-clique.html", "text": "Dodaj nową klikę"}, 
            {"id": "addVisit", "href": "add-visit.html", "text": "Dodaj wizytę!"}, 
            {"id": "addQuote", "href": "add-quote.html", "text": "Dodaj cytat"},
