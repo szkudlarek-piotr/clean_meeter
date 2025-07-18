@@ -282,7 +282,11 @@ tr:last-child td {
     font-weight: 700;
 }
 #interactionsMapContainer {
-    width: 80%;
+    padding-top: 10px;
+    width: 90%;
+    border: 1px solid black;
+    margin-left: calc(5% - 1px);
+    margin-right: calc(5% - 1px);
     aspect-ratio: 3/2;
 }
 #footer {
