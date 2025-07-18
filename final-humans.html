@@ -111,18 +111,17 @@
             modalMenuELement.appendChild(menuHeader)
             let numberOfModalOptions = modalMenuELement.getElementsByClassName("left_modal_option").length
             if (numberOfModalOptions == 0) {
-                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}, "relatiogram": {"text": "Relacjogram", "functionName": `showRelatiogram("${humanId}", "${basicInfoJson["fullName"]}")`}, "map": {"text": "Mapa interakcji", "functionName": `showInteractionsMap(${humanId})`}}
+                const modalButtonsDict = {"visits": {"text": "Wizyty", "functionName": `showVisits(${humanId})`}, "meetings": {"text": "Spotkania", "functionName": `showMeetings(${humanId})`}, "events": {"text": "Wydarzenia", "functionName": `showEvents(${humanId})` }, "quotes": {"text": "Cytaty", "functionName": `showQuotes(${humanId})`}, "relatiogram": {"text": "Relacjogram", "functionName": `showRelatiogram("${humanId}", "${basicInfoJson["fullName"]}")`}, "map": {"text": "Mapa interakcji", "functionName": `showInteractionsMap(${humanId}, "${basicInfoJson["fullName"]}")`}}
                 
                 createModalButton("Dane ogólne", `showGeneralInfo(${humanId})`)
                 const modalButtonsKeys = Object.keys(modalButtonsDict)
 
-                console.log(basicInfoJson)
                 basicInfoJson["visitsCount"] > 0 && createModalButton(modalButtonsDict["visits"]["text"], modalButtonsDict["visits"]["functionName"]);
                 basicInfoJson["meetingsCount"] > 0 && createModalButton(modalButtonsDict["meetings"]["text"], modalButtonsDict["meetings"]["functionName"]);
                 basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"], modalButtonsDict["events"]["functionName"]);
                 basicInfoJson["quotesCount"] > 0 && createModalButton(modalButtonsDict["quotes"]["text"], modalButtonsDict["quotes"]["functionName"]);
                 createModalButton(modalButtonsDict["relatiogram"]["text"], modalButtonsDict["relatiogram"]["functionName"])
-                createModalButton(modalButtonsDict["map"]["text"], modalButtonsDict["map"]["functionName"])
+                basicInfoJson["interactionPlacesNumber"] > 0 && createModalButton(modalButtonsDict["map"]["text"], modalButtonsDict["map"]["functionName"])
             }
             showGeneralInfo(humanId)
         }
@@ -196,7 +195,6 @@
                 </tr>
                 `
                 const placesInfo = basicInfoJson["interactionPlacesCategories"]
-                console.log(placesInfo)
                 for (let category of placesInfo) {
                     let row = interactionPlacesTable.insertRow(-1)
                     let categoryCell = row.insertCell(0)
@@ -250,7 +248,6 @@
         const relationReq = await fetch(`http://localhost:3000/relatiogram?humanId=${humanId}`);
         const relationJson = await relationReq.json();
         const {data, layout} = relationJson
-        console.log(data)
 
         let plotDiv = document.getElementById('relatiogramPlot')
         if (!plotDiv) {
@@ -383,7 +380,6 @@
             
 
             for (let calendarEvent of eventsJson) {
-                console.log(calendarEvent)
                 const eventTitle = calendarEvent.name
                 const eventDate = calendarEvent.date
                 const place = calendarEvent.place
@@ -411,12 +407,17 @@
             }
         }
         
-        async function showInteractionsMap(humanId) {
+        async function showInteractionsMap(humanId, humanName) {
             clearModalInfo()
+            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+
+            let interactionsHeader = document.createElement("h2")
+            interactionsHeader.innerText = `${humanName} - miejsca interakcji`
+            placeForHumanInfo.appendChild(interactionsHeader)
+
             let placesQuery = await fetch(`http://localhost:3000/places-data?humanId=${humanId}`)
             let placesData = await placesQuery.json()
-            console.log(placesData)
-            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            
             let mapContainer = document.createElement("div")
             mapContainer.id = "interactionsMapContainer"
             placeForHumanInfo.appendChild(mapContainer)
@@ -426,7 +427,62 @@
             }).addTo(map)
             let markersGroup = []
             for (let place of placesData) {
-                let marker = L.marker([place.lat, place.lng]).addTo(map)
+                let icon = undefined;
+                if (place.category == "Dyskoteka") {
+                    icon = L.icon({
+                        iconUrl: 'map_icons/disco.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Zabytek") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/landmark.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Bar") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/beer.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Restauracja") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/restaurant.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Mieszkanie") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/apartment.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Dom") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/house.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Kościół rzymskokatolicki") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/church.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Park") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/park.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Cmentarz") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/cementery.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                let marker = icon ? L.marker([place.lat, place.lng], { icon }).addTo(map) : L.marker([place.lat, place.lng]).addTo(map);
                 marker.bindPopup(`<b>${place.place_name}</b><br>${place.category}`)
                 markersGroup.push(marker)
             }
