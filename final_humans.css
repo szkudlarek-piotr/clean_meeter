@@ -285,3 +285,13 @@ tr:last-child td {
     width: 80%;
     aspect-ratio: 3/2;
 }
+#footer {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background-color: black;
+    color: white;
+    text-align: center;
+}
+#footer > a {
+    color: white;
+}

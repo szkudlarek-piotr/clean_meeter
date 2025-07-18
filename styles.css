@@ -545,3 +545,13 @@ h2 .inputHeader {
     margin-bottom: 15px;
 
 }
+#footer {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background-color: black;
+    color: white;
+    text-align: center;
+}
+#footer > a {
+    color: white;
+}
