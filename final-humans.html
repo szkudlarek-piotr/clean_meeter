@@ -37,7 +37,8 @@
             </aside>
         </div>
         <footer id="footer">
-            Map icons by <a target="_blank" href="https://icons8.com/">icons8.com</a> <br>
+            Map and superpowers icons by <a target="_blank" href="https://icons8.com/">icons8.com</a>. <br>
+            <a target="_blank" href="https://www.flaticon.com/free-icons/archer" title="archer icons">Archer icons created by Leremy - Flaticon</a>
             Meeter project by Piotr Szkudlarek
         </footer>
     </body>
@@ -132,6 +133,7 @@
             clearModalInfo()
             const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
             const basicInfoJson = await basicHumanInfoReq.json()
+            console.log(basicInfoJson)
             let placeForHumanInfo = document.getElementById("placeForHumanInfo")
 
             let humanPhotoElement = document.createElement("img")
@@ -143,6 +145,21 @@
             humanNameElement.innerText = basicInfoJson["fullName"]
             humanNameElement.setAttribute("class", "nameInGeneralInfo")
             placeForHumanInfo.appendChild(humanNameElement)
+
+            if (basicInfoJson["superpowers"] && basicInfoJson["superpowers"].length > 0) {
+                let superpowersDiv = document.createElement("div")
+                superpowersDiv.id = "superpowersDiv"
+                placeForHumanInfo.appendChild(superpowersDiv)
+
+                for (let superpower of basicInfoJson["superpowers"]) {
+                    let singleSuperpower = document.createElement("img")
+                    singleSuperpower.className = "singleSuperpower"
+                    singleSuperpower.setAttribute("src", superpower.photo)
+                    singleSuperpower.setAttribute("title", superpower.name)
+                    superpowersDiv.appendChild(singleSuperpower)
+                }
+            }
+
 
             let cliqueLine = document.createElement("div")
             cliqueLine.innerText = `Należy do kliki ${basicInfoJson["cliqueName"]}.`
@@ -426,7 +443,8 @@
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map)
             let markersGroup = []
-            for (let place of placesData) {
+            
+            for (let place of placesData.places) {
                 let icon = undefined;
                 if (place.category == "Dyskoteka") {
                     icon = L.icon({

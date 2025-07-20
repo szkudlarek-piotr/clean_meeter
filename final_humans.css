@@ -278,7 +278,7 @@ tr:last-child td {
     margin-top: 10px;
 }
 .meetingTitle {
-        font-size: 24px;
+    font-size: 24px;
     font-weight: 700;
 }
 #interactionsMapContainer {
@@ -298,4 +298,22 @@ tr:last-child td {
 }
 #footer > a {
     color: white;
+}
+#countriesContainer {
+    margin: 30px;
+}
+#superpowersDiv {
+    width: 80%;
+    justify-content: space-evenly;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.singleSuperpower {
+    width: 50px;
+    height: 50px;
+    margin: 10px;
 }
