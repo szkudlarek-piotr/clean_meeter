@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import mysql from 'mysql2'
 import getHumanPhotoDir from './getPhotoFromHumanId.js'
 import createDateString from './multiuseFunctions/dateToString.js'
+import getDefinedPlacesNumber from './getDefinedPlacesNumber.js'
 import getHumanSuperpowers from './getHumanSuperpowers.js'
 dotenv.config()
 const pool = mysql.createPool({
@@ -297,6 +298,15 @@ WITH rankedVisits AS (
         ORDER BY category_count DESC;
         `
         const [placesCategoriesQuery] = await pool.query(placesCategoriesQueryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId])
+        returnedDict["interactionPlacesCategories"] = placesCategoriesQuery       
+        
+        try {
+            const numberOfDefinedPlaces = await getDefinedPlacesNumber(humanId)
+            returnedDict["interactionPlacesNumber"] = numberOfDefinedPlaces
+        }
+        catch (error) {
+            console.log(error)
+        }
         try {
             const superpowersToAdd = await getHumanSuperpowers(humanId)
             console.log(superpowersToAdd)
