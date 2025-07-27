@@ -26,6 +26,7 @@ import getHumanEvents from './getHumanEvents.js'
 import getRelatiogramData from './getRelatiogramData.js'
 import addEventCompanion from './addEventCompanion.js'
 import getPlacesData from './getPlacesData.js'
+import getVisitedPlaces from './getVisitedPlaces.js'
 import addPlace from './addPlace.js'
 
 const app = express()
@@ -170,6 +171,16 @@ app.get('/places-data', async(req, res) => {
         const humanId = req.query.humanId
         const placesData = await getPlacesData(humanId)
         res.send(placesData)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.get('/get-visited-places', async(req, res) => {
+    try {
+        const visitedPlacesData = await getVisitedPlaces()
+        res.send(visitedPlacesData)
     }
     catch (error) {
         res.send(error)
