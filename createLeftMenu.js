@@ -9,7 +9,10 @@ async function createLeftMenu() {
            {"id": "addVisit", "href": "add-visit.html", "text": "Dodaj wizytę!"}, 
            {"id": "addQuote", "href": "add-quote.html", "text": "Dodaj cytat"},
            {"id": "addEvent", "href": "add-event.html", "text": "Dodaj wydarzenie"},  
-           {"id": "addWedding", "href": "add-wedding.html", "text": "Dodaj wesele"}]
+           {"id": "addWedding", "href": "add-wedding.html", "text": "Dodaj wesele"}, 
+           {"id": "visitedPlaces", "href": "places-map.html", "text": "Odwiedzone miejsca"},
+            {"id": "addPlace", "href": "add-place.html", "text": "Dodaj miejsce"}
+        ]
     for (button of menuButtonsArray) {
         let newButton = document.createElement("div")
         newButton.setAttribute("class", "left_option")

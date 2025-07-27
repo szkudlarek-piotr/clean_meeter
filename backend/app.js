@@ -26,6 +26,7 @@ import getHumanEvents from './getHumanEvents.js'
 import getRelatiogramData from './getRelatiogramData.js'
 import addEventCompanion from './addEventCompanion.js'
 import getPlacesData from './getPlacesData.js'
+import addPlace from './addPlace.js'
 
 const app = express()
 app.use(cors())
@@ -291,6 +292,21 @@ app.post('/save-quote', async(req, res) => {
     try {
         const postQuoteReq = await addQuote(authorId, quote, isPublic)
         res.status(200).send(postQuoteReq)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.post('/add-place', async(req, res) => {
+    try {
+        const name = req.query.name
+        const category = req.query.category
+        const lat = req.query.lat
+        const lon = req.query.lon
+        const wasThere = req.query.wasThere
+        const addPlaceReq = await addPlace(name, category, lat, lon, wasThere)
+        res.send(addPlaceReq)
     }
     catch (error) {
         res.send(error)

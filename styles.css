@@ -555,3 +555,19 @@ h2 .inputHeader {
 #footer > a {
     color: white;
 }
+#allPlacesMap {
+    margin: 5%;
+    border: 1px solid black;
+    width: calc(90% - 2px);
+    aspect-ratio: 3/2;
+}
+#geoCoordinatesDiv {
+    display: flex;
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-bottom: 40px;
+}
+.geoCoordInput {
+    width: 50%;
+}

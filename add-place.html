@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Real Meeter - baza danych interakcji społecznych</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            Baza danych spotkań
+        </header>
+        <div class="container">
+            <nav class="left-menu">
+            </nav>
+            <div id="main">
+                <h1>Dodaj miejsce</h1>
+                <div id="allPlacesMap">
+
+                </div>
+                <form>
+                    <h1>Nazwa miejsca</h1>
+                    <input type="text" id="placeNameInput"> <br>
+                    <h1>Kategoria miejsca</h1>
+                    <input type="text" id="placeCategoryInput">  <br>
+                    <div id="geoCoordinatesDiv">
+                            <div class="geoCoordInput">
+                                <h3>Szerokość geograficzna</h3>
+                                <input type="text" id="latInput" readonly> 
+                            </div>
+                            <div class="geoCoordInput">
+                                <h3>Długość geograficzna</h3>
+                                <input type="text" id="lonInput" readonly> 
+                            </div>                            
+                    </div>
+                    <h3>Czy byłeś w tym miejscu?</h3>
+                    Tak <input type="radio" value=1 name="wasThere"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Nie <input type="radio" value=0 name="wasThere"> <br> <br> <br>
+                    <input type="button" value="Dodaj miejsce!" onclick="addPlace()">
+                </form>
+            </div>
+            <aside class="right-menu">
+                <!-- Right menu content goes here -->
+            </aside>
+        </div>
+        <footer id="footer">
+            Map and superpowers icons by <a target="_blank" href="https://icons8.com/">icons8.com</a>. <br>
+            <a target="_blank" href="https://www.flaticon.com/free-icons/archer" title="archer icons">Archer icons created by Leremy - Flaticon</a>
+            Meeter project by Piotr Szkudlarek
+        </footer>
+    </body>
+    <script src="./createLeftMenu.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script>
+        createLeftMenu()
+        async function createMap() {
+            let map = L.map('allPlacesMap').setView([52.2297, 21.0122], 13)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map)
+
+            let currentMarker = null
+
+                map.on('dblclick', function (e) {
+                    const { lat, lng } = e.latlng;
+                    document.getElementById('latInput').value = lat.toFixed(10);
+                    document.getElementById('lonInput').value = lng.toFixed(10);
+
+                    if (currentMarker) {
+                        map.removeLayer(currentMarker);
+                    }
+
+                    currentMarker = L.marker([lat, lng]).addTo(map);
+                })
+        }
+        createMap()
+        async function addPlace() {
+            const placName = document.getElementById("placeNameInput").value
+            const placeCategory = document.getElementById("placeCategoryInput").value
+            const placeLat = document.getElementById("latInput").value
+            const placeLon = document.getElementById("lonInput").value
+            const wasThereInput = document.querySelector('input[name="wasThere"]:checked')
+
+            if (!placName || !placeCategory || !placeLat || !placeLon) {
+                alert("Nie dostarczono niektórych danych.")
+                return
+            }
+
+            if (!wasThereInput) {
+                alert("Zaznacz, czy byłeś w tym miejscu.")
+                return
+            }
+
+            const wasThere = wasThereInput.value
+            const placeData = {
+                name: placName,
+                category: placeCategory,
+                lat: placeLat,
+                lon: placeLon,
+                wasThere: wasThere
+            }
+            
+            if (placName && placeCategory && placeLat && placeLon && wasThere != null) {
+                const urledParams = new URLSearchParams(placeData)
+                try {
+                    const postReq = await fetch(`http://localhost:3000/add-place?${urledParams}`, {method: "POST"})
+                    const postResponse = await postReq.json()
+                }
+                catch (error) {
+                    alert(error)
+                }
+                
+            }
+            else {
+                alert("Nie dostarczono niektóych danych.")
+            }
+        }
+    </script>
+</html>
