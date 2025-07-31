@@ -133,7 +133,6 @@
             clearModalInfo()
             const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
             const basicInfoJson = await basicHumanInfoReq.json()
-            console.log(basicInfoJson)
             let placeForHumanInfo = document.getElementById("placeForHumanInfo")
 
             let humanPhotoElement = document.createElement("img")
