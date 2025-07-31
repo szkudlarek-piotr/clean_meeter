@@ -309,7 +309,6 @@ WITH rankedVisits AS (
         }
         try {
             const superpowersToAdd = await getHumanSuperpowers(humanId)
-            console.log(superpowersToAdd)
             returnedDict["superpowers"] = superpowersToAdd
         }
         catch (error) {
