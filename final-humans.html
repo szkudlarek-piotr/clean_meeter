@@ -234,12 +234,6 @@
 
 
 
-            let lastSeenDiv = document.createElement("div")
-            lastSeenDiv.innerText = basicInfoJson["lastSeen"]
-            lastSeenDiv.setAttribute("class", "lineInGeneralInfo")
-            placeForHumanInfo.appendChild(lastSeenDiv)
-
-
             const usualCompanionsReq = await fetch(`http://localhost:3000/get-often-seen-with?humanId=${humanId}`)
             const usualCompanionsJson = await usualCompanionsReq.json()
 
@@ -501,9 +495,63 @@
                         iconSize: [30, 30]
                     })
                 }
+                else if (place.category == "Escape Room") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/key.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Kino") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/film.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Wypożyczalnia kajaków") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/kayak.png',
+                        iconSize: [30, 30]
+                    })
+                }
                 else if (place.category == "Cmentarz") {
                         icon = L.icon({
                         iconUrl: 'map_icons/cementery.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Hotel") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/hotel.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "ZOO") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/zoo.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Plaża") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/beach.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Dworzec autobusowy") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/bus_station.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Zamek") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/castle.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Szczyt górski") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/mountain.png',
                         iconSize: [30, 30]
                     })
                 }
