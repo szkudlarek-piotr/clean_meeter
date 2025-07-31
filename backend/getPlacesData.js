@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import mysql from 'mysql2'
+import getCountryName from './getCountryName.js'
 dotenv.config()
 const pool = mysql.createPool({
     host     : process.env.host,
@@ -48,7 +49,25 @@ export default async function getPlacesData(humanId) {
     FROM weddings
     JOIN places ON places.id = weddings.party_place_id
     WHERE weddings.id IN (SELECT wedding_guest.wedding_id FROM wedding_guest WHERE wedding_guest.guest_id = ?)
-    group by places.id`
-    const [placesData] = await pool.query(queryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId])
-    return placesData
+    group by places.id
+    UNION
+    SELECT places.place_name, places.category, places.latitude AS lat, places.longitude AS lng, COUNT(places.id) as place_count
+    FROM citybreak_companion
+    JOIN citybreaks ON citybreaks.ID = citybreak_companion.citybreak_id
+    JOIN trip_place ON trip_place.trip_id = citybreaks.ID
+    JOIN places ON places.id = trip_place.place_id
+    WHERE citybreak_companion.human_id = ?
+    GROUP BY places.id;`
+    let countriesArray = []
+    const [placesData] = await pool.query(queryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId])
+    let countriesList = []
+    for (let place of placesData) {
+        let countryName = getCountryName(place.lat, place.lng)
+
+        if (countryName && countryName.name !== "Poland" && !countriesList.includes(countryName.name)) {
+            countriesList.push(countryName.name);
+        }
+    }
+    const returnedData = {"places": placesData, "countries": countriesList}
+    return returnedData
 }
