@@ -4,6 +4,7 @@
     "body-parser": "^1.20.3",
     "chromedriver": "^138.0.1",
     "cors": "^2.8.5",
+    "country-reverse-geocoding": "^0.2.2",
     "date-and-time": "^3.6.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
