@@ -25,6 +25,7 @@ import getHumanMeetings from './getHumanMeetings.js'
 import getHumanEvents from './getHumanEvents.js'
 import getRelatiogramData from './getRelatiogramData.js'
 import addEventCompanion from './addEventCompanion.js'
+import getBasicDayInfo from './getBasicDayInfo.js'
 import getPlacesData from './getPlacesData.js'
 import getVisitedPlaces from './getVisitedPlaces.js'
 import addPlace from './addPlace.js'
@@ -164,6 +165,12 @@ app.get('/relatiogram', async(req, res) => {
     catch (error) {
         res.send(error)
     }
+})
+
+app.get('/basic-day-info', async(req, res) => {
+    const dateString = req.query.dateString
+    const queryResult = await getBasicDayInfo(dateString)
+    res.send(queryResult)
 })
 
 app.get('/places-data', async(req, res) => {
