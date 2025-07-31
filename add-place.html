@@ -30,11 +30,11 @@
                     <div id="geoCoordinatesDiv">
                             <div class="geoCoordInput">
                                 <h3>Szerokość geograficzna</h3>
-                                <input type="text" id="latInput"> 
+                                <input type="text" id="latInput" onkeyup="createMarkerFromText()"> 
                             </div>
                             <div class="geoCoordInput">
                                 <h3>Długość geograficzna</h3>
-                                <input type="text" id="lonInput"> 
+                                <input type="text" id="lonInput" onkeyup="createMarkerFromText()"> 
                             </div>                            
                     </div>
                     <h3>Czy byłeś w tym miejscu?</h3>
@@ -62,27 +62,42 @@
      crossorigin=""></script>
     <script>
         createLeftMenu()
+        let map = undefined
+        let currentMarker = null
         async function createMap() {
-            let map = L.map('allPlacesMap').setView([52.2297, 21.0122], 13)
+            map = L.map('allPlacesMap').setView([52.2297, 21.0122], 13)
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map)
 
-            let currentMarker = null
+            currentMarker = null
 
                 map.on('dblclick', function (e) {
                     const { lat, lng } = e.latlng;
                     document.getElementById('latInput').value = lat.toFixed(10);
                     document.getElementById('lonInput').value = lng.toFixed(10);
 
-                    if (currentMarker) {
-                        map.removeLayer(currentMarker);
-                    }
-
-                    currentMarker = L.marker([lat, lng]).addTo(map);
+                    createMarker(lat, lng)
                 })
         }
         createMap()
+        function createMarker(lat, lng) {
+            if (currentMarker) {
+                map.removeLayer(currentMarker)
+            }
+            currentMarker = L.marker([lat, lng]).addTo(map)
+            map.setView([lat, lng], map.getZoom())
+        }
+        function createMarkerFromText() {
+            const latValue = document.getElementById("latInput").value
+            const lonValue = document.getElementById("lonInput").value
+            const lat = parseFloat(latValue)
+            const lon = parseFloat(lonValue)
+
+            if (!isNaN(lat) && !isNaN(lon)) {
+                createMarker(lat, lon)
+            }
+        }
         async function addPlace() {
             const placName = document.getElementById("placeNameInput").value
             const placeCategory = document.getElementById("placeCategoryInput").value
