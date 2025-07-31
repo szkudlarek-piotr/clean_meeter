@@ -194,6 +194,13 @@
                 placeForHumanInfo.appendChild(spouseLine)
             }
 
+            
+
+            let lastSeenDiv = document.createElement("div")
+            lastSeenDiv.innerText = basicInfoJson["lastSeen"]
+            lastSeenDiv.setAttribute("class", "lineInGeneralInfo")
+            placeForHumanInfo.appendChild(lastSeenDiv)
+
 
             if (basicInfoJson["interactionPlacesCategories"].length > 0) {
                 let placeForTableDiv = document.createElement("div")
