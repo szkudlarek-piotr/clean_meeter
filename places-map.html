@@ -41,6 +41,16 @@
     <script>
         createLeftMenu()
         async function createMap() {
+            const redIcon = new L.Icon({
+                iconUrl:
+                    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+                shadowUrl:
+                    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
             let map = L.map('allPlacesMap').setView([52.2297, 21.0122], 13)
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
@@ -49,12 +59,17 @@
             try {
                 const placesReq = await fetch(`http://localhost:3000/get-visited-places`)
                 const placesJson = await placesReq.json()
+                console.log(placesJson)
                 for (let place of placesJson) {
                     console.log(place)
-                    let marker = L.marker([place.lat, place.lng]).addTo(map)
+                    if (place.was_visited == 0) {
+                        marker = L.marker([place.lat, place.lng], {icon: redIcon})
+                    } else {
+                        marker = L.marker([place.lat, place.lng]) // lub jakiś inny ikonik
+                    }
+                    marker.addTo(map)
                     marker.bindPopup(`<b>${place.place_name}</b><br>${place.category}`)
                     markersGroup.push(marker)
-                    
                 }
                 map.fitBounds(L.featureGroup(markersGroup).getBounds())
             }

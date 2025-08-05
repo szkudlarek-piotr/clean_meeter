@@ -9,9 +9,9 @@ const pool = mysql.createPool({
 
 export default async function getVisitedPlaces() {
     const queryText = `
-    SELECT places.place_name, places.category, places.latitude AS lat, places.longitude AS lng
+    SELECT places.place_name, places.category, places.latitude AS lat, places.longitude AS lng, places.was_visited
     FROM places
-    WHERE was_visited = 1 AND places.category NOT IN ('Mieszkanie')
+    WHERE places.category NOT IN ('Mieszkanie')
     `
     const [visitedPlacesData] = await pool.query(queryText)
     return visitedPlacesData
