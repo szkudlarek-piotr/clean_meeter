@@ -138,6 +138,13 @@
             else {
                 alert("Nie dostarczono niektóych danych.")
             }
+            document.getElementById("placeNameInput").value = ""
+            document.getElementById("placeCategoryInput").value = ""
+            document.getElementById("latInput").value = ""
+            document.getElementById("lonInput").value = ""
+            map.removeLayer(currentMarker)
+            currentMarker = null
+
         }
     </script>
 </html>
