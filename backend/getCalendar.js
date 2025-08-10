@@ -262,10 +262,11 @@ export default async function getCalendar(year) {
                     sortedValues.push(returnedDict[dateIdentifier]["titlesDict"][key])
                 }
                 let computedTitle = ""
-                for (let description of sortedValues.slice(0,-1)) {
+                for (let description of sortedValues.slice(0,-2)) {
                     computedTitle = computedTitle + `${description}, `
                 }
-                computedTitle = computedTitle + ` oraz ${sortedValues.at(-1)}`
+                computedTitle = computedTitle + `${sortedValues.at(-2)} `
+                computedTitle = computedTitle + `oraz ${sortedValues.at(-1)}`
                 returnedDict[dateIdentifier]["computedTitle"] = computedTitle
             }
         }
