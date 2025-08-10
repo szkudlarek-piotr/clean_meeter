@@ -217,7 +217,14 @@ export default async function getCalendar(year) {
         while (createDateId(currentDatetime) != createDateId(addDays(endDate, 1))) {
             let dateId = createDateId(currentDatetime)
             if (!(returnedDict[dateId])) {
-                returnedDict[dateId] = {"interactionClass": "trip", "title": tripTitle, "photos": photosToAdd, "titlesDict": {[currentDatetime.toISOString()]: tripTitle}}
+                returnedDict[dateId] = {"interactionClass": "trip", "title": tripTitle, "photos": [...photosToAdd], "titlesDict": {[currentDatetime.toISOString()]: tripTitle}}
+            }
+            else if ((returnedDict[dateId]) && returnedDict[dateId]["interactionClass"].includes("trip") && !(Object.values(returnedDict[dateId]["titlesDict"]).includes(tripTitle))) {
+                returnedDict[dateId]["titlesDict"][currentDatetime.toISOString()] = tripTitle
+                for (let photo of photosToAdd) {
+                    if (!(returnedDict[dateId]["photos"]).includes(photo))
+                    returnedDict[dateId]["photos"].push(photo)
+                }
             }
             else {
                 returnedDict[dateId]["interactionClass"] += "_trip"
