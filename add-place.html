@@ -26,7 +26,9 @@
                     <h1>Nazwa miejsca</h1>
                     <input type="text" id="placeNameInput"> <br>
                     <h1>Kategoria miejsca</h1>
-                    <input type="text" id="placeCategoryInput">  <br>
+                    <div id="placeCategoryInput">
+                        <input type="text" id="placeCategoryInputDiv" onkeyup="suggestPlaceCategory()">
+                    </div> 
                     <div id="geoCoordinatesDiv">
                             <div class="geoCoordInput">
                                 <h3>Szerokość geograficzna</h3>
@@ -98,6 +100,25 @@
                 createMarker(lat, lon)
             }
         }
+        async function suggestPlaceCategory() {
+            clearPlacesCategories()
+            let placeCategoryInputElement = document.getElementById("placeCategoryInput")
+            let placeCategoryInputValue = document.getElementById("placeCategoryInputDiv").value
+            if (placeCategoryInputValue.length > 2) {
+                const placesCategoriesReq = await fetch(`http://localhost:3000/get-place-categories?placeCategory=${placeCategoryInputValue}`)
+                const placesCategoriesJson = await placesCategoriesReq.json()
+                for (let category of placesCategoriesJson) {
+                    let suggestionElement = document.createElement("div")
+                    suggestionElement.setAttribute("class", "placeCategorySuggestion")
+                    placeCategoryInputElement.appendChild(suggestionElement)
+                    let placeCategoryName = document.createElement("div")
+                    placeCategoryName.setAttribute("class", "placeCategoryName")
+                    placeCategoryName.innerText = category.category
+                    suggestionElement.appendChild(placeCategoryName)
+                    suggestionElement.setAttribute("ondblclick", `setCategoryName("${category.category}")`)
+                }
+            }
+        }
         async function addPlace() {
             const placName = document.getElementById("placeNameInput").value
             const placeCategory = document.getElementById("placeCategoryInput").value
@@ -145,6 +166,16 @@
             map.removeLayer(currentMarker)
             currentMarker = null
 
+        }
+        function clearPlacesCategories() {
+            let allSuggestions = document.getElementsByClassName("placeCategorySuggestion")
+            while (allSuggestions.length > 0) {
+                allSuggestions[0].remove()
+            }
+        }
+        function setCategoryName(categoryName) {
+            clearPlacesCategories()
+            document.getElementById("placeCategoryInputDiv").value = categoryName
         }
     </script>
 </html>

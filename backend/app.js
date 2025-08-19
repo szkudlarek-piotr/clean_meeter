@@ -29,6 +29,7 @@ import getBasicDayInfo from './getBasicDayInfo.js'
 import getPlacesData from './getPlacesData.js'
 import getVisitedPlaces from './getVisitedPlaces.js'
 import addPlace from './addPlace.js'
+import getSuggestedPlaceCategories from './getPLaceCategories.js'
 
 const app = express()
 app.use(cors())
@@ -188,6 +189,17 @@ app.get('/get-visited-places', async(req, res) => {
     try {
         const visitedPlacesData = await getVisitedPlaces()
         res.send(visitedPlacesData)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
+app.get('/get-place-categories', async(req, res) => {
+    try {
+        const inputString = req.query.placeCategory
+        const placesCategories = await getSuggestedPlaceCategories(inputString)
+        res.send(placesCategories)
     }
     catch (error) {
         res.send(error)

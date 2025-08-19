@@ -571,3 +571,131 @@ h2 .inputHeader {
 .geoCoordInput {
     width: 50%;
 }
+
+#modalInfo {
+    text-align: center;
+    width: 75%;
+    overflow-y: scroll;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.5;
+    font-family: "Comic Sans MS";
+    margin-bottom: 15px;
+
+}
+#placeForTableDiv {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+table {
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px 20px;
+    border-bottom: 1px solid black;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+.nameInGeneralInfo {
+    font-family: 'Comic Sans MS';
+    font-size: 36px;
+}
+.lineInGeneralInfo {
+    margin-left: 10%;
+    width: 80%;
+    margin-left: 10%;
+    font-family: 'Comic Sans MS';
+    font-size: 20px;
+}
+
+#placeForInteractingPeople {
+    justify-content: space-evenly;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: 40px;
+}
+
+.interactingPersonImage {
+    width: 25%;
+    border-radius: 10px;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border: 1px solid black;
+}
+.quoteDivInModal {
+    margin-left: 10%;
+    margin-right: 10%;
+    width: 80%;
+    font-family: serif;
+    font-style: italic;
+    font-size: 24px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid black;
+}
+.quoteDivInModal:last-of-type {
+    padding-bottom: 30px;
+    border-bottom: none;
+}
+.quoteAuthorPhoto {
+    width:30%;
+    border: 1px solid black;
+}
+.humanPhotoInModal {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    width:30%;
+    border: 1px solid black;
+
+}
+#superpowersDiv {
+    width: 80%;
+    justify-content: space-evenly;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.singleSuperpower {
+    width: 50px;
+    height: 50px;
+    margin: 10px;
+}
+#dayDescButton {
+    font-size: 24px;
+    font-weight: 300;
+    text-align: center;
+    padding-bottom: 10px;
+}
+#dayDescButton:hover {
+    font-weight: 600;
+}
+.placeCategorySuggestion {
+    display: flex;
+    margin-left: 10%;
+    margin-right: 10%;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid #010101;
+}
+.placeCategorySuggestion>.placeCategoryName {
+    font-size: 24px;
+    width:95%;
+    margin-left: 2%;
+    text-align: left;
+}
+.placeCategorySuggestion:hover {
+    font-weight: 700;
+}
