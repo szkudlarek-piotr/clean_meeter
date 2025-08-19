@@ -57,9 +57,18 @@ export default async function getPlacesData(humanId) {
     JOIN trip_place ON trip_place.trip_id = citybreaks.ID
     JOIN places ON places.id = trip_place.place_id
     WHERE citybreak_companion.human_id = ?
-    GROUP BY places.id;`
+    GROUP BY places.id
+    UNION
+    SELECT places.place_name, places.category, places.latitude AS lat, places.longitude AS lng, COUNT(places.id) as place_count
+    FROM places
+    WHERE places.id IN (
+        SELECT cliques_names.clique_capital
+        FROM party_people
+        LEFT JOIN cliques_names ON party_people.klika_id = cliques_names.id
+        WHERE party_people.ID = ?
+    );`
     let countriesArray = []
-    const [placesData] = await pool.query(queryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId])
+    const [placesData] = await pool.query(queryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId])
     let countriesList = []
     for (let place of placesData) {
         let countryName = getCountryName(place.lat, place.lng)
@@ -69,5 +78,6 @@ export default async function getPlacesData(humanId) {
         }
     }
     const returnedData = {"places": placesData, "countries": countriesList}
+    console.log(returnedData)
     return returnedData
 }
