@@ -4,7 +4,7 @@ This project is  a digital diary of mine. You can write don all the visits, meet
 For a presentation purposes, I created dummy data which will be presented on a video soon.
 
 At the moment, not all features were implemented in the refactorized version. I created some dummy data for the presentation purposes.
-Presentation of the project (in Polish) can be found here: https://www.youtube.com/watch?v=D-qVszXLZdE
+Presentation of the project (in Polish, for 8th July 2025) can be found here: https://www.youtube.com/watch?v=D-qVszXLZdE
 
 Old version of the code can be found here:
 https://github.com/szkudlarek-piotr/Meeter
