@@ -7,8 +7,8 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 
-export default async function addMeeting(date, place, shortDesc, longDesc) {
-    const queryText = "INSERT INTO `meetings` (`ID`, `meeting_date`, `Place`, `short_description`, `long_desc`) VALUES (NULL, ?, ?, ?, ?);"
-    const [addQuoteQuery] = await pool.query(queryText, [date, place, shortDesc, longDesc])
+export default async function addMeeting(date, place, shortDesc, longDesc, meetingPlaceId) {
+    const queryText = "INSERT INTO `meetings` (`ID`, `meeting_date`, `Place`, `short_description`, `long_desc`, `place_id`) VALUES (NULL, ?, ?, ?, ?, ?);"
+    const [addQuoteQuery] = await pool.query(queryText, [date, place, shortDesc, longDesc, meetingPlaceId])
     return addQuoteQuery
 }

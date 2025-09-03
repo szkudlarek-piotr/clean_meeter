@@ -15,6 +15,7 @@ import addCalendarEvent from './addEvent.js'
 import addMettingHuman from './addMeetingHuman.js'
 import addWedding from './addWedding.js'
 import getCalendar from './getCalendar.js'
+import getPlaceBySubstring from './getPlaceBySubstring.js'
 import getHumanNameFromId from './getHumanNameFromId.js'
 import getSuggestedEventPhotos from './getSuggestedEventPhotos.js'
 import getBasicInfoForModal from './getBasicInfoForHumanModal.js'
@@ -206,6 +207,17 @@ app.get('/get-place-categories', async(req, res) => {
     }
 })
 
+app.get('/get-place-by-substring', async(req, res) => {
+    try {
+        const inputString = req.query.placeName
+        const places = await getPlaceBySubstring(inputString)
+        res.send(places)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
+
 app.post('/add-event-human', async(req, res) => {
     try {
         const eventId = req.body.eventId
@@ -266,8 +278,9 @@ app.post('/add-meeting', async(req, res) => {
     const place = req.query.place
     const shortDesc = req.query.shortDesc
     const longDesc = req.query.longDesc
+    const meetingPlaceId = req.query.meetingPlaceId
     try {
-        const meetingAddReq = await addMeeting(date, place, shortDesc, longDesc)
+        const meetingAddReq = await addMeeting(date, place, shortDesc, longDesc, meetingPlaceId)
         res.send(meetingAddReq) 
     }
     catch (error) {

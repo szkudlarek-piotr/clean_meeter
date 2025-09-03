@@ -699,3 +699,32 @@ tr:last-child td {
 .placeCategorySuggestion:hover {
     font-weight: 700;
 }
+.placeSuggestion {
+    display: flex;
+    margin-left: 10%;
+    margin-right: 10%;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid #010101;
+}
+.placeSuggestion>.placeName {
+    font-size: 24px;
+    width:70%;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-left: 2%;
+    text-align: left;
+}
+.placeSuggestion>.categoryName {
+    font-size: 24px;
+    width:25%;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    flex-wrap: wrap;
+    color: gray;
+    margin-left: 2%;
+    text-align: center;
+}
+.placeSuggestion:hover {
+    font-weight: 700;
+}

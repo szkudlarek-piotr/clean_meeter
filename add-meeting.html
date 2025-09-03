@@ -23,10 +23,16 @@
                     <input type="datetime-local" id="meetingDateInput"/>
                     <h2 class="inputHeader">Miejsce spotkania</h2>
                     <input type="text" id="meetingPlaceInput"/>
+                    <h2 class="inputHeader">Wybierz miejsce spotkania</h2>
+                    <div id="placeWithDropdown">
+                        <input type="hidden" id="hiddenPlaceIdInput"/>
+                        <input type="text" id="placeWithDropdownInput" onkeyup="suggestPlace()">
+                    </div> 
                     <h2 class="inputHeader">Krótki opis spotkania</h2>
                     <input type="text" id="shortDescInput"/>
                     <h2 class="inputHeader">Długi opis spotkanie</h2>
                     <textarea id="longDescInput" rows=20 cols=120></textarea>
+
                     <h2 class="inputHeader">Wybierz ludzi</h2>
                     <input type="text" id="searchedHumanInput" onkeyup="createHumansTilesFromName()" placeholder="Wyszukaj osobę..."/>
                     <div id="suggestedHumansContainer">
@@ -36,7 +42,7 @@
                     <div id="chosenHumansContainer">
 
                     </div>
-                    <button onclick="addMeetingWithGuests(event)">Dodaj spotkanie!</button>
+                    <button onclick="addMeetingWithGuests(event)" style="margin-bottom: 50px;">Dodaj spotkanie!</button>
                 </form>
 
             </div>
@@ -50,6 +56,8 @@
         </footer>
     </body>
     <script src="createLeftMenu.js" ></script>
+    <script src="multiuse_functions/suggestPlace.js"></script>
+    <script src="multiuse_functions/setInteractionPlace.js"></script>
     <script>
         createLeftMenu()
         function clearSuggestedHumans() {
@@ -118,6 +126,7 @@
             event.preventDefault()
             const meetingDate = document.getElementById("meetingDateInput").value
             const meetingPlace = document.getElementById("meetingPlaceInput").value
+            const meetingPlaceId = document.getElementById("hiddenPlaceIdInput").value
             const shortDesc = document.getElementById("shortDescInput").value
             const longDesc = document.getElementById("longDescInput").value
             const humansArray = document.querySelectorAll("div.chosen_human_tile")
@@ -126,7 +135,8 @@
                     date: meetingDate,
                     place: meetingPlace,
                     shortDesc: shortDesc,
-                    longDesc: longDesc
+                    longDesc: longDesc,
+                    meetingPlaceId: meetingPlaceId
                 }
                 const queryString = new URLSearchParams(meetingParams).toString()
                 const addMeetingQueryAdress = `http://localhost:3000/add-meeting?${queryString}`
@@ -155,8 +165,5 @@
                 alert("Podane przez Ciebie dane zostały uznane za niewystarczające.")
             }
         }
-        async function showBasicDayInfo(dateId) {
-            
-        } 
     </script>
 </html>
