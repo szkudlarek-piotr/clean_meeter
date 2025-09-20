@@ -25,7 +25,7 @@
                     <input type="text" id="meetingPlaceInput"/>
                     <h2 class="inputHeader">Wybierz miejsce spotkania</h2>
                     <div id="placeWithDropdown">
-                        <input type="hidden" id="hiddenPlaceIdInput"/>
+                        <input type="hidden" id="hiddenPlaceIdInput" value="" />
                         <input type="text" id="placeWithDropdownInput" onkeyup="suggestPlace()">
                     </div> 
                     <h2 class="inputHeader">Krótki opis spotkania</h2>
@@ -126,7 +126,10 @@
             event.preventDefault()
             const meetingDate = document.getElementById("meetingDateInput").value
             const meetingPlace = document.getElementById("meetingPlaceInput").value
-            const meetingPlaceId = document.getElementById("hiddenPlaceIdInput").value
+            let meetingPlaceId = document.getElementById("hiddenPlaceIdInput").value
+            const val = document.getElementById("hiddenPlaceIdInput").value
+
+
             const shortDesc = document.getElementById("shortDescInput").value
             const longDesc = document.getElementById("longDescInput").value
             const humansArray = document.querySelectorAll("div.chosen_human_tile")
