@@ -648,6 +648,7 @@ tr:last-child td {
 }
 .quoteAuthorPhoto {
     width:30%;
+    margin-top: 20px;
     border: 1px solid black;
 }
 .humanPhotoInModal {
@@ -727,4 +728,116 @@ tr:last-child td {
 }
 .placeSuggestion:hover {
     font-weight: 700;
+}
+
+#quoteAuthorPhoto {
+    width: 30%;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+#quoteAuothorName {
+    margin-top: 20px;
+    font-size: 32px;
+    font-family: "Patrick Hand";
+    margin-bottom: 20px;
+}
+#quoteFrame {
+    width: 80%;
+    margin: 20px auto;
+    padding: 40px;
+    font-style: italic;
+    font-size: 32px;
+    font-family: 'Patrick Hand', cursive;
+    border: 4px solid #daa520; /* złoto */
+    border-radius: 30px;
+    background: linear-gradient(145deg, #fff8dc, #fffdf5);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    text-align: center;
+    line-height: 1.5;
+    position: relative;
+}
+#quoteFrame::before,
+#quoteFrame::after {
+    font-size: 60px;
+    color: #daa520;
+    font-family: Georgia, serif;
+    position: relative;
+}
+#quoteFrame::before {
+    content: "“";
+    margin-right: 10px;
+}
+#quoteFrame::after {
+    content: "”";
+    margin-left: 10px;
+}
+#suggestedQuoteAuthors {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.quoteAuthorDiv {
+    width: 28%;
+    aspect-ratio: 5/6;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.quoteAuthorPhoto {
+    width: 75%;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin: 12.5%;
+    margin-bottom: 10px;
+    aspect-ratio: 1/1;
+}
+.quoteAuthorName {
+    font-size: 20px;
+    font-family: 'Patrick Hand', cursive;
+    width: 75%;
+    margin-left: 12.5%;
+    margin-right: 12.5%;
+    margin-bottom: 10px;
+}
+#checkAuthorButton {
+    width: 40%;
+    font-size: 48px;
+    border: 3px solid red;
+    background-color: orange;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border-radius: 50px;
+    cursor: pointer;
+}
+#countersDiv {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 30px;
+    justify-content: space-evenly;
+}
+#countersDiv > .guessQuoteCounter {
+    width: 30%;
+    border-radius: 10px;
+    aspect-ratio: 1/1;
+    border: 3px solid rgb(198, 118, 15);
+    background-color: #83ac41;
+}
+#countersDiv > .guessQuoteCounter > .counterName {
+    height: 30%;
+    border-top: 5%;
+    border-bottom: 5%;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 20px;
+}
+#countersDiv > .guessQuoteCounter > .counterNumber {
+    height: 50%;
+    border-top: 5%;
+    border-bottom: 5%;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 60px;
 }

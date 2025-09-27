@@ -31,6 +31,8 @@ import getPlacesData from './getPlacesData.js'
 import getVisitedPlaces from './getVisitedPlaces.js'
 import addPlace from './addPlace.js'
 import getSuggestedPlaceCategories from './getPLaceCategories.js'
+import getQuoteForGuessingWithExcludedQuoteIds from './getQuoteForGuessingWithExcludedIds.js'
+import getQuoteAuthorData from './getQuoteAuthorData.js'
 
 const app = express()
 app.use(cors())
@@ -214,6 +216,25 @@ app.get('/get-place-by-substring', async(req, res) => {
         res.send(places)
     }
     catch (error) {
+        res.send(error)
+    }
+})
+
+app.get('/single-quote-exclude-ids', async(req, res) => {
+    const excludedQuotesString = req.query.excludedIds
+    const quoteToGuess = await getQuoteForGuessingWithExcludedQuoteIds(excludedQuotesString)
+    res.send(quoteToGuess)
+})
+
+app.get('/check-quote-author-data', async(req, res) => {
+    const quoteId = req.query.quoteId
+    try {
+        const quoteAuthorData = await getQuoteAuthorData(quoteId)
+        console.log(quoteAuthorData)
+        res.send(quoteAuthorData)
+    }
+    catch (error) {
+        console.log(error)
         res.send(error)
     }
 })

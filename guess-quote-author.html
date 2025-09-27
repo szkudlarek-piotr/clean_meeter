@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Real Meeter - baza danych interakcji społecznych</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            Baza danych spotkań
+        </header>
+        <div class="container">
+            <nav class="left-menu">
+            </nav>
+            <div id="main" style="display: flex; align-items: center;">
+                <div id="countersDiv">
+                    <div class="guessQuoteCounter">
+                        <div class="counterName">Poprawnych odpowiedzi</div>
+                        <div class="counterNumber" id="guessedCounter">0</div>
+                    </div>
+
+                    <div class="guessQuoteCounter">
+                        <div class="counterName" >Wszystkich zgadywanych cytatów</div>
+                        <div class="counterNumber" id="allGuessesCounter">0</div>
+                    </div>
+
+                    <div class="guessQuoteCounter">
+                        <div class="counterName">Procent sukcesów</div>
+                        <div class="counterNumber" id="successRate">-</div>
+                    </div>
+                </div>
+                <img id="quoteAuthorPhoto" src="./backend/photos/anonymous.jpg">
+                <div id="quoteAuothorName">Złotousty Anonim</div>
+                <input type="hidden" id="quoteIdHolder"/>
+                <input type="hidden" id="predictedAuthorInput"/>
+                <div id="quoteFrame">Tutaj będzie cytat.</div>
+                <h2>Kto to powiedział?</h2>
+                <input type="text" id="quotesAuthorInput" placeholder="Wpisz fragment imienia lub nazwiska..." onkeyup="suggestQuoteAuthors()"/>
+                <div id="suggestedQuoteAuthors">
+
+
+                </div>
+                <button id="checkAuthorButton" ondblclick="checkQuoteAuthor()">Sprawdź!</button>
+            </div>
+
+            <aside class="right-menu">
+                <!-- Right menu content goes here -->
+            </aside>
+        </div>
+        <footer id="footer">
+            Map icons by <a target="_blank" href="https://icons8.com/">icons8.com</a> <br>
+            Meeter project by Piotr Szkudlarek
+        </footer>
+    </body>
+    <script src="createLeftMenu.js" ></script>
+    <script>
+        createLeftMenu()
+        let excludedQuotesArr = []
+        async function getSingleQuote() {
+            console.log(excludedQuotesArr)
+            const url = `http://localhost:3000/single-quote-exclude-ids?excludedIds=${excludedQuotesArr.join(",")}`
+            const res = await fetch(url, { method: "GET" })
+            const quote = await res.json()
+            let quoteFrameElement = document.getElementById("quoteFrame")
+            quoteFrameElement.innerHTML = quote.quote
+            let quoteIdHolder = document.getElementById("quoteIdHolder")
+            quoteIdHolder.setAttribute("value", quote.quote_id)
+        }
+        async function suggestQuoteAuthors() {
+            clearPredictedAuthors()
+            const searchString = document.getElementById("quotesAuthorInput").value
+            if (searchString.length > 2) {
+                const authorCandidatesReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${searchString}`)
+                const authorCandidates = await authorCandidatesReq.json()
+                for (let humanJson of authorCandidates) {
+                    createQuoteAuthorTile(humanJson)
+                }
+            }
+        }
+        function createQuoteAuthorTile(humanJson) {
+            let suggestedQuoteAuthors = document.getElementById("suggestedQuoteAuthors")
+            
+            let quoteAuthorDiv = document.createElement("div")
+
+            quoteAuthorDiv.setAttribute("class", "quoteAuthorDiv")
+            quoteAuthorDiv.id = `quoteAuthorDiv_${humanJson.humanId}`
+
+            let photoElement = document.createElement("img")
+            photoElement.setAttribute("class", "quoteAuthorPhoto")
+            photoElement.setAttribute("src", humanJson.photoDir)
+            quoteAuthorDiv.appendChild(photoElement)
+
+            let authorName = document.createElement("div")
+            authorName.setAttribute("class", "quoteAuthorName")
+            authorName.innerText = humanJson.name
+            quoteAuthorDiv.appendChild(authorName)
+            quoteAuthorDiv.addEventListener("dblclick", () => {setPredictedAuthor(humanJson.photoDir, humanJson.name, humanJson.id);});
+
+            suggestedQuoteAuthors.appendChild(quoteAuthorDiv)
+        }
+        function setPredictedAuthor(photoDir, humanName, humanId) {
+            let photoElement = document.getElementById("quoteAuthorPhoto")
+            photoElement.setAttribute("src", photoDir)
+
+            let nameElement = document.getElementById("quoteAuothorName")
+            nameElement.innerText = humanName
+            let predictedAuthorInput = document.getElementById("predictedAuthorInput")
+            predictedAuthorInput.setAttribute("value", humanId)
+
+        }
+        function clearPredictedAuthors() {
+            let authorTiles = document.getElementsByClassName("quoteAuthorDiv")
+            while (authorTiles.length > 0) {
+                authorTiles[0].remove()
+            }
+        }
+        async function checkQuoteAuthor() {
+            const quoteId = document.getElementById("quoteIdHolder").value
+            const predictedQuoteAuthor = document.getElementById("predictedAuthorInput").value
+
+            if (predictedQuoteAuthor.length > 0) {
+                excludedQuotesArr.push(quoteId)
+                const authorDataReq = await fetch(`http://localhost:3000/check-quote-author-data?quoteId=${quoteId}`)
+                const authorDataJson = await authorDataReq.json()
+                
+                let oldAllGuessesCounter = parseInt(document.getElementById("allGuessesCounter").innerText, 10)
+                let newAllGuessesCounter = oldAllGuessesCounter + 1
+
+                let oldGuessedCount = parseInt(document.getElementById("guessedCounter").innerText, 10)
+                document.getElementById("allGuessesCounter").innerText = newAllGuessesCounter
+                if (predictedQuoteAuthor == authorDataJson.humanId) {
+                    alert("Brawo! Udało Ci się poprawnie zgadnać autora!")
+                    let newGuessedCount = oldGuessedCount + 1
+                    document.getElementById("guessedCounter").innerText = newGuessedCount
+                    const succesRate = (newGuessedCount / newAllGuessesCounter * 100).toFixed(1)
+                    document.getElementById("successRate").innerText = `${succesRate}%`
+                }
+                else {
+                    alert(`Niestety, nie udało Ci się. Prawdziwym autorem cytatu jest ${authorDataJson.name}`)
+                    const succesRate = (oldGuessedCount / newAllGuessesCounter * 100).toFixed(1)
+                    document.getElementById("successRate").innerText = `${succesRate}%`
+                }
+                setPredictedAuthor("./backend/photos/anonymous.jpg", "Złotousty Anonim", "")
+                getSingleQuote()
+            }
+            else {
+                alert("Aby sprawdzić autora cytatuy, musisz najpierw coś wytypować!")
+            }
+            clearPredictedAuthors()
+            document.getElementById("quotesAuthorInput").value = ""
+        }
+
+        getSingleQuote()
+    </script>
+</html>
