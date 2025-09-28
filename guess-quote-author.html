@@ -34,11 +34,17 @@
                         <div class="counterNumber" id="successRate">-</div>
                     </div>
                 </div>
-                <img id="quoteAuthorPhoto" src="./backend/photos/anonymous.jpg">
-                <div id="quoteAuothorName">Złotousty Anonim</div>
+                <div id="guesser">
+                    <div id="quoteAuthorDataDiv">
+                        <img id="quoteAuthorPhoto" src="./backend/photos/anonymous.jpg">
+                        <div id="quoteAuothorName">Złotousty Anonim</div>
+                    </div>
+                    <div id="quoteFrame">Tutaj będzie cytat.</div>
+                </div>
                 <input type="hidden" id="quoteIdHolder"/>
                 <input type="hidden" id="predictedAuthorInput"/>
-                <div id="quoteFrame">Tutaj będzie cytat.</div>
+                    
+
                 <h2>Kto to powiedział?</h2>
                 <input type="text" id="quotesAuthorInput" placeholder="Wpisz fragment imienia lub nazwiska..." onkeyup="suggestQuoteAuthors()"/>
                 <div id="suggestedQuoteAuthors">
