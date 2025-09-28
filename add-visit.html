@@ -61,7 +61,7 @@
             let deliveredInput = document.getElementById("searchedHumanInput").value
             if (deliveredInput.length > 2) {
                 clearSuggestedGuests()
-                const guestCandidatesReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${deliveredInput}`)
+                const guestCandidatesReq = await fetch(`http://localhost:3000/get-sorted-humans-from-substring?queryString=${deliveredInput}&mode=visits`)
                 const guestCandidates = await guestCandidatesReq.json()
                 createHumanTiles(guestCandidates)
             }

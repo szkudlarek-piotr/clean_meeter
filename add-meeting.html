@@ -67,13 +67,16 @@
 
         async function createHumansTilesFromName() {
             let deliveredInput = document.getElementById("searchedHumanInput").value
+            console.log(deliveredInput)
             if (deliveredInput.length > 2) {
                 clearSuggestedHumans()
-                const humansCandidatesReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${deliveredInput}`)
+                const humansCandidatesReq = await fetch(`http://localhost:3000/get-sorted-humans-from-substring?queryString=${deliveredInput}&mode=meetings`)
                 const humansCandidates = await humansCandidatesReq.json()
+                console.log(humansCandidates)
                 createHumanTiles(humansCandidates)
             }
         }
+        
         function createSingleHumanTile(singleHumanJson, containerElementId, withClosingCross=false, withAddingToChosen=false) {
             let newHumanTile = document.createElement("div")
             let containerElement = document.getElementById(containerElementId)

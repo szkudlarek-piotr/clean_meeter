@@ -36,6 +36,12 @@
                     <h2 class="inputHeader">Miejsce wydarzenie</h2>
                     <input type="text" id="meetingPlaceInput"/>
 
+                    <h2 class="inputHeader">Wybierz miejsce wydarzenia</h2>
+                    <div id="placeWithDropdown">
+                        <input type="hidden" id="hiddenPlaceIdInput"/>
+                        <input type="text" id="placeWithDropdownInput" onkeyup="suggestPlace()">
+                    </div> 
+
 
                     
                     <h2 class="inputHeader">Długi opis eventu</h2>
@@ -80,6 +86,8 @@
         </footer>
     </body>
     <script src="createLeftMenu.js" ></script>
+    <script src="multiuse_functions/suggestPlace.js"></script>
+    <script src="multiuse_functions/setInteractionPlace.js"></script>
     <script>
         createLeftMenu()
         async function addEvent(event) {
@@ -166,7 +174,7 @@
             let deliveredInput = document.getElementById("searchedHumanInput").value
             if (deliveredInput.length > 2) {
                 clearSuggestedHumans()
-                const humanCandidatesReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${deliveredInput}`)
+                const humanCandidatesReq = await fetch(`http://localhost:3000/get-sorted-humans-from-substring?queryString=${deliveredInput}&mode=events`)
                 const humanCandidates = await humanCandidatesReq.json()
                 createHumanTiles(humanCandidates)
             }
@@ -348,6 +356,8 @@
 
         
         }
+
+
 
     </script>
 </html>

@@ -7,6 +7,7 @@ import addHuman from './addHuman.js'
 import addQuote from './addQuoteBackend.js'
 import addVisitGuest from './addVisitGuest.js'
 import getHumanFromSubstring from './getHumanFromNameSubstring.js'
+import getHumanFromSubstringSorted from './getHumanFromSubstringSorted.js'
 import getCliquesFromSubstring from './getCliquesFromSubstring.js'
 import getCliquesWithHumans from './getCLiquesWithHumans.js'
 import addVisit from './addVisitBackend.js'
@@ -97,6 +98,18 @@ app.get('/get-human-from-substring', async (req, res) => {
         res.status(500).send({ error: "Internal Server Error" });
     }
 });
+
+app.get('/get-sorted-humans-from-substring', async(req, res) => {
+    try {
+        const deliveredString = req.query.queryString
+        const mode = req.query.mode
+        const sortedHumans = await getHumanFromSubstringSorted(deliveredString, mode)
+        res.send(sortedHumans)
+    }
+    catch (error) {
+        res.send(error)
+    }
+})
 
 app.get('/basic-info-for-human-modal', async(req, res) => {
     try {
