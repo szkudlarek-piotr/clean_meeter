@@ -67,15 +67,31 @@
     <script>
         createLeftMenu()
         let excludedQuotesArr = []
+        let authorsSoFar = {}
         async function getSingleQuote() {
-            console.log(excludedQuotesArr)
-            const url = `http://localhost:3000/single-quote-exclude-ids?excludedIds=${excludedQuotesArr.join(",")}`
-            const res = await fetch(url, { method: "GET" })
-            const quote = await res.json()
+            let excludedAuthors = Object.entries(authorsSoFar).filter(([humanId, quotes_count]) => quotes_count > 1).map(([humanId]) => Number(humanId))
+            const excludedAuthorsString = excludedAuthors.join(",")
+            const url = `http://localhost:3000/single-quote-exclude-quotes-and-humans?excludedQuoteIds=${excludedQuotesArr.join(",")}&excludedHumans=${excludedAuthorsString}`
             let quoteFrameElement = document.getElementById("quoteFrame")
-            quoteFrameElement.innerHTML = quote.quote
             let quoteIdHolder = document.getElementById("quoteIdHolder")
-            quoteIdHolder.setAttribute("value", quote.quote_id)
+            try {
+                const res = await fetch(url, { method: "GET" })
+                const quote = await res.json()
+
+                if (quote && quote.quote && quote.quote_id) {
+                    quoteFrameElement.innerHTML = quote.quote
+                    quoteIdHolder.setAttribute("value", quote.quote_id)
+                }
+                else {
+                    quoteFrameElement.innerHTML = "Przejrzałeś/aś już wszystkie dostępne dla Ciebie cytaty! Dzięki za grę!"
+                    quoteIdHolder.setAttribute("value", 0)                    
+                }
+            }
+            catch {
+                quoteFrameElement.innerHTML = "Przejrzałeś/aś już wszystkie dostępne dla Ciebie cyaty! Dzięki za grę!"
+                quoteIdHolder.setAttribute("value", 0)
+            }
+
         }
         async function suggestQuoteAuthors() {
             clearPredictedAuthors()
@@ -105,7 +121,7 @@
             authorName.setAttribute("class", "quoteAuthorName")
             authorName.innerText = humanJson.name
             quoteAuthorDiv.appendChild(authorName)
-            quoteAuthorDiv.addEventListener("dblclick", () => {setPredictedAuthor(humanJson.photoDir, humanJson.name, humanJson.id);});
+            quoteAuthorDiv.addEventListener("click", () => {setPredictedAuthor(humanJson.photoDir, humanJson.name, humanJson.id);});
 
             suggestedQuoteAuthors.appendChild(quoteAuthorDiv)
         }
@@ -151,8 +167,15 @@
                     const succesRate = (oldGuessedCount / newAllGuessesCounter * 100).toFixed(1)
                     document.getElementById("successRate").innerText = `${succesRate}%`
                 }
+                if (!(authorsSoFar.hasOwnProperty(authorDataJson.humanId))) {
+                    authorsSoFar[authorDataJson.humanId] = 1
+                }
+                else {
+                    authorsSoFar[authorDataJson.humanId] += 1
+                }
                 setPredictedAuthor("./backend/photos/anonymous.jpg", "Złotousty Anonim", "")
                 getSingleQuote()
+
             }
             else {
                 alert("Aby sprawdzić autora cytatuy, musisz najpierw coś wytypować!")

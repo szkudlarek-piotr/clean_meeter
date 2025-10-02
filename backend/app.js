@@ -233,9 +233,10 @@ app.get('/get-place-by-substring', async(req, res) => {
     }
 })
 
-app.get('/single-quote-exclude-ids', async(req, res) => {
-    const excludedQuotesString = req.query.excludedIds
-    const quoteToGuess = await getQuoteForGuessingWithExcludedQuoteIds(excludedQuotesString)
+app.get('/single-quote-exclude-quotes-and-humans', async(req, res) => {
+    const excludedQuotesString = req.query.excludedQuoteIds
+    const excludedQuoteAuthorsString = req.query.excludedHumans
+    const quoteToGuess = await getQuoteForGuessingWithExcludedQuoteIds(excludedQuotesString, excludedQuoteAuthorsString)
     res.send(quoteToGuess)
 })
 
@@ -243,11 +244,9 @@ app.get('/check-quote-author-data', async(req, res) => {
     const quoteId = req.query.quoteId
     try {
         const quoteAuthorData = await getQuoteAuthorData(quoteId)
-        console.log(quoteAuthorData)
         res.send(quoteAuthorData)
     }
     catch (error) {
-        console.log(error)
         res.send(error)
     }
 })
