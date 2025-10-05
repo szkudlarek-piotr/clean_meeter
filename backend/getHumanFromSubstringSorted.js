@@ -58,14 +58,26 @@ export default async function getHumanFromSubstringSorted(deliveredSubstring, mo
             ORDER BY human_events_count.interaction_count DESC, party_people.surname, party_people.name;
             `
             break
+        case "quotes": 
+            queryString = `WITH human_quotes_count AS (
+                SELECT party_people.ID AS humanId, COALESCE(COUNT(golden_quotes.human_id), 0) as interaction_count
+                FROM party_people
+                LEFT JOIN golden_quotes ON party_people.ID = golden_quotes.human_id
+                GROUP BY party_people.ID
+            )
+            SELECT id, CONCAT(name, ' ', surname) as full_name 
+            FROM party_people
+            JOIN human_quotes_count ON party_people.ID = human_quotes_count.humanId
+            WHERE CONCAT(name, ' ', surname) LIKE ?
+            ORDER BY human_quotes_count.interaction_count DESC, party_people.surname, party_people.name;
+            `
+            break
 
     }
         const [possiblePeopleArr] = await pool.query(queryString, [`%${deliveredSubstring}%`])
-        console.log(possiblePeopleArr)
         for (let human of possiblePeopleArr) {
             let newHumanToAdd = {"id": human.id, "name": human.full_name, "photoDir": getHumanPhotoDir(human.id)}
             returnedArr.push(newHumanToAdd)
         }
-    console.log(returnedArr)
     return returnedArr
 }

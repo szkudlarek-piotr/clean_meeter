@@ -100,9 +100,10 @@ app.get('/get-human-from-substring', async (req, res) => {
 });
 
 app.get('/get-sorted-humans-from-substring', async(req, res) => {
+    const deliveredString = req.query.queryString
+    const mode = req.query.mode
     try {
-        const deliveredString = req.query.queryString
-        const mode = req.query.mode
+
         const sortedHumans = await getHumanFromSubstringSorted(deliveredString, mode)
         res.send(sortedHumans)
     }

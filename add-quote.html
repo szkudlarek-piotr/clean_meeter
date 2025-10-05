@@ -39,7 +39,7 @@
                     <label for="notPublicQuote">Nie</label>
                     <br/><br/>
                     
-                    <button onclick="addQuote()">Dodaj cytat!</button>
+                    <button type="button" onclick="addQuote()">Dodaj cytat!</button>
                 
                 
                 </form>
@@ -66,7 +66,7 @@
             let humanInputValue = document.getElementById("quoteAuthorInput").value
             let quoteAuthorSugestionsDiv = document.getElementById("quoteAuthorSugestions")
             if (humanInputValue.length > 2) {
-                const queryAdress = `http://localhost:3000/get-human-from-substring?name_fragment=${humanInputValue}`
+                const queryAdress = `http://localhost:3000/get-sorted-humans-from-substring?queryString=${humanInputValue}&mode=quotes`
                 const suggestionRequest = await fetch(queryAdress)
                 const suggestedPeople = await suggestionRequest.json()
                 for (let human of suggestedPeople) {
