@@ -34,6 +34,7 @@ import addPlace from './addPlace.js'
 import getSuggestedPlaceCategories from './getPLaceCategories.js'
 import getQuoteForGuessingWithExcludedQuoteIds from './getQuoteForGuessingWithExcludedIds.js'
 import getQuoteAuthorData from './getQuoteAuthorData.js'
+import addQuoteGuessInstnce from './addGuessQuoteInstance.js'
 
 const app = express()
 app.use(cors())
@@ -373,6 +374,16 @@ app.post('/save-quote', async(req, res) => {
     catch (error) {
         res.send(error)
     }
+})
+
+app.post('/add-guess-quote-instance', async(req, res) => {
+    const playerId = req.query.playerId
+    const quoteId = req.query.quoteId
+    const postulatedAuthorId = req.query.postulatedAuthorId
+    const response = await addQuoteGuessInstnce(quoteId, playerId, postulatedAuthorId)
+
+    res.send(response)
+
 })
 
 app.post('/add-place', async(req, res) => {
