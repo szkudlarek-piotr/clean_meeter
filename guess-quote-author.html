@@ -25,7 +25,7 @@
                     </div>
 
                     <div class="guessQuoteCounter">
-                        <div class="counterName" >Wszystkich zgadywanych cytatów</div>
+                        <div class="counterName">Wszystkich zgadywanych cytatów</div>
                         <div class="counterNumber" id="allGuessesCounter">0</div>
                     </div>
 
@@ -34,7 +34,15 @@
                         <div class="counterNumber" id="successRate">-</div>
                     </div>
                 </div>
+                
+                <h3>Wybierz gracza</h3>
+                <div id="chooseQuoteGuessingPlayer">
+                        <input type="text" id="quoteGamePlayerNameInput" onkeyup="suggestPlayer()"/>
+                        <input type="hidden" id="playerIdInput" />
+                </div>
+
                 <div id="guesser">
+
                     <div id="quoteAuthorDataDiv">
                         <img id="quoteAuthorPhoto" src="./backend/photos/anonymous.jpg">
                         <div id="quoteAuothorName">Złotousty Anonim</div>
@@ -44,14 +52,14 @@
                 <input type="hidden" id="quoteIdHolder"/>
                 <input type="hidden" id="predictedAuthorInput"/>
                     
+                <button id="checkAuthorButton" ondblclick="checkQuoteAuthor()">Sprawdź!</button>
 
                 <h2>Kto to powiedział?</h2>
                 <input type="text" id="quotesAuthorInput" placeholder="Wpisz fragment imienia lub nazwiska..." onkeyup="suggestQuoteAuthors()"/>
                 <div id="suggestedQuoteAuthors">
 
-
                 </div>
-                <button id="checkAuthorButton" ondblclick="checkQuoteAuthor()">Sprawdź!</button>
+
             </div>
 
             <aside class="right-menu">
@@ -69,8 +77,19 @@
         let excludedQuotesArr = []
         let authorsSoFar = {}
         async function getSingleQuote() {
-            let excludedAuthors = Object.entries(authorsSoFar).filter(([humanId, quotes_count]) => quotes_count > 1).map(([humanId]) => Number(humanId))
-            const excludedAuthorsString = excludedAuthors.join(",")
+            const excludedAuthors = Object.entries(authorsSoFar)
+                .filter(([_, quotesCount]) => quotesCount > 1)
+                .map(([humanId]) => Number(humanId));
+
+            const playerId = document.getElementById("playerIdInput").value;
+
+            const excludedAuthorsString = excludedAuthors.length > 0
+                ? playerId.length > 0
+                    ? [...excludedAuthors, Number(playerId)].join(",")
+                    : excludedAuthors.join(",")
+                : playerId.length > 0
+                    ? playerId
+                    : ""
             const url = `http://localhost:3000/single-quote-exclude-quotes-and-humans?excludedQuoteIds=${excludedQuotesArr.join(",")}&excludedHumans=${excludedAuthorsString}`
             let quoteFrameElement = document.getElementById("quoteFrame")
             let quoteIdHolder = document.getElementById("quoteIdHolder")
@@ -174,14 +193,74 @@
                     authorsSoFar[authorDataJson.humanId] += 1
                 }
                 setPredictedAuthor("./backend/photos/anonymous.jpg", "Złotousty Anonim", "")
+                addGuessInstance(quoteId, predictedQuoteAuthor)
                 getSingleQuote()
 
             }
             else {
-                alert("Aby sprawdzić autora cytatuy, musisz najpierw coś wytypować!")
+                alert("Aby sprawdzić autora cytatu, musisz najpierw coś wytypować!")
             }
             clearPredictedAuthors()
             document.getElementById("quotesAuthorInput").value = ""
+        }
+        async function suggestPlayer() {
+            clearPlayerSuggstions()
+            let playerNameInputValue = document.getElementById("quoteGamePlayerNameInput").value
+            if (playerNameInputValue.length > 2) {
+                const playerCandidatesReq = await fetch(`http://localhost:3000/get-human-from-substring?name_fragment=${playerNameInputValue}`)
+                const playerCandidates = await playerCandidatesReq.json()
+                for (let player of playerCandidates) {
+                    createPlayerSuggestion("chooseQuoteGuessingPlayer", player)
+                }     
+            }
+        }
+        function createPlayerSuggestion(parentElementId, playerJson) {
+            let parentElement = document.getElementById(parentElementId)
+
+            let playerElement = document.createElement("div")
+            playerElement.setAttribute("class", "guessQuotePlayerSuggestion")
+            parentElement.appendChild(playerElement)
+
+            let nameElement = document.createElement("div")
+            nameElement.innerText = playerJson.name
+            nameElement.setAttribute("class", "guessQuotePlayerNameSuggestion")
+            playerElement.appendChild(nameElement)
+
+
+
+            let photoElement = document.createElement("img")          
+            photoElement.setAttribute("src", playerJson.photoDir)
+            playerElement.setAttribute("ondblclick", `setActivePlayer("${playerJson.id}", "${playerJson.name}")`)
+            playerElement.appendChild(photoElement)
+
+        }
+
+        function setActivePlayer(playerId, playerName) {
+            console.log(playerId, playerName)
+
+            let playerInputElement = document.getElementById("playerIdInput")
+            playerInputElement.setAttribute("value", playerId)
+            
+            let quoteGamePlayerNameInput = document.getElementById("quoteGamePlayerNameInput")
+            quoteGamePlayerNameInput.value = ""
+            quoteGamePlayerNameInput.setAttribute("placeholder", playerName)
+
+            clearPlayerSuggstions()
+
+        }
+
+        function clearPlayerSuggstions() {
+            let suggestionsList = document.getElementsByClassName("guessQuotePlayerSuggestion")
+            
+            while (suggestionsList.length > 0) {
+                suggestionsList[0].remove()
+            }
+        }
+        async function addGuessInstance(quoteId, postulatedAuthorId) {
+            const playerId = document.getElementById("playerIdInput").value
+            const postReq = await fetch(`http://localhost:3000/add-guess-quote-instance?playerId=${playerId}&quoteId=${quoteId}&postulatedAuthorId=${postulatedAuthorId}`, {method: "POST"})
+            const postJson = await postReq.json()
+            console.log(postJson)
         }
 
         getSingleQuote()

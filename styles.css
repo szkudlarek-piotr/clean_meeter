@@ -242,10 +242,8 @@ a {
     margin-right: calc(10% - 1px);
     justify-content: center;
 }
-.quoteAuthorSuggestion {
-    width:80%;
-    margin-left: 10%;
-    margin-right: 10%;
+.quoteAuthorSuggestion, .guessQuotePlayerSuggestion {
+    width:100%;
     height: 50px;
     display: flex;
     border-bottom: 1px dashed gray;
@@ -254,7 +252,11 @@ a {
     padding-top: 5px;
     padding-top: 5px;
 }
-.quoteAuthorSuggestion > img {
+.quoteAuthorSuggestion:last-child, .guessQuotePlayerSuggestion:last-child {
+    border-bottom: 1px solid black;
+}
+.quoteAuthorSuggestion > img, 
+.guessQuotePlayerSuggestion > img {
     height: 80%;
     padding-top: auto;
     padding-bottom: auto;
@@ -264,7 +266,8 @@ a {
     width: 40px;
     aspect-ratio: 1/1;
 }
-.quoteAuthorSuggestion > .quoteAuthorName {
+.quoteAuthorSuggestion > .quoteAuthorName,
+.guessQuotePlayerSuggestion > .guessQuotePlayerNameSuggestion {
     font-family: cursive; 
     font-size: 25px;
     height: 80%;
@@ -851,5 +854,14 @@ tr:last-child td {
 #quoteAuthorDataDiv {
     width: 25%;
     align-content: space-evenly;
+
+}
+#chooseQuoteGuessingPlayer {
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+#chooseQuoteGuessingPlayer > input {
+    width: 100%;
 
 }
