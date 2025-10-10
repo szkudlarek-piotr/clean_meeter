@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+
+import writeToLogFile from './write_to_log.js'
 import getFinalHumans from './getFinalHumans.js'
 import addClique from './addClique.js'
 import addHuman from './addHuman.js'
