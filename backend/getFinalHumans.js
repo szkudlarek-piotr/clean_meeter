@@ -115,8 +115,12 @@ WITH visits_count AS (
         SELECT human_id, COUNT(human_id) AS trips_c
         FROM citybreak_companion
         GROUP BY human_id
+    ),
+    quotes_count AS (
+    	SELECT human_id, COUNT(human_id) AS quotes_c
+        FROM golden_quotes
+        GROUP BY human_id
     )
-
     SELECT 
         party_people.id, 
         CONCAT(party_people.name, ' ', party_people.surname) AS full_name,
@@ -132,7 +136,7 @@ WITH visits_count AS (
         COALESCE(trips_count.trips_c, 0) AS trips_c,
         (SELECT quote FROM golden_quotes WHERE golden_quotes.is_public=1 AND golden_quotes.human_id = party_people.ID ORDER BY RAND() LIMIT 1) AS quote,
         COALESCE(meetings_count.meeting_c, 0) + COALESCE(events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) + COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) +  COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) AS other_interactions_c,
-        6 * COALESCE(recent_visits_count.visit_c, 0) + 3 * COALESCE(recent_meetings_count.meeting_c, 0) + COALESCE(recent_events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(recent_wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 AS rank_points
+        6 * COALESCE(recent_visits_count.visit_c, 0) + 3 * COALESCE(recent_meetings_count.meeting_c, 0) + COALESCE(recent_events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(recent_wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 3 AS rank_points
 
     FROM party_people 
     LEFT JOIN cliques_names ON cliques_names.id = party_people.klika_id
@@ -149,7 +153,8 @@ WITH visits_count AS (
     LEFT JOIN wed_guest_count ON wed_guest_count.guest_id = party_people.id
     LEFT JOIN recent_wed_guest_count ON recent_wed_guest_count.guest_id = party_people.id
     LEFT JOIN trips_count ON trips_count.human_id = party_people.id
-    WHERE party_people.klika_id != 15 AND 6 * COALESCE(recent_visits_count.visit_c, 0) + 3 * COALESCE(recent_meetings_count.meeting_c, 0) + COALESCE(recent_events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(recent_wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 6 > 1
+    LEFT JOIN quotes_count ON quotes_count.human_id = party_people.ID
+    WHERE party_people.klika_id != 15 AND 6 * COALESCE(recent_visits_count.visit_c, 0) + 3 * COALESCE(recent_meetings_count.meeting_c, 0) + COALESCE(recent_events_count.event_c, 0) + COALESCE(wed_inv_count.wed_inv_c, 0) * 15 + 3 * COALESCE(wed_acc_count.wed_acc_c, 0) + COALESCE(wed_guest_count.wed_guest_c, 0) + 6 * COALESCE(recent_wed_partner_count.wed_partner_c, 0) + COALESCE(trips_count.trips_c, 0) * 3 > 1 OR quotes_count.quotes_c > 100
     ORDER BY rank_points DESC;
     `
     //I created a view in my database that has almost all info I need to create human tiles
