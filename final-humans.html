@@ -18,7 +18,7 @@
             <div id="restOfModal">
                 <div id="leftModalMenu">
                 </div>
-                <div id="placeForHumanInfo">
+                <div id="modalInfo">
 
                 </div>
             </div>
@@ -127,28 +127,28 @@
             showGeneralInfo(humanId)
         }
         function clearModalInfo() {
-            document.getElementById("placeForHumanInfo").innerHTML = ""
+            document.getElementById("modalInfo").innerHTML = ""
         }
         async function showGeneralInfo(humanId) {
             clearModalInfo()
             const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
             const basicInfoJson = await basicHumanInfoReq.json()
-            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let modalInfo = document.getElementById("modalInfo")
 
             let humanPhotoElement = document.createElement("img")
             humanPhotoElement.setAttribute("src", basicInfoJson["photoDir"])
             humanPhotoElement.setAttribute("class", "humanPhotoInModal")
-            placeForHumanInfo.appendChild(humanPhotoElement)
+            modalInfo.appendChild(humanPhotoElement)
 
             let humanNameElement = document.createElement("div")
             humanNameElement.innerText = basicInfoJson["fullName"]
             humanNameElement.setAttribute("class", "nameInGeneralInfo")
-            placeForHumanInfo.appendChild(humanNameElement)
+            modalInfo.appendChild(humanNameElement)
 
             if (basicInfoJson["superpowers"] && basicInfoJson["superpowers"].length > 0) {
                 let superpowersDiv = document.createElement("div")
                 superpowersDiv.id = "superpowersDiv"
-                placeForHumanInfo.appendChild(superpowersDiv)
+                modalInfo.appendChild(superpowersDiv)
 
                 for (let superpower of basicInfoJson["superpowers"]) {
                     let singleSuperpower = document.createElement("img")
@@ -163,34 +163,34 @@
             let cliqueLine = document.createElement("div")
             cliqueLine.innerText = `Należy do kliki ${basicInfoJson["cliqueName"]}.`
             cliqueLine.setAttribute("class", "lineInGeneralInfo")
-            placeForHumanInfo.appendChild(cliqueLine)
+            modalInfo.appendChild(cliqueLine)
 
             let visitsLine = document.createElement("div")
             visitsLine.innerText = `Liczba wizyt: ${basicInfoJson["visitsCount"]}.`
             visitsLine.setAttribute("class", "lineInGeneralInfo")
-            placeForHumanInfo.appendChild(visitsLine)
+            modalInfo.appendChild(visitsLine)
 
             let meetingsLine = document.createElement("div")
             meetingsLine.innerText = `Liczba spotkań: ${basicInfoJson["meetingsCount"]}.`
             meetingsLine.setAttribute("class", "lineInGeneralInfo")
-            placeForHumanInfo.appendChild(meetingsLine)
+            modalInfo.appendChild(meetingsLine)
 
             let eventsLine = document.createElement("div")
             eventsLine.innerText = `Liczba wspónych wydarzeń: ${basicInfoJson["eventsCount"]}.`
             eventsLine.setAttribute("class", "lineInGeneralInfo")
-            placeForHumanInfo.appendChild(eventsLine)
+            modalInfo.appendChild(eventsLine)
 
             let quotesLine = document.createElement("div")
             quotesLine.setAttribute("class", "lineInGeneralInfo")
             basicInfoJson["gender"] == "M" ? quotesLine.innerText = `Autor ${basicInfoJson["quotesCount"]} publicznych cytatów.` : 
             quotesLine.innerHTML = `Autorka ${basicInfoJson["quotesCount"]} publicznych cytatów.`
-            placeForHumanInfo.appendChild(quotesLine)
+            modalInfo.appendChild(quotesLine)
 
             if (basicInfoJson["spouse_name"] != null) {
                 let spouseLine = document.createElement("div")
                 spouseLine.setAttribute("class", "lineInGeneralInfo")
                 basicInfoJson["gender"] == "M" ? spouseLine.innerText = `Jego żoną jest ${basicInfoJson["spouse_name"]}.` : spouseLine.innerText = `Jej mężem jest ${basicInfoJson["spouse_name"]}.`
-                placeForHumanInfo.appendChild(spouseLine)
+                modalInfo.appendChild(spouseLine)
             }
 
             
@@ -198,13 +198,13 @@
             let lastSeenDiv = document.createElement("div")
             lastSeenDiv.innerText = basicInfoJson["lastSeen"]
             lastSeenDiv.setAttribute("class", "lineInGeneralInfo")
-            placeForHumanInfo.appendChild(lastSeenDiv)
+            modalInfo.appendChild(lastSeenDiv)
 
 
             if (basicInfoJson["interactionPlacesCategories"].length > 0) {
                 let placeForTableDiv = document.createElement("div")
                 placeForTableDiv.setAttribute("id", "placeForTableDiv")
-                placeForHumanInfo.appendChild(placeForTableDiv)
+                modalInfo.appendChild(placeForTableDiv)
 
                 let placesCategoriesHeader = document.createElement("h3")
                 placesCategoriesHeader.innerText = "Gdzie się spotykacie poza tripami?"
@@ -239,11 +239,11 @@
             if (usualCompanionsJson.length > 0) {
                 let closeFriendsHeader = document.createElement("h3")
                 basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
-                placeForHumanInfo.appendChild(closeFriendsHeader)
+                modalInfo.appendChild(closeFriendsHeader)
 
                 let placeForInteractingPeople = document.createElement("div")
                 placeForInteractingPeople.id = "placeForInteractingPeople"
-                placeForHumanInfo.appendChild(placeForInteractingPeople)
+                modalInfo.appendChild(placeForInteractingPeople)
 
                 for (let human of usualCompanionsJson) {
                     createInteractingPersonObj(human.fullName, human.photoDir)
@@ -255,12 +255,12 @@
     async function showRelatiogram(humanId, fullName) {
         clearModalInfo()
 
-        const placeForHumanInfo = document.getElementById("placeForHumanInfo")
+        const modalInfo = document.getElementById("modalInfo")
 
 
         let nameHeader = document.createElement("h2")
         nameHeader.innerText = `${fullName} - relacjogram`
-        placeForHumanInfo.appendChild(nameHeader)
+        modalInfo.appendChild(nameHeader)
 
         const relationReq = await fetch(`http://localhost:3000/relatiogram?humanId=${humanId}`);
         const relationJson = await relationReq.json();
@@ -274,7 +274,7 @@
             plotDiv.style.marginLeft = '10%'
             plotDiv.style.marginRight = '10%'
             //plotDiv.style.height = '400px'
-            placeForHumanInfo.appendChild(plotDiv)
+            modalInfo.appendChild(plotDiv)
         } else {
             // Jeśli już istnieje, wyczyść go
             Plotly.purge(plotDiv)
@@ -284,14 +284,14 @@
     }
 
         function createInteractingPersonObj(humanName, photoDir) {
-            let placeForHumanInfo = document.getElementById("placeForInteractingPeople")
+            let modalInfo = document.getElementById("placeForInteractingPeople")
 
             let createdElement = document.createElement("img")
             createdElement.setAttribute("title", humanName)
             createdElement.setAttribute("src", photoDir)
             createdElement.setAttribute("class", "interactingPersonImage")
 
-            placeForHumanInfo.appendChild(createdElement)
+            modalInfo.appendChild(createdElement)
             
         }
 
@@ -299,17 +299,17 @@
             clearModalInfo()
             const quotesRequest = await fetch(`http://localhost:3000/get-human-quotes?humanId=${humanId}`)
             const quotesJson = await quotesRequest.json()
-            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let modalInfo = document.getElementById("modalInfo")
 
             let quotesHeader = document.createElement("h1")
             quotesHeader.innerText = "Cytaty"
-            placeForHumanInfo.appendChild(quotesHeader)
+            modalInfo.appendChild(quotesHeader)
 
             for (let quote of quotesJson) {
                 let quoteElement = document.createElement("div")
                 quoteElement.setAttribute("class", "quoteDivInModal")
                 quoteElement.innerHTML = `"${quote["quote"]}"`
-                placeForHumanInfo.appendChild(quoteElement)
+                modalInfo.appendChild(quoteElement)
             }
         }
         async function showMeetings(humanId) {
@@ -318,15 +318,15 @@
             const meetingsJson = await meetingsReq.json()
             
             
-            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let modalInfo = document.getElementById("modalInfo")
             let meetingsHeader = document.createElement("h1")
             meetingsHeader.innerText = "Spotkania"
-            placeForHumanInfo.appendChild(meetingsHeader)
+            modalInfo.appendChild(meetingsHeader)
 
             for (const meeting of meetingsJson) {
                 let newMeetingDiv = document.createElement("div")
                 newMeetingDiv.setAttribute("class", "meetingsDetailsDiv")
-                placeForHumanInfo.appendChild(newMeetingDiv)
+                modalInfo.appendChild(newMeetingDiv)
 
                 let meetingTitle = document.createElement("div")
                 meetingTitle.setAttribute("class", "meetingTitle")
@@ -357,15 +357,15 @@
             const visitsJson = await visitsRequest.json()
             
 
-            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let modalInfo = document.getElementById("modalInfo")
             let visitsHeader = document.createElement("h1")
             visitsHeader.innerText = "Wizyty"
-            placeForHumanInfo.appendChild(visitsHeader)
+            modalInfo.appendChild(visitsHeader)
 
             for (let visitDict of visitsJson) {
                 let singleVisitDiv = document.createElement("div")
                 singleVisitDiv.setAttribute("class", "visitDetailsDiv")
-                placeForHumanInfo.appendChild(singleVisitDiv)
+                modalInfo.appendChild(singleVisitDiv)
 
                 let dateDiv = document.createElement("div")
                 dateDiv.setAttribute("class", "interactionDateDiv")
@@ -389,11 +389,11 @@
             clearModalInfo()
             const eventsRequest = await fetch(`http://localhost:3000/get-human-events?humanId=${humanId}`)
             const eventsJson = await eventsRequest.json()
-            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let modalInfo = document.getElementById("modalInfo")
             
             let eventsTitle = document.createElement("h1")
             eventsTitle.innerText = "Wspólne wydarzenia"
-            placeForHumanInfo.appendChild(eventsTitle)
+            modalInfo.appendChild(eventsTitle)
             
 
             for (let calendarEvent of eventsJson) {
@@ -403,7 +403,7 @@
 
                 let eventElement = document.createElement("div")
                 eventElement.setAttribute("class", "eventDetailsDiv")
-                placeForHumanInfo.appendChild(eventElement)
+                modalInfo.appendChild(eventElement)
 
                 let eventTitleElement = document.createElement("div")
                 eventTitleElement.innerText = eventTitle
@@ -426,18 +426,18 @@
         
         async function showInteractionsMap(humanId, humanName) {
             clearModalInfo()
-            let placeForHumanInfo = document.getElementById("placeForHumanInfo")
+            let modalInfo = document.getElementById("modalInfo")
 
             let interactionsHeader = document.createElement("h2")
             interactionsHeader.innerText = `${humanName} - miejsca interakcji`
-            placeForHumanInfo.appendChild(interactionsHeader)
+            modalInfo.appendChild(interactionsHeader)
 
             let placesQuery = await fetch(`http://localhost:3000/places-data?humanId=${humanId}`)
             let placesData = await placesQuery.json()
             
             let mapContainer = document.createElement("div")
             mapContainer.id = "interactionsMapContainer"
-            placeForHumanInfo.appendChild(mapContainer)
+            modalInfo.appendChild(mapContainer)
             const map = L.map("interactionsMapContainer")
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: '&copy; OpenStreetMap contributors'
@@ -482,6 +482,12 @@
                         iconSize: [30, 30]
                     })
                 }
+                else if (place.category == "Browar") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/brewery.png',
+                        iconSize: [30, 30]
+                    })
+                }
                 else if (place.category == "Kościół rzymskokatolicki") {
                         icon = L.icon({
                         iconUrl: 'map_icons/church.png',
@@ -515,6 +521,12 @@
                 else if (place.category == "Cmentarz") {
                         icon = L.icon({
                         iconUrl: 'map_icons/cementery.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Wine bar") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/wine.png',
                         iconSize: [30, 30]
                     })
                 }
@@ -554,6 +566,30 @@
                         iconSize: [30, 30]
                     })
                 }
+                else if (place.category == "Ramenownia") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/ramen.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Kawiarnia") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/cafe.png',
+                        iconSize: [30, 30]
+                    })
+                }    
+                else if (place.category == "Teatr") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/theater.png',
+                        iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Szkoła tańca") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/dancing_school.png',
+                        iconSize: [30, 30]
+                    })
+                }                        
                 let marker = icon ? L.marker([place.lat, place.lng], { icon }).addTo(map) : L.marker([place.lat, place.lng]).addTo(map);
                 marker.bindPopup(`<b>${place.place_name}</b><br>${place.category}`)
                 markersGroup.push(marker)
@@ -570,7 +606,7 @@
             leftMenuElement.appendChild(createdElement)
         }
         function closeModal() {
-            document.getElementById("placeForHumanInfo").innerHTML = ""
+            document.getElementById("modalInfo").innerHTML = ""
             document.getElementById("leftModalMenu").innerHTML = ""
             let modalElement = document.getElementById("human_modal")
             modalElement.style.display = "none"

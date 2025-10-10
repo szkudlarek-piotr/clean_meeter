@@ -175,7 +175,7 @@ a {
     border: 1px solid black;
 
 }
-#placeForHumanInfo {
+#modalInfo {
     text-align: center;
     width: 75%;
     overflow-y: scroll;
