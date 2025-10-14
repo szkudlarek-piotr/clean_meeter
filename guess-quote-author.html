@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
         <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_forward" />
     </head>
     <body>
         <header>
@@ -51,8 +52,13 @@
                 </div>
                 <input type="hidden" id="quoteIdHolder"/>
                 <input type="hidden" id="predictedAuthorInput"/>
-                    
-                <button id="checkAuthorButton" ondblclick="checkQuoteAuthor()">Sprawdź!</button>
+
+
+                <div id="buttons_operations_div">  
+                    <button id="checkAuthorButton" ondblclick="checkQuoteAuthor()">Sprawdź!</button>
+                    <button id="skipQuoteButton" ondblclick="skipQuote()">Pomiń<span class="material-symbols-outlined">
+                    arrow_forward</span></button>
+                </div>  
 
                 <h2>Kto to powiedział?</h2>
                 <input type="text" id="quotesAuthorInput" placeholder="Wpisz fragment imienia lub nazwiska..." onkeyup="suggestQuoteAuthors()"/>
@@ -261,6 +267,28 @@
             const postReq = await fetch(`http://localhost:3000/add-guess-quote-instance?playerId=${playerId}&quoteId=${quoteId}&postulatedAuthorId=${postulatedAuthorId}`, {method: "POST"})
             const postJson = await postReq.json()
             console.log(postJson)
+        }
+        async function skipQuote() {
+            let oldAllGuessesCounter = parseInt(document.getElementById("allGuessesCounter").innerText, 10)
+            let newAllGuessesCounter = oldAllGuessesCounter + 1
+            document.getElementById("allGuessesCounter").innerText = newAllGuessesCounter
+            const quoteId = document.getElementById("quoteIdHolder").value
+            const predictedAuthorId = document.getElementById("predictedAuthorInput").value
+            addGuessInstance(quoteId, predictedAuthorId)
+            excludedQuotesArr.push(quoteId)
+            
+            const authorDataReq = await fetch(`http://localhost:3000/check-quote-author-data?quoteId=${quoteId}`)
+            const authorDataJson = await authorDataReq.json()
+            if (!(authorsSoFar.hasOwnProperty(authorDataJson.humanId))) {
+                authorsSoFar[authorDataJson.humanId] = 1
+            }
+            else {
+                authorsSoFar[authorDataJson.humanId] += 1
+            }
+            
+            getSingleQuote()
+            console.log(authorsSoFar)
+
         }
 
         getSingleQuote()
