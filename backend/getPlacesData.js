@@ -78,6 +78,5 @@ export default async function getPlacesData(humanId) {
         }
     }
     const returnedData = {"places": placesData, "countries": countriesList}
-    console.log(returnedData)
     return returnedData
 }
