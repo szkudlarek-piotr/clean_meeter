@@ -38,6 +38,7 @@ import getSuggestedPlaceCategories from './getPLaceCategories.js'
 import getQuoteForGuessingWithExcludedQuoteIds from './getQuoteForGuessingWithExcludedIds.js'
 import getQuoteAuthorData from './getQuoteAuthorData.js'
 import addQuoteGuessInstnce from './addGuessQuoteInstance.js'
+import getRandomDancingVideo from './getRandomDancingVideo.js'
 
 const app = express()
 app.use(cors())
@@ -255,6 +256,17 @@ app.get('/check-quote-author-data', async(req, res) => {
         res.send(error)
     }
 })
+
+app.get('/get-random-dancing-video', async(req, res) => {
+    try {
+        const randomVideo = await getRandomDancingVideo()
+        res.send(randomVideo)
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
 
 app.post('/add-event-human', async(req, res) => {
     try {
