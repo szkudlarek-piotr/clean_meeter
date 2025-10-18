@@ -31,6 +31,7 @@ import getRelatiogramData from './getRelatiogramData.js'
 import addEventCompanion from './addEventCompanion.js'
 import getBasicDayInfo from './getBasicDayInfo.js'
 import getPlacesData from './getPlacesData.js'
+import addDancingLessonVideoToDb from './addDancingLessonVideoToDb.js'
 import getVisitedPlaces from './getVisitedPlaces.js'
 import addPlace from './addPlace.js'
 import getSuggestedPlaceCategories from './getPLaceCategories.js'
@@ -332,6 +333,13 @@ app.post('/add-event', async(req, res) => {
     res.send(eventAddingResult)
 
 })
+
+app.post('/add-dancing-video', async (req, res) => {
+    const videoLink = req.query.link;
+    const addVideoReq = await addDancingLessonVideoToDb(videoLink);
+    res.send(addVideoReq);
+});
+
 
 app.get('/get-calendar', async(req, res) => {
     const yearNumber = req.query.year

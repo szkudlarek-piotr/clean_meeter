@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Real Meeter - baza danych interakcji społecznych</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            Baza danych spotkań
+        </header>
+        <div class="container">
+            <nav class="left-menu">
+            </nav>
+            <div id="main">
+                <form onsubmit="addVideo(event)">
+                    
+                    <h2 class="inputHeader">Wklej link</h2>
+                    <input type="text" id="videoLinkInput" placeholder="Wklej link z YT"/>
+
+                    <button type="submit">Dodaj film!</button>
+                </form>
+
+            </div>
+            <aside class="right-menu">
+                <!-- Right menu content goes here -->
+            </aside>
+        </div>
+        <footer id="footer">
+            Map icons by <a target="_blank" href="https://icons8.com/">icons8.com</a> <br>
+            Meeter project by Piotr Szkudlarek
+        </footer>
+    </body>
+    <script src="createLeftMenu.js" ></script>
+    <script>
+        createLeftMenu()
+        async function addVideo(event) {
+            debugger
+            event.preventDefault()
+            const videoLink = document.getElementById("videoLinkInput").value
+            if (videoLink.length < 10) {
+                alert("Wklejony przez Cibie link jest za krtóki, by być linkiem do filmiku na Youtube")
+            }
+            else {
+                const addLessonQuery = await fetch(`http://localhost:3000/add-dancing-video?link=${videoLink}`, {method: "POST"})
+                const addLessonJson = await addLessonQuery.json()
+                alert(JSON.stringify(addLessonJson, null, 2))
+                document.getElementById("videoLinkInput").value = ""
+
+            }
+            debugger
+        }
+    </script>
+</html>

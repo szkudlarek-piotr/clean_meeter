@@ -15,9 +15,9 @@ export default async function addDancingLessonVideoToDb(youtubeUrl) {
     try {
         await driver.get(youtubeUrl);
         let videoTitle = await driver.getTitle()
-        const splittedTitle = videoTitle.split("-")
-        const videoTitleInDb = splittedTitle[0]
-        const videoDatetime = splittedTitle[1].trim()
+        const splittedTitle = videoTitle.split("_")
+        const videoTitleInDb = splittedTitle[1].trim()
+        const videoDatetime = splittedTitle[0].trim()
         const videoYear = videoDatetime.substring(0, 4)
         const videoMonth = videoDatetime.substring(4, 6)
         const videoDay = videoDatetime.substring(6, 8)
@@ -25,7 +25,7 @@ export default async function addDancingLessonVideoToDb(youtubeUrl) {
         const findEventReqText = `    
         SELECT id 
         FROM events
-        WHERE DATE(dateStart) = ? AND nameOfEvent LIKE '%bachata%'
+        WHERE DATE(dateStart) = ?
         `
         const [findEventReq] = await pool.query(findEventReqText, [dateToCheck])
         if (findEventReq.length == 1) {
