@@ -92,6 +92,7 @@
         createLeftMenu()
         async function addEvent(event) {
             event.preventDefault()
+            console.log("zaczynam dodwać event")
             const eventName = document.getElementById("eventNameInput").value
             const startDate = document.getElementById("dateStartInput").value
             const stopDate = document.getElementById("dateStopInput").value
@@ -99,6 +100,10 @@
             const leavingDate = document.getElementById("meLeavingDateInput").value
             const eventPlace = document.getElementById("meetingPlaceInput").value
             const longDesc = document.getElementById("longDescInput").value
+            const hiddenPlaceIdInputValue = document.getElementById("hiddenPlaceIdInput").value
+            if (hiddenPlaceIdInputValue.length == 0) {
+                hiddenPlaceIdInputValue = ""
+            }
             if (document.querySelector(`input[name="photoSource"]:checked`).value == "link") {
                 if (document.getElementById("hiddenPhotoNameInput").value.length > 0) {
                     let eventPhotoName = document.getElementById("hiddenPhotoNameInput").value
@@ -116,7 +121,8 @@
                             mode: "link",
                             name: eventPhotoName,
                             link: photoLink
-                        }
+                        },
+                        placeId: hiddenPlaceIdInputValue
                     }))
                     const sendReq = await fetch(`http://localhost:3000/add-event`, {method: "POST", 
                     headers: {
@@ -134,9 +140,11 @@
                             mode: "link",
                             name: eventPhotoName,
                             link: photoLink
-                        }
+                        },
+                        placeId: hiddenPlaceIdInputValue
                     })})
                 const addEventJson = await sendReq.json()
+                console.log(sendReq)
                 console.log(addEventJson)
                 await addHumansToEvent(addEventJson.insertId)
                 }
@@ -158,10 +166,11 @@
                         photoAddingInfo: {
                             mode: "database",
                             name: phonoName
-                        }
+                        },
+                        placeId: hiddenPlaceIdInputValue
                     })})
                 let addEventResponse = await sendReq.json()
-                console.log(addEventResponse)
+                //console.log(addEventResponse)
                 await addHumansToEvent(addEventResponse.insertId)
             }
         }

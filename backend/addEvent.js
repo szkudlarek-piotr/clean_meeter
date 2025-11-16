@@ -13,18 +13,38 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 
-export default async function addCalendarEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo) {
+export default async function addCalendarEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo, placeId) {
     const eventPhotosDir = path.join(__dirname, "events")
-    const addEventText = "INSERT INTO `events` (`id`, `nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?);"
+
     if (photoAddingInfo.mode == "link") {
         if (photoAddingInfo.name.length > 1) {
             const addedPhotoName = await downloadPhotoFromLink(photoAddingInfo.link, eventPhotosDir, photoAddingInfo.name)
-            const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, addedPhotoName, longDesc])
+            if (placeId.length == 0) {
+                let addEventText = "INSERT INTO `events` (`id`, `nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?);"
+                const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, addedPhotoName, longDesc])
+                console.log(addEventReq)   
+            }
+            else {
+                let addEventText = "INSERT INTO `events` (`id`, `nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`, `place_id`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+                try {
+                    const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, addedPhotoName, longDesc, placeId])
+                    console.log(addEventReq)      
+                }
+                catch (error) {
+                    console.log(error)
+                    addEventText = "INSERT INTO `events` (`id`, `nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?);"
+                    const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, addedPhotoName, longDesc])
+                    console.log(addEventReq)   
+                }
+          
+            }
+
             return addEventReq
         }
         else {
             console.log("Będę dodawał z linka bez nazwy zdjęcia!")
             const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, "", longDesc])
+            console.log(addEventReq)   
             const addedEventId = addEventReq.insertId
             const addedPhotoName = await downloadPhotoFromLink(photoAddingInfo.link, eventPhotosDir, addedEventId)
         }
@@ -32,8 +52,18 @@ export default async function addCalendarEvent(eventName, dateStart, dateStop, c
     }
     if (photoAddingInfo.mode == "database") {
         try {
-            const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, photoAddingInfo.name, longDesc])
-            return addEventReq
+            if (placeId.length == 0) {
+                let addEventText = "INSERT INTO `events` (`nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);"
+                const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, photoAddingInfo.name, longDesc])
+                console.log(addEventReq)   
+                return addEventReq
+            }
+            else {
+                let addEventText = "INSERT INTO `events` (`nameOfEvent`, `dateStart`, `dateStop`, `meComingDate`, `meLeavingDate`, `place`, `Generic_photo`, `description`, `place_id`) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+                const [addEventReq] = await pool.query(addEventText, [eventName, dateStart, dateStop, comingDate, leavingDate, placeName, photoAddingInfo.name, longDesc, placeId])
+                console.log(addEventReq)   
+                return addEventReq
+            }
         }
         catch (error) {
             return error

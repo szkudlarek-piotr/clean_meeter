@@ -339,9 +339,11 @@ app.post('/add-meeting', async(req, res) => {
 })
 
 app.post('/add-event', async(req, res) => {
-    const { eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo } = req.body
+    const { eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo, placeId } = req.body
     const stringifiedJson = JSON.stringify(req.body)
-    const eventAddingResult = await addCalendarEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo)
+    console.log(stringifiedJson)
+    const eventAddingResult = await addCalendarEvent(eventName, dateStart, dateStop, comingDate, leavingDate, placeName, longDesc, photoAddingInfo, placeId)
+    console.log(eventAddingResult)
     res.send(eventAddingResult)
 
 })
