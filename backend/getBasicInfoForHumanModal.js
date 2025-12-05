@@ -314,7 +314,5 @@ WITH rankedVisits AS (
         catch (error) {
             console.log(`Nie udalo się pobrać supermocy dla osoby o ID ${humanId}.`)
         }
-
         return returnedDict
 }
-//getBasicInfoForModal(41)
