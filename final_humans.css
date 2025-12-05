@@ -319,3 +319,8 @@ tr:last-child td {
     height: 50px;
     margin: 10px;
 }
+.map-icon {
+  filter: drop-shadow(0 0 0 black)
+          drop-shadow(0 0 2px black)
+          drop-shadow(0 0 4px black);
+}
