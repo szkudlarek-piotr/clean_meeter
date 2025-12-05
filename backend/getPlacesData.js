@@ -9,7 +9,9 @@ const pool = mysql.createPool({
 }).promise()
 
 export default async function getPlacesData(humanId) {
-    const queryText = `SELECT places.place_name, places.category, places.latitude AS lat, places.longitude AS lng, COUNT(places.id) as place_count
+    const queryText = `
+SELECT * FROM (
+    SELECT places.place_name, places.category, places.latitude AS lat, places.longitude AS lng, COUNT(places.id) as place_count
     FROM visits
     JOIN places ON visits.place_id = places.id
     WHERE visits.visit_id IN (SELECT visit_guest.visit_id FROM visit_guest WHERE visit_guest.guest_id = ?)
@@ -66,9 +68,21 @@ export default async function getPlacesData(humanId) {
         FROM party_people
         LEFT JOIN cliques_names ON party_people.klika_id = cliques_names.id
         WHERE party_people.ID = ?
-    );`
+        AND cliques_names.clique_capital IS NOT NULL
+    ) AND places.latitude IS NOT NULL
+    UNION
+    SELECT places.place_name, "Dream direction" AS category, places.latitude AS lat, places.longitude AS lng, COUNT(places.id) as place_count
+    FROM places
+    WHERE places.id IN (SELECT place_id FROM wants_to_visit WHERE human_id = ?)
+    GROUP BY places.id
+    )  AS all_places
+    WHERE place_name IS NOT NULL
+    AND category IS NOT NULL
+    AND lat IS NOT NULL
+    AND lng IS NOT NULL;
+    `
     let countriesArray = []
-    const [placesData] = await pool.query(queryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId])
+    const [placesData] = await pool.query(queryText, [humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId, humanId])
     let countriesList = []
     for (let place of placesData) {
         let countryName = getCountryName(place.lat, place.lng)
