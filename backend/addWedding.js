@@ -7,15 +7,18 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 
-export default async function addWedding(date, groomId, brideId, infoAfterHover, partnerId, weddingPlace, partyPlace, hotelName, description, was_i_invited) {
+export default async function addWedding(date, groomId, brideId, infoAfterHover, partnerId,  description, was_i_invited) {
+    let addWeddingReq
     if (partnerId != "null") {
-        const addWeddingText = "INSERT INTO `weddings` (`id`, `date`, `man_id`, `woman_id`, `info_after_hover`, `partner_id`, `wedding_place_name`, `party_place_text`, `hotel_name`, `description`, `was_i_invited`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-        const [addWeddingReq] = await pool.query(addWeddingText, [date, groomId, brideId, infoAfterHover, partnerId, weddingPlace, partyPlace, hotelName, description, was_i_invited])
+        const addWeddingText = "INSERT INTO `weddings` (`id`, `date`, `man_id`, `woman_id`, `info_after_hover`, `partner_id`, `description`, `was_i_invited`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?);"
+        const [addWeddingReq] = await pool.query(addWeddingText, [date, groomId, brideId, infoAfterHover, partnerId, description, was_i_invited])
+        return addWeddingReq
     }
     else {
-        const addWeddingText = "INSERT INTO `weddings` (`id`, `date`, `man_id`, `woman_id`, `info_after_hover`, `wedding_place_name`, `party_place_text`, `hotel_name`, `description`, `was_i_invited`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-        const [addWeddingReq] = await pool.query(addWeddingText, [date, groomId, brideId, infoAfterHover,  weddingPlace, partyPlace, hotelName, description, was_i_invited])
+        const addWeddingText = "INSERT INTO `weddings` (`id`, `date`, `man_id`, `woman_id`, `info_after_hover`, `description`, `was_i_invited`) VALUES (NULL, ?, ?, ?, ?, ?, ?);"
+        const [addWeddingReq] = await pool.query(addWeddingText, [date, groomId, brideId, infoAfterHover, description, was_i_invited])
+        return addWeddingReq
     }
 
-    return addWeddingReq
+
 }
