@@ -122,7 +122,10 @@
                 basicInfoJson["eventsCount"] > 0 && createModalButton(modalButtonsDict["events"]["text"], modalButtonsDict["events"]["functionName"]);
                 basicInfoJson["quotesCount"] > 0 && createModalButton(modalButtonsDict["quotes"]["text"], modalButtonsDict["quotes"]["functionName"]);
                 createModalButton(modalButtonsDict["relatiogram"]["text"], modalButtonsDict["relatiogram"]["functionName"])
-                basicInfoJson["interactionPlacesNumber"] > 0 && createModalButton(modalButtonsDict["map"]["text"], modalButtonsDict["map"]["functionName"])
+                
+                if (Number(basicInfoJson["interactionPlacesNumber"]) > 0 || Number(humanId) === 77) {
+                    createModalButton(modalButtonsDict["map"]["text"], modalButtonsDict["map"]["functionName"]);
+                }
             }
             showGeneralInfo(humanId)
         }
@@ -474,6 +477,13 @@
                         icon = L.icon({
                         iconUrl: 'map_icons/apartment.png',
                         iconSize: [30, 30]
+                    })
+                }
+                else if (place.category == "Dream direction") {
+                        icon = L.icon({
+                        iconUrl: 'map_icons/unicorn.png',
+                        iconSize: [30, 30],
+                        className: 'map-icon'
                     })
                 }
                 else if (place.category == "Dom") {
