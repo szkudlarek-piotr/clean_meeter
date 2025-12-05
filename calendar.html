@@ -22,9 +22,9 @@
                 </div>
                 <div id="restOfModal">
                     <div id="leftModalMenu">
-                        <h2>Menu</h2>
+
                     </div>
-                    <div id="placeForDayInfo">
+                    <div id="modalInfo">
 
                     </div>
                 </div>
@@ -43,7 +43,142 @@
     </body>
     <script src="createLeftMenu.js" ></script>
     <script>
+        function createInteractingPersonObj(humanName, photoDir) {
+            let modalInfo = document.getElementById("placeForInteractingPeople")
 
+            let createdElement = document.createElement("img")
+            createdElement.setAttribute("title", humanName)
+            createdElement.setAttribute("src", photoDir)
+            createdElement.setAttribute("class", "interactingPersonImage")
+
+            modalInfo.appendChild(createdElement)            
+        }
+
+        function clearModalInfo() {
+            document.getElementById("modalInfo").innerHTML = ""
+        }
+        async function showGeneralInfo(humanId) {
+            clearModalInfo()
+            const basicHumanInfoReq = await fetch(`http://localhost:3000/basic-info-for-human-modal?humanId=${humanId}`)
+            const basicInfoJson = await basicHumanInfoReq.json()
+            let modalInfo = document.getElementById("modalInfo")
+
+            let humanPhotoElement = document.createElement("img")
+            humanPhotoElement.setAttribute("src", basicInfoJson["photoDir"])
+            humanPhotoElement.setAttribute("class", "humanPhotoInModal")
+            modalInfo.appendChild(humanPhotoElement)
+
+            let humanNameElement = document.createElement("div")
+            humanNameElement.innerText = basicInfoJson["fullName"]
+            humanNameElement.setAttribute("class", "nameInGeneralInfo")
+            modalInfo.appendChild(humanNameElement)
+
+            if (basicInfoJson["superpowers"] && basicInfoJson["superpowers"].length > 0) {
+                let superpowersDiv = document.createElement("div")
+                superpowersDiv.id = "superpowersDiv"
+                modalInfo.appendChild(superpowersDiv)
+
+                for (let superpower of basicInfoJson["superpowers"]) {
+                    let singleSuperpower = document.createElement("img")
+                    singleSuperpower.className = "singleSuperpower"
+                    singleSuperpower.setAttribute("src", superpower.photo)
+                    singleSuperpower.setAttribute("title", superpower.name)
+                    superpowersDiv.appendChild(singleSuperpower)
+                }
+            }
+
+
+            let cliqueLine = document.createElement("div")
+            cliqueLine.innerText = `Należy do kliki ${basicInfoJson["cliqueName"]}.`
+            cliqueLine.setAttribute("class", "lineInGeneralInfo")
+            modalInfo.appendChild(cliqueLine)
+
+            let visitsLine = document.createElement("div")
+            visitsLine.innerText = `Liczba wizyt: ${basicInfoJson["visitsCount"]}.`
+            visitsLine.setAttribute("class", "lineInGeneralInfo")
+            modalInfo.appendChild(visitsLine)
+
+            let meetingsLine = document.createElement("div")
+            meetingsLine.innerText = `Liczba spotkań: ${basicInfoJson["meetingsCount"]}.`
+            meetingsLine.setAttribute("class", "lineInGeneralInfo")
+            modalInfo.appendChild(meetingsLine)
+
+            let eventsLine = document.createElement("div")
+            eventsLine.innerText = `Liczba wspónych wydarzeń: ${basicInfoJson["eventsCount"]}.`
+            eventsLine.setAttribute("class", "lineInGeneralInfo")
+            modalInfo.appendChild(eventsLine)
+
+            let quotesLine = document.createElement("div")
+            quotesLine.setAttribute("class", "lineInGeneralInfo")
+            basicInfoJson["gender"] == "M" ? quotesLine.innerText = `Autor ${basicInfoJson["quotesCount"]} publicznych cytatów.` : 
+            quotesLine.innerHTML = `Autorka ${basicInfoJson["quotesCount"]} publicznych cytatów.`
+            modalInfo.appendChild(quotesLine)
+
+            if (basicInfoJson["spouse_name"] != null) {
+                let spouseLine = document.createElement("div")
+                spouseLine.setAttribute("class", "lineInGeneralInfo")
+                basicInfoJson["gender"] == "M" ? spouseLine.innerText = `Jego żoną jest ${basicInfoJson["spouse_name"]}.` : spouseLine.innerText = `Jej mężem jest ${basicInfoJson["spouse_name"]}.`
+                modalInfo.appendChild(spouseLine)
+            }
+
+            
+
+            let lastSeenDiv = document.createElement("div")
+            lastSeenDiv.innerText = basicInfoJson["lastSeen"]
+            lastSeenDiv.setAttribute("class", "lineInGeneralInfo")
+            modalInfo.appendChild(lastSeenDiv)
+
+
+            if (basicInfoJson["interactionPlacesCategories"].length > 0) {
+                let placeForTableDiv = document.createElement("div")
+                placeForTableDiv.setAttribute("id", "placeForTableDiv")
+                modalInfo.appendChild(placeForTableDiv)
+
+                let placesCategoriesHeader = document.createElement("h3")
+                placesCategoriesHeader.innerText = "Gdzie się spotykacie poza tripami?"
+                placeForTableDiv.appendChild(placesCategoriesHeader)
+
+                let interactionPlacesTable = document.createElement("table")
+                interactionPlacesTable.innerHTML = `
+                <tr> 
+                    <th>Kategoria miejsca</th> 
+                    <th> Liczba interakcji</th>
+                </tr>
+                `
+                const placesInfo = basicInfoJson["interactionPlacesCategories"]
+                for (let category of placesInfo) {
+                    let row = interactionPlacesTable.insertRow(-1)
+                    let categoryCell = row.insertCell(0)
+                    categoryCell.innerHTML = category["category"]
+                    let countCell = row.insertCell(1)
+                    countCell.innerHTML = category["category_count"]
+                }
+                placeForTableDiv.appendChild(interactionPlacesTable)
+
+            }
+
+            
+
+
+
+            const usualCompanionsReq = await fetch(`http://localhost:3000/get-often-seen-with?humanId=${humanId}`)
+            const usualCompanionsJson = await usualCompanionsReq.json()
+
+            if (usualCompanionsJson.length > 0) {
+                let closeFriendsHeader = document.createElement("h3")
+                basicInfoJson["gender"] == "M" ? closeFriendsHeader.innerText = "Widywany z:" : closeFriendsHeader.innerText = "Widywana z:"
+                modalInfo.appendChild(closeFriendsHeader)
+
+                let placeForInteractingPeople = document.createElement("div")
+                placeForInteractingPeople.id = "placeForInteractingPeople"
+                modalInfo.appendChild(placeForInteractingPeople)
+
+                for (let human of usualCompanionsJson) {
+                    createInteractingPersonObj(human.fullName, human.photoDir)
+                }
+            }
+
+        }
         function makeCalendar(year) {
             const startDay = new Date(`${year}-01-01`)
             const lastDay = new Date(`${year}-12-31`)
@@ -90,15 +225,36 @@
         }
         async function showDayModal(date) {
             let dateAsDate = new Date(date)
-            console.log(dateAsDate.toDateString())
             let modalElement = document.getElementById("day_modal")
             modalElement.style.display = "block"
             const dateString = `${dateAsDate.getFullYear()}-${dateAsDate.getMonth() + 1}-${dateAsDate.getDate()}`
             const dayReq = await fetch(`http://localhost:3000/basic-day-info?dateString=${dateString}`)
             let dayJson = await dayReq.json()
             console.log(dayJson)
+            let leftModalMenu = document.getElementById("leftModalMenu")
+            let dayDescButton = document.createElement("div")
+            dayDescButton.id = "dayDescButton"
+            dayDescButton.innerText = "Opis dnia"
+            leftModalMenu.appendChild(dayDescButton)
+            for (let record of dayJson) {
+                if (!leftModalMenu.innerText.includes(record.humanName)) {
+                    let humanButton = document.createElement("div")
+                    humanButton.innerText = record["humanName"]
+                    humanButton.setAttribute("class", "left_modal_option")
+                    humanButton.setAttribute("onclick", `showGeneralInfo(${record.humanId})`)
+                    leftModalMenu.appendChild(humanButton)
+                }
+            }
+            printInteractionsInfoFromDayJson(dayJson)
         }
-
+        function printInteractionsInfoFromDayJson(dayJson) {
+            let interactionsDict = {}
+            for (let interaction of dayJson) {
+                if (!(interaction.title in interactionsDict)) {
+                    interactionsDict[interaction.title] = {"long_desc": interaction.long_desc, "humans": [{"name": interaction.name}]}
+                }
+            }
+        }
         function createSlider(modifiedDivId, array_of_photos, divColor) {
             let modifiedDiv = document.getElementById(modifiedDivId)
             let sliderDiv = document.createElement("div")
@@ -133,7 +289,7 @@
                 let modifiedDiv = document.getElementById(dateId)
                 modifiedDiv.innerHTML = ""
                 if (activity["interactionClass"].includes("trip")) {
-                    createSlider(dateId, activity["photos"], "olive")
+                    createSlider(dateId, activity["photos"], "#f5f527")
                 }
                 else if (activity["interactionClass"] == "visit") {
                     createSlider(dateId, activity["photos"], "red")
@@ -154,7 +310,7 @@
                     createSlider(dateId, activity["photos"], "#00cccc")
                 }
                 else if (activity["interactionClass"].includes("trip")) {
-                    createSlider(dateId, activity["photos"], "#c5c564")
+                    createSlider(dateId, activity["photos"], "#f5f527")
                 }
                 else if (activity["interactionClass"] == "wedding") {
                     modifiedDiv.setAttribute("style", "background-color: #ff72fb")
@@ -210,8 +366,10 @@
 
         }
         function closeModal() {
-            let dayInfoElement = document.getElementById("placeForDayInfo")
+            let dayInfoElement = document.getElementById("modalInfo")
             let modalElement = document.getElementById("day_modal")
+            let leftModalMenu = document.getElementById("leftModalMenu")
+            leftModalMenu.innerHTML = ""
             dayInfoElement.innerHTML = ""
             modalElement.style.display = "none"
         }
