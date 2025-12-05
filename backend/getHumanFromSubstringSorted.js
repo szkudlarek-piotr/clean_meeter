@@ -8,7 +8,6 @@ const pool = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 }).promise()
 export default async function getHumanFromSubstringSorted(deliveredSubstring, mode){
-    console.log(deliveredSubstring, mode)
     let returnedArr = []
     let queryString
     switch (mode) {
