@@ -11,13 +11,17 @@ export default async function addQuoteGuessInstnce(quoteId, playerId, postulated
     const [quoteIdReq] = await pool.query(quoteIdReqString, [quoteId]);
 
     let insertReq;
-    let addGuessInstanceReq; // ← tutaj deklaracja
+    let addGuessInstanceReq;
 
     if (quoteIdReq.length > 0) {
         const realAuthorId = quoteIdReq[0]["human_id"];
         console.log(playerId)
+        if (postulatedAuthorId === "" || postulatedAuthorId === undefined) {
+            postulatedAuthorId = null;
+        }
         if (playerId) {
             console.log(`powinienem wstawić z numerki ${playerId}`)
+
             addGuessInstanceReq = `INSERT INTO quote_guesses (id, quote_id, player_id, postulated_author_id, author_id)
                                    VALUES (NULL, ?, ?, ?, ?);`;
             [insertReq] = await pool.query(addGuessInstanceReq, [quoteId, playerId, postulatedAuthorId, realAuthorId]);
