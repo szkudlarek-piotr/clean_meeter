@@ -63,3 +63,27 @@ JOIN places ON places.id = trip_place.place_id
 GROUP BY citybreaks.ID
 ORDER BY avg_km_from_warsaw DESC;
 
+
+DELIMITER //
+DROP FUNCTION IF EXISTS  get_distance_by_ids//
+CREATE FUNCTION get_distance_by_ids(p_id1 INT, p_id2 INT)
+RETURNS DOUBLE
+DETERMINISTIC
+BEGIN
+	DECLARE lat1 DOUBLE;
+	DECLARE lon1 DOUBLE;    
+	DECLARE lat2 DOUBLE;
+	DECLARE lon2 DOUBLE;
+    
+    SELECT latitude, longitude INTO lat1, lon1 FROM places WHERE places.id = p_id1;
+    
+    SELECT latitude, longitude INTO lat2, lon2 FROM places WHERE places.id = p_id2;
+    
+    IF lat1 IS NULL OR lat2 IS NULL or lon1 IS NULL or lon2 IS NULL THEN
+    	RETURN NULL;
+    END IF;
+    
+    RETURN ROUND(get_places_distance(lat1, lon1, lat2, lon2), 1);
+END//
+DELIMITER ;
+
