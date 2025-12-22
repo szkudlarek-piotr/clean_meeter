@@ -317,7 +317,7 @@
         }
         async function showMeetings(humanId) {
             clearModalInfo()
-            const meetingsReq = await fetch(`http://localhost:3000/get-human-meetings?humanId=${humanId}`)
+            const meetingsReq = await fetch(`http://localhost:3000/get-human-meetings?humanId=${humanId}&years=5`)
             const meetingsJson = await meetingsReq.json()
             
             
@@ -356,7 +356,7 @@
         }
         async function showVisits(humanId) {
             clearModalInfo()
-            const visitsRequest = await fetch(`http://localhost:3000/get-human-visits?humanId=${humanId}`)
+            const visitsRequest = await fetch(`http://localhost:3000/get-human-visits?humanId=${humanId}&years=5`)
             const visitsJson = await visitsRequest.json()
             
 

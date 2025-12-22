@@ -15,7 +15,8 @@ function addDays(date, numberOfDays) {
     return result;
   }
 
-export default async function getHumanVisits(humanId) {
+export default async function getHumanVisits(humanId, years) {
+    const numberOfDays = years * 365
     const visitsReqText = `
     SELECT visit_id, visit_date as date, visit_duration as duration, short_description AS title, description AS long_description
     FROM visits
@@ -24,10 +25,11 @@ export default async function getHumanVisits(humanId) {
         FROM visit_guest
         WHERE guest_id = ?
     )
+    AND visits.visit_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
     ORDER BY visits.visit_date DESC
     `
     const monthsDict = {0: "stycznia", 1: "lutego", 2: "marca", 3: "kwietnia", 4: "maja", 5: "czerwca", 6: "lipca", 7: "sierpnia", 8: "września", 9: "października", 10: "listopada", 11: "grudnia"}
-    const [visitsData] = await pool.query(visitsReqText, [humanId])
+    const [visitsData] = await pool.query(visitsReqText, [humanId, numberOfDays])
     let visitsList = []
     for (let visit of visitsData) {
         let newVisit = {}
@@ -47,6 +49,5 @@ export default async function getHumanVisits(humanId) {
         }
         visitsList.push(newVisit)
     }
-
     return visitsList
 }

@@ -149,7 +149,8 @@ app.get('/get-human-quotes', async(req, res) => {
 app.get('/get-human-meetings', async(req, res) => {
     try {
         const humanId = req.query.humanId
-        const humanMeetingsList = await getHumanMeetings(humanId)
+        const years = req.query.years
+        const humanMeetingsList = await getHumanMeetings(humanId, years)
         res.send(humanMeetingsList)
     }
     catch (error) {
@@ -160,7 +161,8 @@ app.get('/get-human-meetings', async(req, res) => {
 app.get('/get-human-visits', async(req, res) => {
     try {
         const humanId = req.query.humanId
-        const humanVisitsData = await getHumanVisits(humanId)
+        const years = req.query.years
+        const humanVisitsData = await getHumanVisits(humanId, years)
         res.send(humanVisitsData)
     }
     catch (error) {
